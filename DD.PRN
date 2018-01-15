@@ -1,0 +1,22 @@
+http://api-new.healthline.com:8080/core/article/content?partnerId=31a86f67-b1b6-4fd7-8b98-8caeee8d3078&url=/health-news/obamacare-what-to-expect-in-2017
+
+
+Hello Emma,
+
+I downloaded csv file from http://vmj-hlcms01-prod.healthline.com/report_news_as_of_today .
+It has only three fields Path,Title,All terms. As per instruction document https://docs.google.com/document/d/1LFb06h2XNA6dPYrQUR-cD6kiUnqjEgRboStV5kfJG10/edit
+Canonical, Title, Publish Date, Author, Landscape Image, Summary, Category filed should be there in downloaded file. 
+
+We assume that we will be provided the CSV with all above fields except body field. We have to extract the body field using http://jsonpath.com/? by following instructions and copy it to 
+https://docs.google.com/spreadsheets/d/10PtXogKtbgOmsr4_gCMCyoHaiw9sshHUjRVSh8jMWd8/edit#gid=0
+
+Considering minimum 30 articles per day, our estimate is 4-5 hours daily. 
+
+Thanks,
+
+
+$.metadata.canonical
+$.metadata.title
+$.ga.publishedDate
+$.ga.author
+$.data.largeImage.path

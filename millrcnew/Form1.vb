@@ -1,0 +1,248 @@
+﻿Public Class MainMDIForm
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.MaximumSize = New Size(My.Computer.Screen.WorkingArea.Size.Width,
+                                      My.Computer.Screen.WorkingArea.Size.Height)
+        Me.WindowState = FormWindowState.Maximized
+        PictureBox4.Width = Me.Width
+        PictureBox4.Top = 0
+        PictureBox4.Left = 0
+        Label1.Width = Me.Width
+        MainMenuStrip.Width = Me.Width
+        MainMenuStrip.Top = Label1.Height + 1
+        PictureBox1.Left = 0
+        PictureBox2.Left = Me.Width - 50
+        PictureBox2.Top = 10
+        PictureBox3.Left = Me.Width - 100
+        PictureBox3.Top = 10
+        '  PictureBox4.Dock = DockStyle.Top
+        MainMenuStrip.Left = 0
+        If muser.Equals("super") Then
+            RentToolStripMenuItem.Enabled = False
+            GodownCloseToolStripMenuItem.Enabled = False
+            BillToolStripMenuItem.Enabled = False
+        End If
+
+    End Sub
+
+    Private Sub GroupToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GroupToolStripMenuItem.Click
+
+
+        If Application.OpenForms().OfType(Of FrmGodownType).Any Then
+            FrmGodownType.BringToFront()
+        Else
+            FrmGodownType.Show()
+        End If
+    End Sub
+
+    Private Sub TenantToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles TenantToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmTenant).Any Then
+            FrmTenant.BringToFront()
+        Else
+            FrmTenant.Show()
+        End If
+    End Sub
+
+    Private Sub BillToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BillToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmInvoice).Any Then
+            FrmInvoice.BringToFront()
+        Else
+            FrmInvoice.Show()
+        End If
+    End Sub
+
+    Private Sub MenuStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles MenuStrip1.ItemClicked
+
+    End Sub
+
+    Private Sub PictureBox2_Click(sender As Object, e As EventArgs) Handles PictureBox2.Click
+
+        Me.Close()
+        FrmLogin.Close()
+    End Sub
+
+    Private Sub PictureBox3_Click(sender As Object, e As EventArgs) Handles PictureBox3.Click
+        Me.WindowState = FormWindowState.Minimized
+    End Sub
+
+    Private Sub GodownToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GodownToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmGodown).Any Then
+            FrmGodown.BringToFront()
+        Else
+            FrmGodown.Show()
+        End If
+    End Sub
+
+    Private Sub InvoicePrintingToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles InvoicePrintingToolStripMenuItem.Click
+
+    End Sub
+
+    Private Sub ToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem1.Click
+        If Application.OpenForms().OfType(Of FrmInvSingle).Any Then
+            FrmInvSingle.BringToFront()
+        Else
+            FrmInvSingle.Show()
+        End If
+    End Sub
+
+    Private Sub ToolStripMenuItem2_Click_1(sender As Object, e As EventArgs) Handles ToolStripMenuItem2.Click
+
+    End Sub
+
+    Private Sub ToolStripMenuItem3_Click(sender As Object, e As EventArgs)
+
+    End Sub
+
+    Private Sub RentToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RentToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmGodownTransfer).Any Then
+            FrmGodownTransfer.BringToFront()
+        Else
+            FrmGodownTransfer.Show()
+        End If
+    End Sub
+
+    Private Sub Format1ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles Format1ToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmInvSummary).Any Then
+            FrmInvSummary.BringToFront()
+        Else
+            FrmInvSummary.Show()
+        End If
+    End Sub
+
+    Private Sub Format2ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles Format2ToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of Form11).Any Then
+            Form11.BringToFront()
+        Else
+            Form11.Show()
+        End If
+    End Sub
+
+    Private Sub ReceiptToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReceiptToolStripMenuItem.Click
+
+        If Application.OpenForms().OfType(Of FormReceipt).Any Then
+            FormReceipt.BringToFront()
+        Else
+            FormReceipt.Show()
+        End If
+    End Sub
+
+    Private Sub ToolStripMenuItem3_Click_1(sender As Object, e As EventArgs) Handles ToolStripMenuItem3.Click
+        If Application.OpenForms().OfType(Of FrmInvoiceSummary).Any Then
+            FrmInvoiceSummary.BringToFront()
+        Else
+            FrmInvoiceSummary.Show()
+        End If
+    End Sub
+
+    Private Sub GodownCloseToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GodownCloseToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmGodownClose).Any Then
+            FrmGodownClose.BringToFront()
+        Else
+            FrmGodownClose.Show()
+        End If
+    End Sub
+
+    Private Sub ReceiptPrintingToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReceiptPrintingToolStripMenuItem.Click
+
+    End Sub
+
+    Private Sub GSTSpreadsheetsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GSTSpreadsheetsToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of Form16).Any Then
+            Form16.BringToFront()
+        Else
+            Form16.Show()
+        End If
+    End Sub
+
+    Private Sub OutstandingReportToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles OutstandingReportToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmRecChecklist).Any Then
+            FrmRecChecklist.BringToFront()
+        Else
+            FrmRecChecklist.Show()
+        End If
+    End Sub
+
+    Private Sub ToolStripComboBox1_Click(sender As Object, e As EventArgs)
+
+    End Sub
+
+    Private Sub TenantMasterListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles TenantMasterListToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmRecChecklist).Any Then
+            FrmTenantList.BringToFront()
+        Else
+            FrmTenantList.Show()
+        End If
+    End Sub
+
+    Private Sub MonthlyInvoicePrintingToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MonthlyInvoicePrintingToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmInvoicePrn).Any Then
+            FrmInvoicePrn.BringToFront()
+        Else
+            FrmInvoicePrn.Show()
+        End If
+    End Sub
+
+    Private Sub GodownwiseInvoicePrintingToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GodownwiseInvoicePrintingToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmInvoicePrnGdnwise).Any Then
+            FrmInvoicePrnGodown.BringToFront()
+        Else
+            FrmInvoicePrnGodown.Show()
+        End If
+    End Sub
+
+    Private Sub MonthlyReceiptPrintingToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MonthlyReceiptPrintingToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmRecPrn).Any Then
+            FrmRecPrn.BringToFront()
+        Else
+            FrmRecPrn.Show()
+        End If
+    End Sub
+
+    Private Sub ReceiptPrintingForGodownToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReceiptPrintingForGodownToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmRecPrnGdnwise).Any Then
+            FrmRecPrnGdnwise.BringToFront()
+        Else
+            FrmRecPrnGdnwise.Show()
+        End If
+    End Sub
+
+    Private Sub TenantsDetailToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles TenantsDetailToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmPartyDetail).Any Then
+            FrmPartyDetail.BringToFront()
+        Else
+            FrmPartyDetail.Show()
+        End If
+    End Sub
+
+    Private Sub GodownMasterListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GodownMasterListToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmGodownList).Any Then
+            FrmGodownList.BringToFront()
+        Else
+            FrmGodownList.Show()
+        End If
+    End Sub
+
+    Private Sub TransfterOfGodownListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles TransfterOfGodownListToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmGdTrans).Any Then
+            FrmGdTrans.BringToFront()
+        Else
+            FrmGdTrans.Show()
+        End If
+    End Sub
+
+    Private Sub GodownCloseListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GodownCloseListToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmGdClose).Any Then
+            FrmGdClose.BringToFront()
+        Else
+            FrmGdClose.Show()
+        End If
+    End Sub
+
+    Private Sub ToolStripMenuItem5_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem5.Click
+        If Application.OpenForms().OfType(Of FrmInvMultiple).Any Then
+            FrmInvMultiple.BringToFront()
+        Else
+            FrmInvMultiple.Show()
+        End If
+    End Sub
+End Class
