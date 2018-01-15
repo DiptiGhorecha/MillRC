@@ -1623,6 +1623,7 @@ Public Class FrmInvMultiple
                 DateTimePicker2.Select()
                 ' Set the ErrorProvider error with the text to display. 
                 Me.ErrorProvider1.SetError(DateTimePicker2, errorMsg)
+
             End If
         End If
     End Sub
