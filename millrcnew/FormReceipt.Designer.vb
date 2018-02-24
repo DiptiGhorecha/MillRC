@@ -679,6 +679,7 @@ Partial Class FormReceipt
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(929, 550)
+        Me.Controls.Add(Me.Label14)
         Me.Controls.Add(Me.RentComboBox)
         Me.Controls.Add(Me.Label20)
         Me.Controls.Add(Me.Label19)
@@ -686,7 +687,6 @@ Partial Class FormReceipt
         Me.Controls.Add(Me.Label17)
         Me.Controls.Add(Me.Label16)
         Me.Controls.Add(Me.Label15)
-        Me.Controls.Add(Me.Label14)
         Me.Controls.Add(Me.Label13)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.Label21)

@@ -33,6 +33,7 @@ Partial Class MainMDIForm
         Me.TransactionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BillToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem5 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ReceiptToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ReportsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.InvoicePrintingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -53,13 +54,14 @@ Partial Class MainMDIForm
         Me.GodownMasterListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TransfterOfGodownListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GodownCloseListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.OutstandingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.PictureBox2 = New System.Windows.Forms.PictureBox()
         Me.PictureBox3 = New System.Windows.Forms.PictureBox()
         Me.PictureBox4 = New System.Windows.Forms.PictureBox()
-        Me.ToolStripMenuItem5 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SummaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -145,6 +147,12 @@ Partial Class MainMDIForm
         Me.ToolStripMenuItem1.Size = New System.Drawing.Size(199, 22)
         Me.ToolStripMenuItem1.Text = "Invoice Single"
         '
+        'ToolStripMenuItem5
+        '
+        Me.ToolStripMenuItem5.Name = "ToolStripMenuItem5"
+        Me.ToolStripMenuItem5.Size = New System.Drawing.Size(199, 22)
+        Me.ToolStripMenuItem5.Text = "Invoice Sp"
+        '
         'ReceiptToolStripMenuItem
         '
         Me.ReceiptToolStripMenuItem.Name = "ReceiptToolStripMenuItem"
@@ -154,7 +162,7 @@ Partial Class MainMDIForm
         '
         'ReportsToolStripMenuItem
         '
-        Me.ReportsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.InvoicePrintingToolStripMenuItem, Me.ToolStripMenuItem2, Me.ToolStripMenuItem3, Me.ReceiptPrintingToolStripMenuItem, Me.OutstandingReportToolStripMenuItem, Me.TenantsDetailToolStripMenuItem, Me.GSTSpreadsheetsToolStripMenuItem, Me.ToolStripMenuItem4})
+        Me.ReportsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.InvoicePrintingToolStripMenuItem, Me.ToolStripMenuItem2, Me.ToolStripMenuItem3, Me.ReceiptPrintingToolStripMenuItem, Me.OutstandingReportToolStripMenuItem, Me.TenantsDetailToolStripMenuItem, Me.GSTSpreadsheetsToolStripMenuItem, Me.ToolStripMenuItem4, Me.OutstandingToolStripMenuItem, Me.SummaryToolStripMenuItem})
         Me.ReportsToolStripMenuItem.Name = "ReportsToolStripMenuItem"
         Me.ReportsToolStripMenuItem.Size = New System.Drawing.Size(59, 34)
         Me.ReportsToolStripMenuItem.Text = "Reports"
@@ -271,6 +279,12 @@ Partial Class MainMDIForm
         Me.GodownCloseListToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
         Me.GodownCloseListToolStripMenuItem.Text = "Godown Close List"
         '
+        'OutstandingToolStripMenuItem
+        '
+        Me.OutstandingToolStripMenuItem.Name = "OutstandingToolStripMenuItem"
+        Me.OutstandingToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
+        Me.OutstandingToolStripMenuItem.Text = "Outstanding "
+        '
         'Label1
         '
         Me.Label1.BackColor = System.Drawing.SystemColors.ActiveCaption
@@ -334,11 +348,11 @@ Partial Class MainMDIForm
         Me.PictureBox4.TabIndex = 9
         Me.PictureBox4.TabStop = False
         '
-        'ToolStripMenuItem5
+        'SummaryToolStripMenuItem
         '
-        Me.ToolStripMenuItem5.Name = "ToolStripMenuItem5"
-        Me.ToolStripMenuItem5.Size = New System.Drawing.Size(199, 22)
-        Me.ToolStripMenuItem5.Text = "Invoice Sp"
+        Me.SummaryToolStripMenuItem.Name = "SummaryToolStripMenuItem"
+        Me.SummaryToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
+        Me.SummaryToolStripMenuItem.Text = "Summary"
         '
         'MainMDIForm
         '
@@ -410,4 +424,6 @@ Partial Class MainMDIForm
     Friend WithEvents MonthlyReceiptPrintingToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ReceiptPrintingForGodownToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem5 As ToolStripMenuItem
+    Friend WithEvents OutstandingToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents SummaryToolStripMenuItem As ToolStripMenuItem
 End Class

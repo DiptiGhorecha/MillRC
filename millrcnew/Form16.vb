@@ -32,6 +32,10 @@ Public Class Form16
     Dim pwidth As Integer
     Dim formloaded As Boolean = False
     Private Sub Form16_Load(sender As Object, e As EventArgs) Handles Me.Load
+        Me.MdiParent = MainMDIForm
+        Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
+        Me.Left = 0
+        Me.KeyPreview = True
         'ComboBox3.Text = DateAndTime.MonthName(DateTime.Now.Month - 1)
         'ComboBox4.Text = DateTime.Now.Year
         'ComboBox2.Text = DateAndTime.MonthName(DateTime.Now.Month - 1)
@@ -47,6 +51,7 @@ Public Class Form16
             ComboBox2.Text = DateAndTime.MonthName(DateTime.Now.Month - 1)
             ComboBox5.Text = DateTime.Now.Year
         End If
+        formloaded = True
         ShowData(DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month, ComboBox4.Text, DateTime.ParseExact(ComboBox2.Text, "MMMM", CultureInfo.CurrentCulture).Month, ComboBox5.Text)
         If DataGridView2.RowCount > 1 Then
             TextBox1.Text = DataGridView2.Item(0, 0).Value
@@ -383,7 +388,7 @@ Public Class Form16
                             If DataGridView2.Item(15, X).Value = True Then
                             Else
                                 Print(fnum, GetStringToPrint(16, partyGST, "S") & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(16, partyGST, "S") & "," & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(16, partyGST, "S") & "," & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
                             totnet = totnet + DataGridView2.Item(10, X).Value
                             groupnet = groupnet + DataGridView2.Item(10, X).Value
                             tottaxable = tottaxable + DataGridView2.Item(5, X).Value
@@ -528,8 +533,8 @@ Public Class Form16
         taxrate = 18.0
         For X As Integer = 0 To DataGridView1.RowCount - 1
             '   MsgBox(DataGridView1.Item(18, X).Value)
-            Print(fnum, GetStringToPrint(16, DataGridView1.Item(18, X).Value, "S") & GetStringToPrint(35, "WV-" & DataGridView1.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView1.Item(3, X).Value, "S") & GetStringToPrint(10, Format(DataGridView1.Item(27, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(taxrate, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView1.Item(19, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & GetStringToPrint(55, DataGridView1.Item(32, X).Value, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(16, DataGridView1.Item(18, X).Value, "S") & "," & GetStringToPrint(35, "WV-" & DataGridView1.Item(2, X).Value, "S") & "," & GetStringToPrint(13, DataGridView1.Item(3, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView1.Item(27, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(taxrate, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView1.Item(19, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView1.Item(32, X).Value, "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(16, DataGridView1.Item(38, X).Value, "S") & GetStringToPrint(35, "WV-" & DataGridView1.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView1.Item(3, X).Value, "S") & GetStringToPrint(10, Format(DataGridView1.Item(27, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(taxrate, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView1.Item(19, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & GetStringToPrint(55, DataGridView1.Item(32, X).Value, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(16, DataGridView1.Item(38, X).Value, "S") & "," & GetStringToPrint(35, "WV-" & DataGridView1.Item(2, X).Value, "S") & "," & GetStringToPrint(13, DataGridView1.Item(3, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView1.Item(27, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(taxrate, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView1.Item(19, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView1.Item(32, X).Value, "S") & vbNewLine)
             groupnet = groupnet + DataGridView1.Item(27, X).Value
             grouptaxable = grouptaxable + DataGridView1.Item(19, X).Value
         Next

@@ -1,4 +1,5 @@
-﻿Public Class MainMDIForm
+﻿Imports System.Data.OleDb
+Public Class MainMDIForm
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MaximumSize = New Size(My.Computer.Screen.WorkingArea.Size.Width,
@@ -21,8 +22,61 @@
             RentToolStripMenuItem.Enabled = False
             GodownCloseToolStripMenuItem.Enabled = False
             BillToolStripMenuItem.Enabled = False
+            ToolStripMenuItem5.Enabled = False
         End If
+        Dim xcon As New ADODB.Connection    ''''''''variable is used to open a connection
+        Dim xrs As New ADODB.Recordset      '''''''' variable is use to open a Recordset
+        Dim xtemp As New ADODB.Recordset    '''''''' used to open a temparory Recordset
+        Dim XComp As New ADODB.Recordset
+        Dim connString As String = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;"
+        Dim rownum As Integer = 0
+        Dim MyConn As OleDbConnection
+        Dim transaction As OleDbTransaction
+        Dim da As OleDbDataAdapter
+        Dim ds As DataSet
+        Dim dag As OleDbDataAdapter
+        Dim dsg As DataSet
+        Dim dagp As OleDbDataAdapter
+        Dim dsgp As DataSet
+        Try
 
+            MyConn = New OleDbConnection(connString)
+            If MyConn.State = ConnectionState.Closed Then
+                MyConn.Open()
+            End If
+
+            transaction = MyConn.BeginTransaction(IsolationLevel.ReadCommitted)
+            Dim objcmd As New OleDb.OleDbCommand
+            Dim objcmdd As New OleDb.OleDbCommand
+            objcmd.Connection = MyConn
+            objcmd.Transaction = transaction
+            objcmd.CommandType = CommandType.Text
+            Dim iDate As String
+            Dim fDate As DateTime
+
+
+            iDate = "01/09/2017"
+            fDate = Convert.ToDateTime(iDate)
+            Dim save As String = "UPDATE [BILL] SET REC_DATE= Format('" & fDate & "','DD/MM/YYYY') WHERE [GROUP]='NEW' AND [GODWN_NO]='056' AND REC_NO='13'"  ''' sorry about that
+            objcmd.CommandText = save
+            objcmd.ExecuteNonQuery()
+
+            iDate = "04/12/2017"
+            fDate = Convert.ToDateTime(iDate)
+            Dim save1 As String = "UPDATE [BILL] SET REC_DATE= Format('" & fDate & "','DD/MM/YYYY') WHERE [GROUP]='CHALI' AND [GODWN_NO]='042' AND REC_NO='47'"  ''' sorry about that
+            objcmd.CommandText = save1
+            objcmd.ExecuteNonQuery()
+            transaction.Commit()
+            MyConn.Close()
+        Catch ex As Exception
+            MsgBox("Exception: Data update in RECEIPT table in database" & ex.Message)
+            Try
+                transaction.Rollback()
+
+            Catch
+                ' Do nothing here; transaction is not active.
+            End Try
+        End Try
     End Sub
 
     Private Sub GroupToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GroupToolStripMenuItem.Click
@@ -243,6 +297,22 @@
             FrmInvMultiple.BringToFront()
         Else
             FrmInvMultiple.Show()
+        End If
+    End Sub
+
+    Private Sub OutstandingToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles OutstandingToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmOutstanding).Any Then
+            FrmOutstanding.BringToFront()
+        Else
+            FrmOutstanding.Show()
+        End If
+    End Sub
+
+    Private Sub SummaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SummaryToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmSpReport).Any Then
+            FrmSpReport.BringToFront()
+        Else
+            FrmSpReport.Show()
         End If
     End Sub
 End Class

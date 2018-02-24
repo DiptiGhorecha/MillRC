@@ -253,7 +253,7 @@ Partial Class Form16
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1029, 491)
+        Me.ClientSize = New System.Drawing.Size(452, 133)
         Me.Controls.Add(Me.ComboBox5)
         Me.Controls.Add(Me.ComboBox2)
         Me.Controls.Add(Me.DataGridView1)
@@ -274,6 +274,7 @@ Partial Class Form16
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
         Me.Name = "Form16"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "GST Spreadsheets"
         CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)

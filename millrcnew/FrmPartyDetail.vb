@@ -45,6 +45,7 @@ Public Class FrmPartyDetail
     Dim chkrs33 As New ADODB.Recordset
     Dim chkrs44 As New ADODB.Recordset
     Dim chkrs55 As New ADODB.Recordset
+    Dim chkrs66 As New ADODB.Recordset
 
     Private Sub FrmPartyDetail_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.MdiParent = MainMDIForm
@@ -361,6 +362,28 @@ Public Class FrmPartyDetail
                     Else
                         Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(55, chkrs2.Fields(25).Value, "S") & vbNewLine)
                     End If
+                    '''''''''''''''''''' invoice details
+                    chkrs66.Open("SELECT [BILL].* from [BILL] where [BILL].BILL_DATE >= FORMAT('" & chkrs2.Fields(11).Value & "','DD/MM/YYYY') and [BILL].P_CODE ='" & TextBox1.Text & "' AND [BILL].GODWN_NO='" & chkrs2.Fields(3).Value & "' AND [BILL].[GROUP]='" & chkrs2.Fields(0).Value & "' order by [BILL].BILL_DATE+[BILL].INVOICE_NO", xcon)
+                    If chkrs66.BOF = False Then
+                        chkrs66.MoveFirst()
+                    End If
+                    Dim firstInv As Boolean = True
+                    Do While chkrs66.EOF = False
+                        If firstInv Then
+
+                            Print(fnum, GetStringToPrint(17, "Invoice Date", "S") & GetStringToPrint(13, "Invoice No.", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(7, "  GST", "N") & GetStringToPrint(12, " CGST Amt", "N") & GetStringToPrint(12, " SGST Amt", "N") & GetStringToPrint(12, " Net Amt", "N") & GetStringToPrint(20, "  Against Advance", "S") & vbNewLine)
+
+                            Print(fnum, StrDup(180, "=") & vbNewLine)
+                            firstInv = False
+                            xline = xline + 3
+                        End If
+                        Print(fnum, GetStringToPrint(17, chkrs66.Fields(4).Value, "S") & GetStringToPrint(13, chkrs66.Fields(0).Value, "S") & GetStringToPrint(13, chkrs66.Fields(5).Value, "N") & GetStringToPrint(7, "   18.0 %", "S") & GetStringToPrint(12, chkrs66.Fields(7).Value, "N") & GetStringToPrint(12, chkrs66.Fields(9).Value, "N") & GetStringToPrint(12, chkrs66.Fields(10).Value, "N") & GetStringToPrint(20, IIf(chkrs66.Fields(15).Value = True, "     Yes", "     No"), "S") & vbNewLine)
+                        If chkrs66.EOF = False Then
+                            chkrs66.MoveNext()
+                        End If
+                    Loop
+                    chkrs66.Close()
+                    '''''''''''''''''''' invoice details
                     ''''''''''''''''''''payment details
                     Print(fnum, GetStringToPrint(20, "  ", "S") & vbNewLine)
                         Print(fnum, GetStringToPrint(30, "Payment Details  ", "S") & vbNewLine)
@@ -1239,6 +1262,7 @@ Public Class FrmPartyDetail
                             End If
 
                         Loop
+                        chkrs11.Close()
                         ''''''''''''''''''''payment details
 
                         '  End If

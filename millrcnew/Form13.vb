@@ -806,6 +806,7 @@ Public Class FrmGodownTransfer
     End Function
     Private Sub cmdUpdate_Click(sender As Object, e As EventArgs) Handles cmdUpdate.Click
         If ValidateChildren() And checkDue(TextBox2.Text, DateTimePicker1.Value) Then
+            'If ValidateChildren() Then
             insertData()
             DataGridView2.Enabled = True
             If GrpAddCorrect = "C" Then

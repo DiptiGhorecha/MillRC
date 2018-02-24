@@ -533,7 +533,9 @@ Public Class FormReceipt
             If MyConn.State = ConnectionState.Closed Then
                 MyConn.Open()
             End If
-            Dim STR As String = "SELECT [RECEIPT].*,[S].[P_CODE]  from [RECEIPT] INNER JOIN (SELECT [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE] FROM [BILL] GROUP BY [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE]) AS S ON [RECEIPT].[REC_DATE]=[S].[REC_DATE] AND TRIM(STR([RECEIPT].[REC_NO]))=[S].[REC_NO] order by [RECEIPT].[REC_DATE],[RECEIPT].REC_NO"
+            ' Dim STR As String = "SELECT [RECEIPT].*,[S].[P_CODE]  from [RECEIPT] INNER JOIN (SELECT [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE] FROM [BILL] GROUP BY [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE]) AS S ON [RECEIPT].[REC_DATE]=[S].[REC_DATE] AND TRIM(STR([RECEIPT].[REC_NO]))=[S].[REC_NO] order by [RECEIPT].[REC_DATE],[RECEIPT].REC_NO"
+            Dim STR As String = "SELECT [RECEIPT].*,[S].[P_CODE] from [RECEIPT] LEFT OUTER JOIN (SELECT [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE] FROM [BILL] GROUP BY [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE]) AS S ON [RECEIPT].[REC_DATE]=[S].[REC_DATE] AND TRIM(STR([RECEIPT].[REC_NO]))=[S].[REC_NO] order by [RECEIPT].[REC_DATE],[RECEIPT].REC_NO"
+
             da = New OleDb.OleDbDataAdapter(STR, MyConn)
             ds = New DataSet
             ds.Clear()
@@ -796,7 +798,7 @@ Public Class FormReceipt
                         Label19.Text = Format(Convert.ToDouble(DataGridView2.Item(11, 0).Value), "0.00")
                         Label20.Text = DataGridView2.Item(6, 0).Value.ToString & " + " & (Convert.ToDouble(DataGridView2.Item(8, 0).Value) + Convert.ToDouble(DataGridView2.Item(10, 0).Value)).ToString
                         ' MsgBox(DataGridView2.Item(17, DataGridView2.RowCount - 1).Value)
-                        '  MsgBox(DataGridView2.Item(5, DataGridView2.RowCount - 1).Value)
+                        ' MsgBox(DataGridView2.Item(5, DataGridView2.RowCount - 1).Value)
                         RentComboBox.DisplayMember = "Rent"
                         RentComboBox.ValueMember = "Month"
                         Dim tb As New DataTable
@@ -805,8 +807,6 @@ Public Class FormReceipt
                         For i As Integer = 1 To 24
                             tb.Rows.Add(i, Convert.ToDateTime(DataGridView2.Item(5, (DataGridView2.RowCount - 1)).Value).AddMonths(i) & " - " & (Convert.ToDouble(DataGridView2.Item(17, DataGridView2.RowCount - 1).Value) + (Convert.ToDouble(DataGridView2.Item(11, 0).Value) * i)).ToString)
                         Next
-
-
                         RentComboBox.DataSource = tb
                     Else
                         '''''''''''''''''all bills paid than check net_amount of previous bill and store as paayble
@@ -868,26 +868,6 @@ Public Class FormReceipt
                         chkrs3.Close()
                         GST_AMT = GST * amt / 100
 
-                        'CGST_TAXAMT = amt * CGST_RATE / 100
-                        'CGST_TAXAMT = Math.Round(CGST_TAXAMT, 2, MidpointRounding.AwayFromZero)
-                        'SGST_TAXAMT = amt * SGST_RATE / 100
-                        'SGST_TAXAMT = Math.Round(SGST_TAXAMT, 2, MidpointRounding.AwayFromZero)
-
-                        'Dim net As Double
-                        'Dim rnd As Integer
-                        'rnd = CGST_TAXAMT - Math.Round(CGST_TAXAMT)
-                        'If rnd >= 50 Then
-                        '    CGST_TAXAMT = Math.Round(CGST_TAXAMT) + 1
-                        'Else
-                        '    CGST_TAXAMT = Math.Round(CGST_TAXAMT)
-                        'End If
-                        'rnd = SGST_TAXAMT - Math.Round(SGST_TAXAMT)
-                        'If rnd >= 50 Then
-                        '    SGST_TAXAMT = Math.Round(SGST_TAXAMT) + 1
-                        'Else
-                        '    SGST_TAXAMT = Math.Round(SGST_TAXAMT)
-                        'End If
-
                         Dim net As Double
                         Dim rnd As Integer
                         rnd = GST_AMT - Math.Round(GST_AMT)
@@ -914,8 +894,8 @@ Public Class FormReceipt
                         Dim tb As New DataTable
                         tb.Columns.Add("Month", GetType(Integer))
                         tb.Columns.Add("Rent", GetType(String))
-                        For i As Integer = 1 To 24
-                            tb.Rows.Add(i, DateTime.Now.AddMonths(i).ToShortDateString & " - " & (payable * i))
+                        For i As Integer = 0 To 24
+                            tb.Rows.Add(i, DateTime.Now.AddMonths(i).ToShortDateString & " - " & (payable * (i + 1)))
                             ' tb.Rows.Add(i, DateTime.Now.AddMonths(i).ToShortDateString & " - " & ((Convert.ToDouble(DataGridView2.Item(11, 0).Value) * i).ToString))
                         Next
 
@@ -950,6 +930,8 @@ Public Class FormReceipt
 
             Dim destination_abroad As Boolean
             Dim checkedcount = 0
+            '  MsgBox(Label19.Text)
+            payable = Label19.Text
             For X As Integer = 0 To DataGridView2.RowCount - 1
                 destination_abroad = Convert.ToBoolean(DataGridView2.Item(0, X).EditedFormattedValue)
                 If destination_abroad = True Then

@@ -229,7 +229,7 @@ Public Class FrmInvMultiple
                     Label13.Text = GetValue(DataGridView2.Item(17, i).Value)
                 End If
                 If Not IsDBNull(DataGridView2.Item(5, i).Value) Then
-                    TextBox4.Text = Format(CSng(GetValue(DataGridView2.Item(5, i).Value) / DateDiff(DateInterval.Month, DateTimePicker2.Value, DateTimePicker3.Value)), "#####0.00")
+                    TextBox4.Text = Format(CSng(GetValue(DataGridView2.Item(5, i).Value) / (DateDiff(DateInterval.Month, DateTimePicker2.Value, DateTimePicker3.Value) + 1)), "#####0.00")
                     TextBox5.Text = Format(CSng(GetValue(DataGridView2.Item(5, i).Value)), "#####0.00")
                 End If
                 If Not IsDBNull(DataGridView2.Item(7, i).Value) Then
@@ -1534,7 +1534,7 @@ Public Class FrmInvMultiple
                 chkrs.Open("SELECT * FROM GODOWN where [STATUS]='C' and [GROUP]='" & ComboBox3.Text & "' and GODWN_NO='" & ComboBox4.Text & "' order by [GROUP]+GODWN_NO ", xcon)
                 Do While chkrs.EOF = False
                     Dim mnthNo As Long = 1
-                    mnthNo = DateDiff(DateInterval.Month, DateTimePicker2.Value, DateTimePicker3.Value)
+                    mnthNo = DateDiff(DateInterval.Month, DateTimePicker2.Value, DateTimePicker3.Value) + 1
                     Dim amt As Double = TextBox4.Text * mnthNo
                     TextBox5.Text = Format(amt, "#####0.00")
                     Dim ENDDAY As String

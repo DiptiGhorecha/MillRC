@@ -77,9 +77,27 @@ Public Class FrmInvoice
                 Exit Function
             End If
             chkrs1.Close()
-
+            Dim iDate As String
+            Dim fDate As DateTime
+            Dim oDate As String
+            Dim foDate As DateTime
+            If (Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) > 4) Then
+                iDate = "30/04/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                fDate = Convert.ToDateTime(iDate)
+                oDate = "31/03/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) + 1))
+                foDate = Convert.ToDateTime(oDate)
+            Else
+                iDate = "30/04/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) - 1))
+                fDate = Convert.ToDateTime(iDate)
+                oDate = "31/03/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                foDate = Convert.ToDateTime(oDate)
+            End If
+            MsgBox(fDate.ToString)
+            MsgBox(foDate.ToString)
+            Dim strn As String = "Select * FROM BILL where [BILL].bill_date>=Format('" & fDate & "', 'dd/mm/yyyy') and [BILL].bill_date<=Format('" & foDate & "', 'dd/mm/yyyy') order by Year([BILL].bill_date)+[BILL].INVOICE_NO"
             '''''''''''''get last serial number
-            chkrs11.Open("SELECT * FROM BILL where Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' order by Year([BILL].bill_date)+[BILL].INVOICE_NO", xcon)
+            '''''chkrs11.Open("Select * FROM BILL where Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' order by Year([BILL].bill_date)+[BILL].INVOICE_NO", xcon)
+            chkrs11.Open(strn, xcon)
             Dim srno As Integer = 0
             Do While chkrs11.EOF = False
                 srno = chkrs11.Fields(0).Value
@@ -376,6 +394,7 @@ Public Class FrmInvoice
                 If chkrs2.EOF = False Then
                     chkrs2.MoveFirst()
                     advrec = chkrs2.Fields(4).Value
+                    DateTimePicker2.Value = chkrs2.Fields(3).Value
                     adv_date = chkrs2.Fields(3).Value
                     adjamt = chkrs2.Fields(13).Value - net
                     Dim sav As String = "UPDATE [RECEIPT] SET ADJ_AMT=" & adjamt & " WHERE REC_NO=" & chkrs2.Fields(4).Value & " AND year(REC_DATE)='" & Convert.ToDateTime(chkrs2.Fields(3).Value).Year & "'"
@@ -398,27 +417,20 @@ Public Class FrmInvoice
                 Print(fnum, StrDup(85, "-") & vbNewLine)
                 Print(fnum, GetStringToPrint(80, "Subject to Ahmedabad jurisdiction.", "S") & vbNewLine)
                 Print(fnum, GetStringToPrint(80, "This is computer generated invoice.", "S") & vbNewLine)
-
                 Print(fnum, GetStringToPrint(80, " ", "S") & vbNewLine)
                 Print(fnum, GetStringToPrint(80, " ", "S") & vbNewLine)
                 Print(fnum, GetStringToPrint(80, "Ref. No. :" + FILE_NOtmp, "S") & vbNewLine)
                 Dim save As String
                 If advrec > 0 Then
-                    save = "INSERT INTO [BILL](INVOICE_NO,[GROUP],GODWN_NO,P_CODE,BILL_DATE,BILL_AMOUNT,CGST_RATE,CGST_AMT,SGST_RATE,SGST_AMT,NET_AMOUNT,HSN,SRNO,REC_NO,REC_DATE,ADVANCE) VALUES('" & INVOICE_NO & "','" & chkrs.Fields(0).Value & "','" & chkrs.Fields(3).Value & "','" & chkrs.Fields(1).Value & "','" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "'," & amt & "," & CGST_RATE & "," & CGST_TAXAMT & "," & SGST_RATE & "," & SGST_TAXAMT & "," & net & ",'" & chkrs.Fields(37).Value & "','" & FILE_NOtmp & "','" & advrec & "',#" & adv_date & "#,TRUE)"
+                    save = "INSERT INTO [BILL](INVOICE_NO,[GROUP],GODWN_NO,P_CODE,BILL_DATE,BILL_AMOUNT,CGST_RATE,CGST_AMT,SGST_RATE,SGST_AMT,NET_AMOUNT,HSN,SRNO,REC_NO,REC_DATE,ADVANCE) VALUES('" & INVOICE_NO & "','" & chkrs.Fields(0).Value & "','" & chkrs.Fields(3).Value & "','" & chkrs.Fields(1).Value & "','" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "'," & amt & "," & CGST_RATE & "," & CGST_TAXAMT & "," & SGST_RATE & "," & SGST_TAXAMT & "," & net & ",'" & chkrs.Fields(37).Value & "','" & FILE_NOtmp & "','" & advrec & "','" & DateTimePicker2.Value.ToShortDateString & "',TRUE)"
                 Else
                     save = "INSERT INTO [BILL](INVOICE_NO,[GROUP],GODWN_NO,P_CODE,BILL_DATE,BILL_AMOUNT,CGST_RATE,CGST_AMT,SGST_RATE,SGST_AMT,NET_AMOUNT,HSN,SRNO) VALUES('" & INVOICE_NO & "','" & chkrs.Fields(0).Value & "','" & chkrs.Fields(3).Value & "','" & chkrs.Fields(1).Value & "','" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "'," & amt & "," & CGST_RATE & "," & CGST_TAXAMT & "," & SGST_RATE & "," & SGST_TAXAMT & "," & net & ",'" & chkrs.Fields(37).Value & "','" & FILE_NOtmp & "')"
                 End If
-
                 doSQL(save)
-
                 FileClose(fnum)
-
-
                 If (Not System.IO.Directory.Exists(Application.StartupPath & "\Invoices\pdf\" & DateTimePicker1.Value.Year.ToString & "\" & MonthName(DateTimePicker1.Value.Month))) Then
                     System.IO.Directory.CreateDirectory(Application.StartupPath & "\Invoices\pdf\" & DateTimePicker1.Value.Year.ToString & "\" & MonthName(DateTimePicker1.Value.Month))
                 End If
-
-
                 strReportFilePath = Application.StartupPath & "\Invoices\dat\" & DateTimePicker1.Value.Year.ToString & "\" & MonthName(DateTimePicker1.Value.Month) & "\" & FILE_NO & ".dat"
                 CreatePDF(strReportFilePath, FILE_NO)
                 If chkrs.EOF = False Then

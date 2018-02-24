@@ -121,7 +121,7 @@ Public Class FrmInvoicePrnGodown
         End Try
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        If DataGridView2.RowCount <= 1 Then
+        If DataGridView2.RowCount < 1 Then
             MsgBox("No data exist for this godown")
             ComboBox1.Focus()
             Exit Sub
@@ -143,7 +143,7 @@ Public Class FrmInvoicePrnGodown
                 myList.Add(GetValue(DataGridView2.Item(1, X).Value).Replace("/", "_").Replace(" ", "_"))
                 myyrList.Add(yr)
                 mymnList.Add(mnthname)
-                ' FILE_NO = FILE_NO.Replace(" ", "_")
+                'FILE_NO = FILE_NO.Replace(" ", "_")
             End If
         Next
         myArray = myList.ToArray()

@@ -203,6 +203,18 @@
     <Compile Include="Form22.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Form23.Designer.vb">
+      <DependentUpon>Form23.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form23.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form24.Designer.vb">
+      <DependentUpon>Form24.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form24.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Form3.Designer.vb">
       <DependentUpon>Form3.vb</DependentUpon>
     </Compile>
@@ -323,6 +335,12 @@
     <Compile Include="FrmLogin.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FrmOutstanding.Designer.vb">
+      <DependentUpon>FrmOutstanding.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmOutstanding.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmPartyDetail.Designer.vb">
       <DependentUpon>FrmPartyDetail.vb</DependentUpon>
     </Compile>
@@ -345,6 +363,12 @@
       <DependentUpon>FrmRecPrnGdnwise.vb</DependentUpon>
     </Compile>
     <Compile Include="FrmRecPrnGdnwise.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmSpReport.Designer.vb">
+      <DependentUpon>FrmSpReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmSpReport.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FrmTenantList.Designer.vb">
@@ -430,6 +454,12 @@
     <EmbeddedResource Include="Form22.resx">
       <DependentUpon>Form22.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Form23.resx">
+      <DependentUpon>Form23.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form24.resx">
+      <DependentUpon>Form24.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form3.resx">
       <DependentUpon>Form3.vb</DependentUpon>
     </EmbeddedResource>
@@ -490,6 +520,9 @@
     <EmbeddedResource Include="FrmLogin.resx">
       <DependentUpon>FrmLogin.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FrmOutstanding.resx">
+      <DependentUpon>FrmOutstanding.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FrmPartyDetail.resx">
       <DependentUpon>FrmPartyDetail.vb</DependentUpon>
     </EmbeddedResource>
@@ -501,6 +534,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FrmRecPrnGdnwise.resx">
       <DependentUpon>FrmRecPrnGdnwise.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmSpReport.resx">
+      <DependentUpon>FrmSpReport.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmTenantList.resx">
       <DependentUpon>FrmTenantList.vb</DependentUpon>
