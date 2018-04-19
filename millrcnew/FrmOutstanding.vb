@@ -25,11 +25,14 @@ Public Class FrmOutstanding
     Dim ctrlname As String = "TextBox1"
     Dim formloaded As Boolean = False
     Dim fnum As Integer
+    Dim fnumm As Integer
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
+        fnumm = 2 '''''''''Get FreeFile No.'''''''''''
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
         FileOpen(fnum, Application.StartupPath & "\Reports\outstand.dat", OpenMode.Output)
+        FileOpen(fnumm, Application.StartupPath & "\Reports\" & TextBox5.Text & ".csv", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
@@ -67,7 +70,9 @@ Public Class FrmOutstanding
             End If
             If firstrec = True Then
                 Print(fnum, GetStringToPrint(17, "Godown Type", "S") & GetStringToPrint(17, "Godown Number", "S") & GetStringToPrint(50, "Tenant Name", "S") & GetStringToPrint(13, "Rent", "N") & GetStringToPrint(13, "Pe Rent", "N") & GetStringToPrint(13, "GST Amt", "N") & GetStringToPrint(13, "Outstanding", "N") & GetStringToPrint(20, "   From Month-Year", "S") & GetStringToPrint(13, " Advance", "S") & vbNewLine)
+                Print(fnumm, GetStringToPrint(17, "Godown Type", "S") & "," & GetStringToPrint(17, "Godown Number", "S") & "," & GetStringToPrint(50, "Tenant Name", "S") & "," & GetStringToPrint(13, "Rent", "N") & "," & GetStringToPrint(13, "Pe Rent", "N") & "," & GetStringToPrint(13, "GST Amt", "N") & "," & GetStringToPrint(13, "Outstanding", "N") & "," & GetStringToPrint(20, "   From Month-Year", "S") & "," & GetStringToPrint(13, " Advance", "S") & vbNewLine)
                 Print(fnum, StrDup(165, "-") & vbNewLine)
+                Print(fnumm, StrDup(165, "-") & vbNewLine)
                 firstrec = False
             End If
             chkrs4.Open("SELECT * FROM RENT WHERE [GROUP]='" & grp & "' and GODWN_NO='" & gdn & "' and P_CODE ='" & pcd & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
@@ -147,17 +152,21 @@ Public Class FrmOutstanding
             End If
 
             Print(fnum, GetStringToPrint(17, grp, "S") & GetStringToPrint(17, gdn, "S") & GetStringToPrint(50, pnm, "S") & GetStringToPrint(13, Format(ramt, "0.00"), "N") & GetStringToPrint(13, Format(pramt, "0.00"), "N") & GetStringToPrint(13, Format(gst_amt, "0.00"), "N") & GetStringToPrint(13, Format(out, "0.00"), "N") & GetStringToPrint(20, "   " & outDate.Month.ToString & "-" & outDate.Year.ToString, "S") & GetStringToPrint(13, " " & adv, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(17, grp, "S") & "," & GetStringToPrint(17, gdn, "S") & "," & GetStringToPrint(50, pnm, "S") & "," & GetStringToPrint(13, Format(ramt, "0.00"), "N") & "," & GetStringToPrint(13, Format(pramt, "0.00"), "N") & "," & GetStringToPrint(13, Format(gst_amt, "0.00"), "N") & "," & GetStringToPrint(13, Format(out, "0.00"), "N") & "," & GetStringToPrint(20, "   " & outDate.Month.ToString & "-" & outDate.Year.ToString, "S") & "," & GetStringToPrint(13, " " & adv, "S") & vbNewLine)
             If chkrs1.EOF = False Then
                 chkrs1.MoveNext()
             End If
         Loop
         Print(fnum, StrDup(165, "-") & vbNewLine)
+        Print(fnumm, StrDup(165, "-") & vbNewLine)
         Print(fnum, GetStringToPrint(123, "Total Outstanding:", "N") & GetStringToPrint(13, Format(gtotamt, "0.00"), "N") & vbNewLine)
+        Print(fnumm, "" & "," & "" & "," & "" & "," & "" & "," & "" & "," & "" & GetStringToPrint(123, "Total Outstanding:", "N") & "," & GetStringToPrint(13, Format(gtotamt, "0.00"), "N") & vbNewLine)
         Print(fnum, GetStringToPrint(123, "Total Advance:", "N") & GetStringToPrint(13, Format(gtotadv, "0.00"), "N") & vbNewLine)
+        Print(fnumm, "" & "," & "" & "," & "" & "," & "" & "," & "" & "," & "" & GetStringToPrint(123, "Total Advance:", "N") & "," & GetStringToPrint(13, Format(gtotadv, "0.00"), "N") & vbNewLine)
         chkrs1.Close()
         xcon.Close()
         FileClose(fnum)
-
+        FileClose(fnumm)
         Form23.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\outstand.dat", RichTextBoxStreamType.PlainText)
 
         Form23.Show()

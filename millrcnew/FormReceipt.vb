@@ -58,6 +58,7 @@ Public Class FormReceipt
         cmdDelete.Enabled = True
         cmdUpdate.Enabled = False
         cmdCancel.Enabled = False
+        DateTimePicker1.MaxDate = Date.Today
         disablefields()
         fillgroupcombo()
         groupfilled = True
@@ -773,14 +774,11 @@ Public Class FormReceipt
                                 DataGridView2.CurrentCell = DataGridView2.Item(0, X)
                                 DataGridView2.BeginEdit(False)
                                 DataGridView2.Item(0, X).Value = True
-                                ' Dim DGVevent As New Windows.Forms.DataGridViewCellEventArgs(0, X)
-                                ' DataGridView2_CellContentClick(DataGridView2, DGVevent)
                             End If
                         Next
                         checkinserted = True
                         If DataGridView2.CurrentRow Is Nothing Then
                             Label14.Text = DataGridView2.Item(16, 0).Value
-                            ' TextBox6.Text = DataGridView2.Item(16, 0).Value
                             If DataGridView2.Item(12, 0).Value.Equals("997212") Then
                                 Label15.Text = "Rental Or Leasing Services Involving Own Or Leased Non-residential Property"
                             Else
@@ -898,8 +896,6 @@ Public Class FormReceipt
                             tb.Rows.Add(i, DateTime.Now.AddMonths(i).ToShortDateString & " - " & (payable * (i + 1)))
                             ' tb.Rows.Add(i, DateTime.Now.AddMonths(i).ToShortDateString & " - " & ((Convert.ToDouble(DataGridView2.Item(11, 0).Value) * i).ToString))
                         Next
-
-
                         RentComboBox.DataSource = tb
                         xcon.Close()
                     End If
@@ -1160,7 +1156,7 @@ Public Class FormReceipt
                     End If
                 Next i
                 ADJAMTT = Convert.ToDouble(TextBox1.Text) - DETAMT
-                objcmd.CommandText = "INSERT INTO [RECEIPT]([GROUP],GODWN_NO,REC_DATE,REC_NO,AMOUNT,ADVANCE,CASH_CHEQUE,BANK_NAME,BRANCH,CHEQUE_NUMBER,CHEQUE_DATE,BANK_AC_DETAIL,ADJ_AMT) VALUES('" & ComboBox3.SelectedValue.ToString & "','" & ComboBox4.SelectedValue.ToString & "','" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','" & Convert.ToInt32(TextBox2.Text) & "','" & Convert.ToDouble(TextBox1.Text) & "'," & CheckBox1.Checked & ",'" & stus & "','" & TextBox4.Text & "','" & TextBox5.Text & "','" & TextBox3.Text & "','" & Convert.ToDateTime(DateTimePicker2.Value.ToString) & "','" & TextBox6.Text & "','" & Convert.ToDouble(TextBox1.Text) & "')"
+                objcmd.CommandText = "INSERT INTO [RECEIPT]([GROUP],GODWN_NO,REC_DATE,REC_NO,AMOUNT,ADVANCE,CASH_CHEQUE,BANK_NAME,BRANCH,CHEQUE_NUMBER,CHEQUE_DATE,BANK_AC_DETAIL,ADJ_AMT) VALUES('" & ComboBox3.SelectedValue.ToString & "','" & ComboBox4.SelectedValue.ToString & "','" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','" & Convert.ToInt32(TextBox2.Text) & "','" & Convert.ToDouble(TextBox1.Text) & "'," & CheckBox1.Checked & ",'" & stus & "','" & TextBox4.Text & "','" & TextBox5.Text & "','" & TextBox3.Text & "','" & Convert.ToDateTime(DateTimePicker2.Value.ToString) & "','" & TextBox6.Text & "','" & ADJAMTT & "')"
                 objcmd.ExecuteNonQuery()
             End If
             DataGridView1.Update()

@@ -23,6 +23,7 @@ Public Class MainMDIForm
             GodownCloseToolStripMenuItem.Enabled = False
             BillToolStripMenuItem.Enabled = False
             ToolStripMenuItem5.Enabled = False
+            ReupdateToolStripMenuItem.Enabled = False
         End If
         Dim xcon As New ADODB.Connection    ''''''''variable is used to open a connection
         Dim xrs As New ADODB.Recordset      '''''''' variable is use to open a Recordset
@@ -313,6 +314,26 @@ Public Class MainMDIForm
             FrmSpReport.BringToFront()
         Else
             FrmSpReport.Show()
+        End If
+    End Sub
+
+    Private Sub ReportsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReportsToolStripMenuItem.Click
+
+    End Sub
+
+    Private Sub OpeningAdvanceToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles OpeningAdvanceToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmAdvance).Any Then
+            FrmAdvance.BringToFront()
+        Else
+            FrmAdvance.Show()
+        End If
+    End Sub
+
+    Private Sub ReupdateToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReupdateToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmReupdate).Any Then
+            FrmReupdate.BringToFront()
+        Else
+            FrmReupdate.Show()
         End If
     End Sub
 End Class

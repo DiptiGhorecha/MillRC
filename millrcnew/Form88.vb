@@ -911,8 +911,6 @@ Public Class FrmInvSingle
         'End Try
     End Function
     Function print_display_data()
-
-
         Dim objPRNSetup = New clsPrinterSetup
         'set Paper Lines and Left Margin
         prnmaxpagelines = objPRNSetup.LinesPerPage

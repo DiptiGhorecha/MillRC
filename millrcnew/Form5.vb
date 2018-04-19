@@ -92,8 +92,8 @@ Public Class FrmInvoice
                 oDate = "31/03/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
                 foDate = Convert.ToDateTime(oDate)
             End If
-            MsgBox(fDate.ToString)
-            MsgBox(foDate.ToString)
+            ' MsgBox(fDate.ToString)
+            ' MsgBox(foDate.ToString)
             Dim strn As String = "Select * FROM BILL where [BILL].bill_date>=Format('" & fDate & "', 'dd/mm/yyyy') and [BILL].bill_date<=Format('" & foDate & "', 'dd/mm/yyyy') order by Year([BILL].bill_date)+[BILL].INVOICE_NO"
             '''''''''''''get last serial number
             '''''chkrs11.Open("Select * FROM BILL where Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' order by Year([BILL].bill_date)+[BILL].INVOICE_NO", xcon)
@@ -338,34 +338,6 @@ Public Class FrmInvoice
                 SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
                 Print(fnum, Space(58) & GetStringToPrint(17, "CGST@ " & CGST_RATE & "%" & "       :", "S") & GetStringToPrint(10, Format(CGST_TAXAMT, "######0.00"), "N") & vbNewLine)
                 Print(fnum, Space(58) & GetStringToPrint(17, "SGST@ " & SGST_RATE & "%" & "       :", "S") & GetStringToPrint(10, Format(SGST_TAXAMT, "######0.00"), "N") & vbNewLine)
-                Print(fnum, StrDup(58, " ") & StrDup(27, "-") & vbNewLine)
-                'Dim net As Double
-                'Dim rnd As Integer
-                'rnd = CGST_TAXAMT - Math.Round(CGST_TAXAMT)
-                'If rnd >= 50 Then
-                '    CGST_TAXAMT = Math.Round(CGST_TAXAMT) + 1
-                'Else
-                '    CGST_TAXAMT = Math.Round(CGST_TAXAMT)
-                'End If
-
-                'rnd = SGST_TAXAMT - Math.Round(SGST_TAXAMT)
-                'If rnd >= 50 Then
-                '    SGST_TAXAMT = Math.Round(SGST_TAXAMT) + 1
-                'Else
-                '    SGST_TAXAMT = Math.Round(SGST_TAXAMT)
-                'End If
-
-                'net = amt + CGST_TAXAMT + SGST_TAXAMT
-
-
-
-                'rnd = net - Math.Round(net)
-                'If rnd >= 50 Then
-                '    net = Math.Round(net) + 1
-                'Else
-                '    net = Math.Round(net)
-                'End If
-
 
                 Print(fnum, Space(58) & GetStringToPrint(17, "NET AMOUNT     :", "S") & GetStringToPrint(10, Format(net, "######0.00"), "N") & vbNewLine)
                 Print(fnum, StrDup(85, "-") & vbNewLine)

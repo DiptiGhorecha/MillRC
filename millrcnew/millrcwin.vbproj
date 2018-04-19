@@ -263,6 +263,12 @@
     <Compile Include="FormReceipt.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FrmAdvance.Designer.vb">
+      <DependentUpon>FrmAdvance.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmAdvance.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmCalc.Designer.vb">
       <DependentUpon>FrmCalc.vb</DependentUpon>
     </Compile>
@@ -365,6 +371,12 @@
     <Compile Include="FrmRecPrnGdnwise.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FrmReupdate.Designer.vb">
+      <DependentUpon>FrmReupdate.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmReupdate.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmSpReport.Designer.vb">
       <DependentUpon>FrmSpReport.vb</DependentUpon>
     </Compile>
@@ -411,6 +423,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Form10.resx">
       <DependentUpon>Form10.vb</DependentUpon>
@@ -462,9 +475,11 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form3.resx">
       <DependentUpon>Form3.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Form4.resx">
       <DependentUpon>Form4.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Form5.resx">
       <DependentUpon>Form5.vb</DependentUpon>
@@ -483,6 +498,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormReceipt.resx">
       <DependentUpon>FormReceipt.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmAdvance.resx">
+      <DependentUpon>FrmAdvance.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmCalc.resx">
       <DependentUpon>FrmCalc.vb</DependentUpon>
@@ -534,6 +552,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FrmRecPrnGdnwise.resx">
       <DependentUpon>FrmRecPrnGdnwise.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmReupdate.resx">
+      <DependentUpon>FrmReupdate.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmSpReport.resx">
       <DependentUpon>FrmSpReport.vb</DependentUpon>

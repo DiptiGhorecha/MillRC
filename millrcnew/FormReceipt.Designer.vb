@@ -132,6 +132,7 @@ Partial Class FormReceipt
         Me.DateTimePicker1.Name = "DateTimePicker1"
         Me.DateTimePicker1.Size = New System.Drawing.Size(131, 20)
         Me.DateTimePicker1.TabIndex = 3
+        Me.DateTimePicker1.Value = New Date(2018, 3, 3, 0, 0, 0, 0)
         '
         'Label2
         '

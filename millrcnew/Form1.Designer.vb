@@ -30,6 +30,7 @@ Partial Class MainMDIForm
         Me.GodownToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RentToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GodownCloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.OpeningAdvanceToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TransactionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BillToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
@@ -55,13 +56,15 @@ Partial Class MainMDIForm
         Me.TransfterOfGodownListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GodownCloseListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OutstandingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SummaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.PictureBox2 = New System.Windows.Forms.PictureBox()
         Me.PictureBox3 = New System.Windows.Forms.PictureBox()
         Me.PictureBox4 = New System.Windows.Forms.PictureBox()
-        Me.SummaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.UtilityToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ReupdateToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -74,7 +77,7 @@ Partial Class MainMDIForm
         Me.MenuStrip1.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.MenuStrip1.AutoSize = False
         Me.MenuStrip1.Dock = System.Windows.Forms.DockStyle.None
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MastersToolStripMenuItem, Me.TransactionsToolStripMenuItem, Me.ReportsToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MastersToolStripMenuItem, Me.TransactionsToolStripMenuItem, Me.ReportsToolStripMenuItem, Me.UtilityToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 126)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Padding = New System.Windows.Forms.Padding(6, 1, 0, 1)
@@ -84,7 +87,7 @@ Partial Class MainMDIForm
         '
         'MastersToolStripMenuItem
         '
-        Me.MastersToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GroupToolStripMenuItem, Me.TenantToolStripMenuItem, Me.GodownToolStripMenuItem, Me.RentToolStripMenuItem, Me.GodownCloseToolStripMenuItem})
+        Me.MastersToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GroupToolStripMenuItem, Me.TenantToolStripMenuItem, Me.GodownToolStripMenuItem, Me.RentToolStripMenuItem, Me.GodownCloseToolStripMenuItem, Me.OpeningAdvanceToolStripMenuItem})
         Me.MastersToolStripMenuItem.Name = "MastersToolStripMenuItem"
         Me.MastersToolStripMenuItem.Size = New System.Drawing.Size(60, 34)
         Me.MastersToolStripMenuItem.Text = "Masters"
@@ -124,6 +127,12 @@ Partial Class MainMDIForm
         Me.GodownCloseToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.C), System.Windows.Forms.Keys)
         Me.GodownCloseToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
         Me.GodownCloseToolStripMenuItem.Text = "Godown Close"
+        '
+        'OpeningAdvanceToolStripMenuItem
+        '
+        Me.OpeningAdvanceToolStripMenuItem.Name = "OpeningAdvanceToolStripMenuItem"
+        Me.OpeningAdvanceToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
+        Me.OpeningAdvanceToolStripMenuItem.Text = "Opening Advance"
         '
         'TransactionsToolStripMenuItem
         '
@@ -285,6 +294,12 @@ Partial Class MainMDIForm
         Me.OutstandingToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
         Me.OutstandingToolStripMenuItem.Text = "Outstanding "
         '
+        'SummaryToolStripMenuItem
+        '
+        Me.SummaryToolStripMenuItem.Name = "SummaryToolStripMenuItem"
+        Me.SummaryToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
+        Me.SummaryToolStripMenuItem.Text = "Summary"
+        '
         'Label1
         '
         Me.Label1.BackColor = System.Drawing.SystemColors.ActiveCaption
@@ -348,11 +363,18 @@ Partial Class MainMDIForm
         Me.PictureBox4.TabIndex = 9
         Me.PictureBox4.TabStop = False
         '
-        'SummaryToolStripMenuItem
+        'UtilityToolStripMenuItem
         '
-        Me.SummaryToolStripMenuItem.Name = "SummaryToolStripMenuItem"
-        Me.SummaryToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
-        Me.SummaryToolStripMenuItem.Text = "Summary"
+        Me.UtilityToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReupdateToolStripMenuItem})
+        Me.UtilityToolStripMenuItem.Name = "UtilityToolStripMenuItem"
+        Me.UtilityToolStripMenuItem.Size = New System.Drawing.Size(50, 34)
+        Me.UtilityToolStripMenuItem.Text = "Utility"
+        '
+        'ReupdateToolStripMenuItem
+        '
+        Me.ReupdateToolStripMenuItem.Name = "ReupdateToolStripMenuItem"
+        Me.ReupdateToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.ReupdateToolStripMenuItem.Text = "Reupdate"
         '
         'MainMDIForm
         '
@@ -426,4 +448,7 @@ Partial Class MainMDIForm
     Friend WithEvents ToolStripMenuItem5 As ToolStripMenuItem
     Friend WithEvents OutstandingToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SummaryToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents OpeningAdvanceToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents UtilityToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ReupdateToolStripMenuItem As ToolStripMenuItem
 End Class

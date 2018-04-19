@@ -287,16 +287,16 @@ Public Class FrmRecPrn
                             pname = chkrs2.Fields(15).Value
                             pcode1 = chkrs2.Fields(3).Value  ''LAST CHANGE DONE BY DIPTI
                             adjusted_amt = adjusted_amt + chkrs2.Fields(10).Value
-                            If agcount < 8 Then
+                            If agcount < 7 Then
                                 against = against + "GO-" & chkrs2.Fields(0).Value & ", "
                             Else
-                                If agcount < 15 Then
+                                If agcount < 14 Then
                                     against1 = against1 + "GO-" & chkrs2.Fields(0).Value & ", "
                                 Else
-                                    If agcount < 22 Then
+                                    If agcount < 21 Then
                                         against2 = against2 + "GO-" & chkrs2.Fields(0).Value & ", "
                                     Else
-                                        If agcount < 29 Then
+                                        If agcount < 28 Then
                                             against3 = against3 + "GO-" & chkrs2.Fields(0).Value & ", "
                                         Else
                                         End If
@@ -804,16 +804,16 @@ Public Class FrmRecPrn
 
                             pname = chkrs2.Fields(15).Value
                             adjusted_amt = adjusted_amt + chkrs2.Fields(10).Value
-                            If agcount < 8 Then
+                            If agcount < 7 Then
                                 against = against + "GO-" & chkrs2.Fields(0).Value & ", "
                             Else
-                                If agcount < 15 Then
+                                If agcount < 14 Then
                                     against1 = against1 + "GO-" & chkrs2.Fields(0).Value & ", "
                                 Else
-                                    If agcount < 22 Then
+                                    If agcount < 21 Then
                                         against2 = against2 + "GO-" & chkrs2.Fields(0).Value & ", "
                                     Else
-                                        If agcount < 29 Then
+                                        If agcount < 28 Then
                                             against3 = against3 + "GO-" & chkrs2.Fields(0).Value & ", "
                                         Else
                                         End If
