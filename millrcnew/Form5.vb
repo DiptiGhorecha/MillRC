@@ -81,7 +81,7 @@ Public Class FrmInvoice
             Dim fDate As DateTime
             Dim oDate As String
             Dim foDate As DateTime
-            If (Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) > 4) Then
+            If (Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) >= 4) Then
                 iDate = "30/04/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
                 fDate = Convert.ToDateTime(iDate)
                 oDate = "31/03/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) + 1))
