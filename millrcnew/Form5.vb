@@ -92,6 +92,7 @@ Public Class FrmInvoice
                 oDate = "31/03/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
                 foDate = Convert.ToDateTime(oDate)
             End If
+
             ' MsgBox(fDate.ToString)
             ' MsgBox(foDate.ToString)
             Dim strn As String = "Select * FROM BILL where [BILL].bill_date>=Format('" & fDate & "', 'dd/mm/yyyy') and [BILL].bill_date<=Format('" & foDate & "', 'dd/mm/yyyy') order by Year([BILL].bill_date)+[BILL].INVOICE_NO"
