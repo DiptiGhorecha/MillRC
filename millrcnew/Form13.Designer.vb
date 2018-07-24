@@ -68,6 +68,7 @@ Partial Class FrmGodownTransfer
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Label13 = New System.Windows.Forms.Label()
         Me.TextBox9 = New System.Windows.Forms.TextBox()
+        Me.Label23 = New System.Windows.Forms.Label()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
         Me.GroupBox5.SuspendLayout()
@@ -515,11 +516,22 @@ Partial Class FrmGodownTransfer
         Me.TextBox9.Size = New System.Drawing.Size(119, 20)
         Me.TextBox9.TabIndex = 7
         '
+        'Label23
+        '
+        Me.Label23.AutoSize = True
+        Me.Label23.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label23.Location = New System.Drawing.Point(369, 9)
+        Me.Label23.Name = "Label23"
+        Me.Label23.Size = New System.Drawing.Size(66, 29)
+        Me.Label23.TabIndex = 128
+        Me.Label23.Text = "View"
+        '
         'FrmGodownTransfer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(938, 465)
+        Me.Controls.Add(Me.Label23)
         Me.Controls.Add(Me.TextBox9)
         Me.Controls.Add(Me.Label13)
         Me.Controls.Add(Me.TextBox1)
@@ -605,4 +617,5 @@ Partial Class FrmGodownTransfer
     Friend WithEvents TextBox1 As TextBox
     Friend WithEvents Label6 As Label
     Friend WithEvents TextBox9 As TextBox
+    Friend WithEvents Label23 As Label
 End Class

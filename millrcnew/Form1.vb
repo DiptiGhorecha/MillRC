@@ -202,11 +202,11 @@ Public Class MainMDIForm
     End Sub
 
     Private Sub GSTSpreadsheetsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GSTSpreadsheetsToolStripMenuItem.Click
-        If Application.OpenForms().OfType(Of Form16).Any Then
-            Form16.BringToFront()
-        Else
-            Form16.Show()
-        End If
+        'If Application.OpenForms().OfType(Of Form16).Any Then
+        '    Form16.BringToFront()
+        'Else
+        '    Form16.Show()
+        'End If
     End Sub
 
     Private Sub OutstandingReportToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles OutstandingReportToolStripMenuItem.Click
@@ -334,6 +334,46 @@ Public Class MainMDIForm
             FrmReupdate.BringToFront()
         Else
             FrmReupdate.Show()
+        End If
+    End Sub
+
+    Private Sub GodownReopenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GodownReopenToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmGodownReopen).Any Then
+            FrmGodownReopen.BringToFront()
+        Else
+            FrmGodownReopen.Show()
+        End If
+    End Sub
+
+    Private Sub RegenerateBillsWithLogoToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RegenerateBillsWithLogoToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmInvoiceRegenerate).Any Then
+            FrmInvoiceRegenerate.BringToFront()
+        Else
+            FrmInvoiceRegenerate.Show()
+        End If
+    End Sub
+
+    Private Sub GSTSpreadsheetsToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles GSTSpreadsheetsToolStripMenuItem1.Click
+        If Application.OpenForms().OfType(Of Form16).Any Then
+            Form16.BringToFront()
+        Else
+            Form16.Show()
+        End If
+    End Sub
+
+    Private Sub GSTSalesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GSTSalesToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmGstSales).Any Then
+            FrmGstSales.BringToFront()
+        Else
+            FrmGstSales.Show()
+        End If
+    End Sub
+
+    Private Sub GSTAdvancesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GSTAdvancesToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmGSTAdvance).Any Then
+            FrmGSTAdvance.BringToFront()
+        Else
+            FrmGSTAdvance.Show()
         End If
     End Sub
 End Class

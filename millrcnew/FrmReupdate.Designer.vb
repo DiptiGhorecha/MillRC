@@ -25,11 +25,12 @@ Partial Class FrmReupdate
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FrmReupdate))
         Me.Button4 = New System.Windows.Forms.Button()
         Me.cmdClose = New System.Windows.Forms.Button()
+        Me.ChkLogo = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'Button4
         '
-        Me.Button4.Location = New System.Drawing.Point(31, 25)
+        Me.Button4.Location = New System.Drawing.Point(31, 61)
         Me.Button4.Name = "Button4"
         Me.Button4.Size = New System.Drawing.Size(75, 23)
         Me.Button4.TabIndex = 159
@@ -38,18 +39,29 @@ Partial Class FrmReupdate
         '
         'cmdClose
         '
-        Me.cmdClose.Location = New System.Drawing.Point(128, 25)
+        Me.cmdClose.Location = New System.Drawing.Point(128, 61)
         Me.cmdClose.Name = "cmdClose"
         Me.cmdClose.Size = New System.Drawing.Size(51, 23)
         Me.cmdClose.TabIndex = 160
         Me.cmdClose.Text = "E&xit"
         Me.cmdClose.UseVisualStyleBackColor = True
         '
+        'ChkLogo
+        '
+        Me.ChkLogo.AutoSize = True
+        Me.ChkLogo.Location = New System.Drawing.Point(31, 26)
+        Me.ChkLogo.Name = "ChkLogo"
+        Me.ChkLogo.Size = New System.Drawing.Size(75, 17)
+        Me.ChkLogo.TabIndex = 161
+        Me.ChkLogo.Text = "With Logo"
+        Me.ChkLogo.UseVisualStyleBackColor = True
+        '
         'FrmReupdate
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(479, 125)
+        Me.ClientSize = New System.Drawing.Size(319, 125)
+        Me.Controls.Add(Me.ChkLogo)
         Me.Controls.Add(Me.cmdClose)
         Me.Controls.Add(Me.Button4)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
@@ -57,9 +69,11 @@ Partial Class FrmReupdate
         Me.Name = "FrmReupdate"
         Me.Text = "Reupdate"
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
     Friend WithEvents Button4 As Button
     Friend WithEvents cmdClose As Button
+    Friend WithEvents ChkLogo As CheckBox
 End Class

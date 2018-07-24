@@ -77,7 +77,7 @@ Partial Class FrmGodownList
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(157, 179)
+        Me.Button3.Location = New System.Drawing.Point(157, 188)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(50, 22)
         Me.Button3.TabIndex = 31
@@ -86,7 +86,7 @@ Partial Class FrmGodownList
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(88, 179)
+        Me.Button2.Location = New System.Drawing.Point(88, 188)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(50, 22)
         Me.Button2.TabIndex = 30
@@ -95,7 +95,7 @@ Partial Class FrmGodownList
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(16, 179)
+        Me.Button1.Location = New System.Drawing.Point(16, 188)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(50, 22)
         Me.Button1.TabIndex = 29
@@ -161,6 +161,7 @@ Partial Class FrmGodownList
         Me.TextBox5.Size = New System.Drawing.Size(132, 20)
         Me.TextBox5.TabIndex = 139
         Me.TextBox5.Text = "Godownmasterlist"
+        Me.TextBox5.Visible = False
         '
         'Label6
         '
@@ -169,6 +170,7 @@ Partial Class FrmGodownList
         Me.Label6.Size = New System.Drawing.Size(91, 41)
         Me.Label6.TabIndex = 140
         Me.Label6.Text = "Report File Name (Without Extn)"
+        Me.Label6.Visible = False
         '
         'Label4
         '

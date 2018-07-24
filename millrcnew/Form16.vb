@@ -11,6 +11,7 @@ Public Class Form16
     Dim chkrs3 As New ADODB.Recordset
     Dim chkrs4 As New ADODB.Recordset
     Dim chkrs5 As New ADODB.Recordset
+    Dim chkrs6 As New ADODB.Recordset
     Dim xcon As New ADODB.Connection    ''''''''variable is used to open a connection
     Dim xrs As New ADODB.Recordset      '''''''' variable is use to open a Recordset
     Dim xtemp As New ADODB.Recordset    '''''''' used to open a temparory Recordset
@@ -1217,7 +1218,7 @@ Public Class Form16
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
-        Dim str As String = "SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].REC_DATE between FORMAT('" & strtP & "','DD/MM/YYYY') AND FORMAT('" & edP & "','DD/MM/YYYY')  order by YEAR([RECEIPT].REC_DATE)+[RECEIPT].REC_NO"
+        Dim str As String = "SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].REC_DATE between FORMAT('" & strtP & "','DD/MM/YYYY') AND FORMAT('" & edP & "','DD/MM/YYYY') order by [RECEIPT].REC_DATE,[RECEIPT].REC_NO"
 
         chkrs1.Open(str, xcon)
         If chkrs1.BOF = False Then
@@ -1332,7 +1333,7 @@ Public Class Form16
                 Dim against2 As String = ""
             Dim agcount As Integer = 0
             Dim adjusted_amt As Double = 0
-
+            Dim last_bldate As DateTime = Nothing
             '  If chkrs1.Fields(6).Value = True Then
 
             '  Else
@@ -1347,15 +1348,25 @@ Public Class Form16
                     'sgamt = chkrs2.Fields(9).Value
                     'cgamt = chkrs2.Fields(7).Value
                     If chkrs2.Fields(13).Value >= inv And chkrs2.Fields(14).Value <= invdt And chkrs1.Fields(3).Value >= chkrs2.Fields(4).Value Then
-                        If FIRSTREC Then
-                            FROMNO = MonthName(Convert.ToDateTime(chkrs2.Fields(4).Value).Month, False) & "-" & Convert.ToDateTime(chkrs2.Fields(4).Value).Year
-                            TONO = FROMNO
-                            FIRSTREC = False
+                    If FIRSTREC Then
+                        chkrs6.Open("Select FROM_DATE,TO_DATE FROM BILL_TR WHERE [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND INVOICE_NO='" & chkrs2.Fields(0).Value & "' and  BILL_DATE=format('" & Convert.ToDateTime(chkrs2.Fields(4).Value) & "','dd/mm/yyyy') ", xcon)
+                        If chkrs6.EOF = False Then
+                            FROMNO = MonthName(Convert.ToDateTime(chkrs6.Fields("FROM_DATE").Value).Month, False) & " - " & Convert.ToDateTime(chkrs6.Fields("FROM_DATE").Value).Year
+                            TONO = MonthName(Convert.ToDateTime(chkrs6.Fields("TO_DATE").Value).Month, False) & " - " & Convert.ToDateTime(chkrs6.Fields("TO_DATE").Value).Year
                         Else
-                            TONO = MonthName(Convert.ToDateTime(chkrs2.Fields(4).Value).Month, False) & "-" & Convert.ToDateTime(chkrs2.Fields(4).Value).Year
+                            FROMNO = MonthName(Convert.ToDateTime(chkrs2.Fields(4).Value).Month, False) & " - " & Convert.ToDateTime(chkrs2.Fields(4).Value).Year
+                            TONO = FROMNO
                         End If
-                        pname = chkrs2.Fields(16).Value
-                        adjusted_amt = adjusted_amt + chkrs2.Fields(10).Value
+                        chkrs6.Close()
+                        'FROMNO = MonthName(Convert.ToDateTime(chkrs2.Fields(4).Value).Month, False) & "-" & Convert.ToDateTime(chkrs2.Fields(4).Value).Year
+                        'TONO = FROMNO
+                        FIRSTREC = False
+                    Else
+                        TONO = MonthName(Convert.ToDateTime(chkrs2.Fields(4).Value).Month, False) & "-" & Convert.ToDateTime(chkrs2.Fields(4).Value).Year
+                    End If
+                    last_bldate = chkrs2.Fields(4).Value
+                    pname = chkrs2.Fields(16).Value
+                    adjusted_amt = adjusted_amt + chkrs2.Fields(10).Value
                         If agcount < 8 Then
                             against = against + "GO-" & chkrs2.Fields(0).Value & ", "
                         Else
@@ -1406,9 +1417,9 @@ Public Class Form16
                 ''''''''''''''find out if any advance is left after adjustment start
                 Dim advanceamt As Double = 0
                 Dim advanceamtprint As Double = 0
-                Dim lastbilladjusted As Integer
-                Dim last_bldate As DateTime
-                advanceamt = chkrs1.Fields(5).Value - adjusted_amt
+            Dim lastbilladjusted As Integer = 0
+            'Dim last_bldate As DateTime
+            advanceamt = chkrs1.Fields(5).Value - adjusted_amt
                 advanceamtprint = advanceamt
                 If advanceamt > 0 Then
                     Dim Rss As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[GODOWN].FROM_D From [BILL] As t2 inner join GODOWN on t2.[GROUP]=[GODOWN].[GROUP] AND t2.[GODWN_NO]=[GODOWN].GODWN_NO Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND T2.P_CODE='" & pcode1 & "' AND ((t2.REC_NO IS NOT NULL AND t2.REC_DATE IS NOT NULL)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
@@ -1434,22 +1445,33 @@ Public Class Form16
                         End If
                         chkrs5.Close()
                     End If
-                    Dim dtcounter As Integer = 1
-                    Do Until advanceamt <= 0
-                        If FIRSTREC Then
-                            If IsDBNull(FROMNO) Or FROMNO = Nothing Then
-                                FROMNO = MonthName(Convert.ToDateTime(last_bldate).Month, False) & "-" & Convert.ToDateTime(last_bldate).Year
-                                advanceamt = advanceamt - net
-                                TONO = FROMNO
-                                FIRSTREC = False
-                                'last_bldate = chkrs5.Fields(0).Value
-                            End If
-                        Else
-                            TONO = MonthName(Convert.ToDateTime(last_bldate).AddMonths(dtcounter).Month, False) & "-" & Convert.ToDateTime(last_bldate).AddMonths(dtcounter).Year
+                Dim dtcounter As Integer = 1
+                If against.Length >= 1 Or lastbilladjusted = 0 Then
+                    dtcounter = 1
+                Else
+                    dtcounter = 2
+                End If
+                Do Until advanceamt <= 0
+                    Dim sdt As Date = Convert.ToDateTime(last_bldate).AddMonths(1)
+                    If lastbilladjusted = 0 Then
+                        sdt = Convert.ToDateTime(last_bldate)
+
+                    End If
+
+                    If FIRSTREC Then
+                        If IsDBNull(FROMNO) Or FROMNO = Nothing Then
+                            FROMNO = MonthName(sdt.Month, False) & "-" & sdt.Year
                             advanceamt = advanceamt - net
-                            dtcounter = dtcounter + 1
+                            TONO = FROMNO
+                            FIRSTREC = False
+                            'last_bldate = chkrs5.Fields(0).Value
                         End If
-                    Loop
+                    Else
+                        TONO = MonthName(last_bldate.AddMonths(dtcounter).Month, False) & "-" & last_bldate.AddMonths(dtcounter).Year
+                        advanceamt = advanceamt - net
+                        dtcounter = dtcounter + 1
+                    End If
+                Loop
                 End If
 
                 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1462,7 +1484,7 @@ Public Class Form16
                     Print(fnumm, GetStringToPrint(17, "GST-" + chkrs1.Fields(4).Value.ToString, "S") & "," & GetStringToPrint(15, Format((advanceamtprint * 100 / 118), "######0.00"), "N") & "," & GetStringToPrint(15, Format((advanceamtprint * 100 / 118) * 9 / 100, "######0.00"), "N") & "," & GetStringToPrint(15, Format((advanceamtprint * 100 / 118) * 9 / 100, "######0.00"), "N") & "," & GetStringToPrint(15, Format(advanceamtprint, "######0.00"), "N") & vbNewLine)
                     tot1 = tot1 + (advanceamtprint * 100 / 118)
                     tot2 = tot2 + ((advanceamtprint * 100 / 118) * 9 / 100)
-                    tot3 = tot2 + ((advanceamtprint * 100 / 118) * 9 / 100)
+                    tot3 = tot3 + ((advanceamtprint * 100 / 118) * 9 / 100)
                     tot4 = tot4 + advanceamtprint
                     xline = xline + 1
                 End If

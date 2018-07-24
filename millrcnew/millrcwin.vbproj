@@ -317,6 +317,30 @@
     <Compile Include="FrmGodownListView.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FrmGodownReopen.Designer.vb">
+      <DependentUpon>FrmGodownReopen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmGodownReopen.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmGSTAdvance.Designer.vb">
+      <DependentUpon>FrmGSTAdvance.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmGSTAdvance.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmGstSales.Designer.vb">
+      <DependentUpon>FrmGstSales.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmGstSales.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmGSTSalesView.Designer.vb">
+      <DependentUpon>FrmGSTSalesView.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmGSTSalesView.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmInvoicePrnGdnwise.Designer.vb">
       <DependentUpon>FrmInvoicePrnGdnwise.vb</DependentUpon>
     </Compile>
@@ -327,6 +351,12 @@
       <DependentUpon>FrmInvoicePrnGodown.vb</DependentUpon>
     </Compile>
     <Compile Include="FrmInvoicePrnGodown.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmInvoiceRegenerate.Designer.vb">
+      <DependentUpon>FrmInvoiceRegenerate.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmInvoiceRegenerate.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FrmInvoiceSummary.Designer.vb">
@@ -526,11 +556,26 @@
     <EmbeddedResource Include="FrmGodownListView.resx">
       <DependentUpon>FrmGodownListView.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FrmGodownReopen.resx">
+      <DependentUpon>FrmGodownReopen.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmGSTAdvance.resx">
+      <DependentUpon>FrmGSTAdvance.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmGstSales.resx">
+      <DependentUpon>FrmGstSales.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmGSTSalesView.resx">
+      <DependentUpon>FrmGSTSalesView.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FrmInvoicePrnGdnwise.resx">
       <DependentUpon>FrmInvoicePrnGdnwise.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmInvoicePrnGodown.resx">
       <DependentUpon>FrmInvoicePrnGodown.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmInvoiceRegenerate.resx">
+      <DependentUpon>FrmInvoiceRegenerate.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmInvoiceSummary.resx">
       <DependentUpon>FrmInvoiceSummary.vb</DependentUpon>

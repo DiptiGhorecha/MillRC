@@ -250,8 +250,18 @@ Public Class FrmRecChecklist
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
+
+
+        Dim title As String = "Receipt Checklist"
+        If CheckBox2.Checked Then
+            title = title & " HSN Wise "
+        End If
+        If CheckBox1.Checked Then
+            title = title & " - Advance Only"
+        End If
+
         If CheckBox2.Checked = True Then   'hsnwise
-            chkrs11.Open("SELECT * FROM GST ORDER BY HSN_NO", xcon)
+            chkrs11.Open("Select * FROM GST ORDER BY HSN_NO", xcon)
             If chkrs11.BOF = False Then
                 chkrs11.MoveFirst()
             End If
@@ -264,7 +274,7 @@ Public Class FrmRecChecklist
                 HSN = chkrs11.Fields(0).Value
                 HSNPRINT = True
                 If first Then
-
+                    globalHeader(title, fnum, fnumm)
                     Print(fnum, GetStringToPrint(17, "Receipt Date", "S") & GetStringToPrint(17, "Receipt No.", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(13, "  Advance", "S") & GetStringToPrint(12, "Cash/Cheque", "S") & GetStringToPrint(7, "Group", "S") & GetStringToPrint(13, "Godown No.", "S") & GetStringToPrint(50, "Tenant Name", "S") & GetStringToPrint(33, "Bank A/C Detail", "S") & vbNewLine)
                     Print(fnumm, GetStringToPrint(17, "Receipt Date", "S") & "," & GetStringToPrint(17, "Receipt No.", "S") & "," & GetStringToPrint(13, "Amount", "N") & "," & GetStringToPrint(13, "  Advance", "S") & "," & GetStringToPrint(12, "Cash/Cheque", "S") & "," & GetStringToPrint(7, "Group", "S") & "," & GetStringToPrint(13, "Godown No.", "S") & "," & GetStringToPrint(50, "Tenant Name", "S") & "," & GetStringToPrint(33, "Bank A/C Detail", "S") & "," & GetStringToPrint(17, "Cheque No.", "S") & "," & GetStringToPrint(17, "Cheque Date", "S") & "," & GetStringToPrint(50, "Bank Name", "S") & "," & GetStringToPrint(33, "Branch", "S") & "," & GetStringToPrint(17, "From Month-Year", "S") & "," & GetStringToPrint(17, "To Month-Year", "S") & "," & GetStringToPrint(63, "Adjusted Bill No.", "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(17, "Cheque No.", "S") & GetStringToPrint(17, "Cheque Date", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(50, "Bank Name", "S") & GetStringToPrint(33, "Branch", "S") & vbNewLine)
@@ -282,9 +292,9 @@ Public Class FrmRecChecklist
                 xline = xline + 1
 
 
-                Dim str As String = "SELECT [RECEIPT].*,[GODOWN].* from [RECEIPT] INNER JOIN [GODOWN] ON ([RECEIPT].[GROUP]=[GODOWN].[GROUP] AND [RECEIPT].[GODWN_NO]=[GODOWN].[GODWN_NO]  where [RECEIPT].REC_DATE between FORMAT('" & startP & "','DD/MM/YYYY') AND FORMAT('" & endP & "','DD/MM/YYYY') And [GODOWN].GST='" & HSN & "' AND [GODOWN].[STATUS]='C' and [RECEIPT].REC_NO>=" & strrec & " AND [RECEIPT].rec_no<=" & edrec & " order by [RECEIPT].REC_DATE+[RECEIPT].REC_NO"
+                Dim str As String = "SELECT [RECEIPT].*,[GODOWN].* from [RECEIPT] INNER JOIN [GODOWN] ON ([RECEIPT].[GROUP]=[GODOWN].[GROUP] AND [RECEIPT].[GODWN_NO]=[GODOWN].[GODWN_NO]  where [RECEIPT].REC_DATE between FORMAT('" & startP & "','DD/MM/YYYY') AND FORMAT('" & endP & "','DD/MM/YYYY') And [GODOWN].GST='" & HSN & "' AND [GODOWN].[STATUS]='C' and [RECEIPT].REC_NO>=" & strrec & " AND [RECEIPT].rec_no<=" & edrec & " order by [RECEIPT].REC_DATE,[RECEIPT].REC_NO"
 
-                chkrs1.Open("SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].REC_DATE between FORMAT('" & startP & "','DD/MM/YYYY') AND FORMAT('" & endP & "','DD/MM/YYYY') and [RECEIPT].REC_NO>=" & strrec & " AND [RECEIPT].rec_no<=" & edrec & " order by [RECEIPT].REC_DATE+[RECEIPT].REC_NO", xcon)
+                chkrs1.Open("SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].REC_DATE between FORMAT('" & startP & "','DD/MM/YYYY') AND FORMAT('" & endP & "','DD/MM/YYYY') and [RECEIPT].REC_NO>=" & strrec & " AND [RECEIPT].rec_no<=" & edrec & " order by [RECEIPT].REC_DATE,[RECEIPT].REC_NO", xcon)
                 If chkrs1.BOF = False Then
                     chkrs1.MoveFirst()
                 End If
@@ -395,7 +405,7 @@ Public Class FrmRecChecklist
                         Dim against2 As String = ""
                         Dim agcount As Integer = 0
                         Dim adjusted_amt As Double = 0
-                        Dim last_bldate As DateTime
+                        Dim last_bldate As DateTime = Nothing
                         '  If chkrs1.Fields(6).Value = True Then
 
                         '  Else
@@ -428,6 +438,7 @@ Public Class FrmRecChecklist
                                 End If
                                 last_bldate = chkrs2.Fields(4).Value
                                 pname = chkrs2.Fields(16).Value
+                                pcode1 = chkrs2.Fields(3).Value
                                 adjusted_amt = adjusted_amt + chkrs2.Fields(10).Value
                                 If agcount < 8 Then
                                     against = against + "GO-" & chkrs2.Fields(0).Value & ", "
@@ -479,7 +490,7 @@ Public Class FrmRecChecklist
                         ''''''''''''''find out if any advance is left after adjustment start
                         Dim advanceamt As Double = 0
                         Dim advanceamtprint As Double = 0
-                        Dim lastbilladjusted As Integer
+                        Dim lastbilladjusted As Integer = 0
 
                         advanceamt = chkrs1.Fields(5).Value - adjusted_amt
                         advanceamtprint = advanceamt
@@ -661,8 +672,8 @@ Public Class FrmRecChecklist
         Else
             Dim str As String = "SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].REC_DATE between #" & startP & "# AND #" & endP & "#  order by YEAR([RECEIPT].REC_DATE)+[RECEIPT].REC_NO"
 
-        chkrs1.Open("SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].REC_DATE between FORMAT('" & startP & "','DD/MM/YYYY') AND FORMAT('" & endP & "','DD/MM/YYYY')  and REC_NO>=" & strrec & " AND rec_no<=" & edrec & " order by [RECEIPT].REC_DATE+[RECEIPT].REC_NO", xcon)
-        If chkrs1.BOF = False Then
+            chkrs1.Open("SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].REC_DATE between FORMAT('" & startP & "','DD/MM/YYYY') AND FORMAT('" & endP & "','DD/MM/YYYY')  and REC_NO>=" & strrec & " AND rec_no<=" & edrec & " order by [RECEIPT].REC_DATE,[RECEIPT].REC_NO", xcon)
+            If chkrs1.BOF = False Then
             chkrs1.MoveFirst()
         End If
         Dim first As Boolean = True
@@ -671,7 +682,7 @@ Public Class FrmRecChecklist
         Do While chkrs1.EOF = False
             If chkrs1.Fields(4).Value >= strrec And chkrs1.Fields(4).Value <= edrec Then
                 If first Then
-
+                        globalHeader(title, fnum, fnumm)
                         Print(fnum, GetStringToPrint(17, "Receipt Date", "S") & GetStringToPrint(17, "Receipt No.", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(13, "  Advance", "S") & GetStringToPrint(12, "Cash/Cheque", "S") & GetStringToPrint(7, "Group", "S") & GetStringToPrint(13, "Godown No.", "S") & GetStringToPrint(50, "Tenant Name", "S") & GetStringToPrint(33, "Bank A/C Detail", "S") & vbNewLine)
                         Print(fnumm, GetStringToPrint(17, "Receipt Date", "S") & "," & GetStringToPrint(17, "Receipt No.", "S") & "," & GetStringToPrint(13, "Amount", "N") & "," & GetStringToPrint(13, "  Advance", "S") & "," & GetStringToPrint(12, "Cash/Cheque", "S") & "," & GetStringToPrint(7, "Group", "S") & "," & GetStringToPrint(13, "Godown No.", "S") & "," & GetStringToPrint(50, "Tenant Name", "S") & "," & GetStringToPrint(33, "Bank A/C Detail", "S") & ",")
                         Print(fnum, GetStringToPrint(17, "Cheque No.", "S") & GetStringToPrint(17, "Cheque Date", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(50, "Bank Name", "S") & GetStringToPrint(33, "Branch", "S") & vbNewLine)
@@ -771,7 +782,7 @@ Public Class FrmRecChecklist
                 Dim against2 As String = ""
                 Dim agcount As Integer = 0
                     Dim adjusted_amt As Double = 0
-                    Dim last_bldate As DateTime
+                    Dim last_bldate As DateTime = Nothing
                     '  If chkrs1.Fields(6).Value = True Then
 
                     '  Else
@@ -855,7 +866,7 @@ Public Class FrmRecChecklist
                 ''''''''''''''find out if any advance is left after adjustment start
                 Dim advanceamt As Double = 0
                 Dim advanceamtprint As Double = 0
-                Dim lastbilladjusted As Integer
+                    Dim lastbilladjusted As Integer = 0
                     '  Dim last_bldate As DateTime
                     advanceamt = chkrs1.Fields(5).Value - adjusted_amt
                 advanceamtprint = advanceamt
@@ -1115,10 +1126,17 @@ Public Class FrmRecChecklist
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
-        FileOpen(fnum, Application.StartupPath & "\Recprintchecklist.dat", OpenMode.Output)
+        FileOpen(fnum, Application.StartupPath & "\Reports\\Recprintchecklist.dat", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
+        End If
+        Dim title As String = "Receipt Checklist"
+        If CheckBox2.Checked Then
+            title = title & " HSN Wise "
+        End If
+        If CheckBox1.Checked Then
+            title = title & " - Advance Only"
         End If
         If CheckBox2.Checked = True Then   'hsnwise
             chkrs11.Open("SELECT * FROM GST ORDER BY HSN_NO", xcon)
@@ -1134,7 +1152,7 @@ Public Class FrmRecChecklist
                 HSN = chkrs11.Fields(0).Value
                 HSNPRINT = True
                 If first Then
-
+                    globalHeader(title, fnum, 0)
                     Print(fnum, GetStringToPrint(17, "Receipt Date", "S") & GetStringToPrint(17, "Receipt No.", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(13, "  Advance", "S") & GetStringToPrint(12, "Cash/Cheque", "S") & GetStringToPrint(7, "Group", "S") & GetStringToPrint(13, "Godown No.", "S") & GetStringToPrint(50, "Tenant Name", "S") & GetStringToPrint(33, "Bank A/C Detail", "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(17, "Cheque No.", "S") & GetStringToPrint(17, "Cheque Date", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(50, "Bank Name", "S") & GetStringToPrint(33, "Branch", "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(17, "From Month-Year", "S") & GetStringToPrint(17, "To Month-Year", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, "Adjusted Bill No.", "S") & vbNewLine)
@@ -1489,7 +1507,7 @@ Public Class FrmRecChecklist
             Do While chkrs1.EOF = False
                 If chkrs1.Fields(4).Value >= strrec And chkrs1.Fields(4).Value <= edrec Then
                     If first Then
-
+                        globalHeader(title, fnum, 0)
                         Print(fnum, GetStringToPrint(17, "Receipt Date", "S") & GetStringToPrint(17, "Receipt No.", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(13, "  Advance", "S") & GetStringToPrint(12, "Cash/Cheque", "S") & GetStringToPrint(7, "Group", "S") & GetStringToPrint(13, "Godown No.", "S") & GetStringToPrint(50, "Tenant Name", "S") & GetStringToPrint(33, "Bank A/C Detail", "S") & vbNewLine)
                         Print(fnum, GetStringToPrint(17, "Cheque No.", "S") & GetStringToPrint(17, "Cheque Date", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(50, "Bank Name", "S") & GetStringToPrint(33, "Branch", "S") & vbNewLine)
                         Print(fnum, GetStringToPrint(17, "From Month-Year", "S") & GetStringToPrint(17, "To Month-Year", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, "Adjusted Bill No.", "S") & vbNewLine)
@@ -1585,19 +1603,12 @@ Public Class FrmRecChecklist
                     Dim against2 As String = ""
                     Dim agcount As Integer = 0
                     Dim adjusted_amt As Double = 0
-                    '  If chkrs1.Fields(6).Value = True Then
 
-                    '  Else
-                    '  grp = chkrs1.Fields(1).Value
-                    '   gdn = chkrs1.Fields(2).Value
                     Dim RS As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                     chkrs2.Open("SELECT t2.*,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=format('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=format('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO", xcon)
 
                     Do While chkrs2.EOF = False
-                        'sgsrate = chkrs2.Fields(8).Value
-                        'cgsrate = chkrs2.Fields(6).Value
-                        'sgamt = chkrs2.Fields(9).Value
-                        'cgamt = chkrs2.Fields(7).Value
+
                         If chkrs2.Fields(13).Value >= inv And chkrs2.Fields(14).Value <= invdt And chkrs1.Fields(3).Value >= chkrs2.Fields(4).Value Then
                             If FIRSTREC Then
                                 FROMNO = MonthName(Convert.ToDateTime(chkrs2.Fields(4).Value).Month, False) & "-" & Convert.ToDateTime(chkrs2.Fields(4).Value).Year
@@ -1791,8 +1802,8 @@ Public Class FrmRecChecklist
             'Form15.PrintDocument1.PrinterSettings = Form7.PrintDialog1.PrinterSettings
             'Form7.PrintDocument1.Print()
         End If
-        Form17.RichTextBox1.LoadFile(Application.StartupPath & "\Recprintchecklist.dat", RichTextBoxStreamType.PlainText)
-        CreatePDF(Application.StartupPath & "\Recprintchecklist.dat", Application.StartupPath & "\" & TextBox5.Text)
+        Form17.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Recprintchecklist.dat", RichTextBoxStreamType.PlainText)
+        CreatePDF(Application.StartupPath & "\Reports\Recprintchecklist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
         Form17.Show()
         Dim PrintPDFFile As New ProcessStartInfo
         PrintPDFFile.UseShellExecute = True
@@ -1800,7 +1811,7 @@ Public Class FrmRecChecklist
         PrintPDFFile.Verb = "print"
         PrintPDFFile.WindowStyle = ProcessWindowStyle.Normal
         '.Hidden
-        PrintPDFFile.FileName = Application.StartupPath & "\" & TextBox5.Text & ".pdf"
+        PrintPDFFile.FileName = Application.StartupPath & "\Reports\" & TextBox5.Text & ".pdf"
         Process.Start(PrintPDFFile)
     End Sub
 
@@ -2206,4 +2217,60 @@ Public Class FrmRecChecklist
             MsgBox(ex.ToString)
         End Try
     End Function
+
+    Private Sub Label3_Click(sender As Object, e As EventArgs) Handles Label3.Click
+
+    End Sub
+
+    Private Sub Label4_Click(sender As Object, e As EventArgs) Handles Label4.Click
+
+    End Sub
+
+    Private Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click
+
+    End Sub
+
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+
+    End Sub
+
+    Private Sub Label13_Click(sender As Object, e As EventArgs) Handles Label13.Click
+
+    End Sub
+
+    Private Sub TextBox2_TextChanged(sender As Object, e As EventArgs) Handles TextBox2.TextChanged
+
+    End Sub
+
+    Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
+
+    End Sub
+
+    Private Sub CheckBox2_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox2.CheckedChanged
+
+    End Sub
+
+    Private Sub Label6_Click(sender As Object, e As EventArgs) Handles Label6.Click
+
+    End Sub
+
+    Private Sub TextBox5_TextChanged(sender As Object, e As EventArgs) Handles TextBox5.TextChanged
+
+    End Sub
+
+    Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
+
+    End Sub
+
+    Private Sub TextBox4_TextChanged(sender As Object, e As EventArgs) Handles TextBox4.TextChanged
+
+    End Sub
+
+    Private Sub TextBox3_TextChanged(sender As Object, e As EventArgs) Handles TextBox3.TextChanged
+
+    End Sub
+
+    Private Sub TxtSrch_TextChanged(sender As Object, e As EventArgs) Handles TxtSrch.TextChanged
+
+    End Sub
 End Class

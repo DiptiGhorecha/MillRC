@@ -107,7 +107,7 @@ Partial Class FrmTenantList
         '
         'TextBox5
         '
-        Me.TextBox5.Location = New System.Drawing.Point(109, 87)
+        Me.TextBox5.Location = New System.Drawing.Point(108, 88)
         Me.TextBox5.Name = "TextBox5"
         Me.TextBox5.Size = New System.Drawing.Size(132, 20)
         Me.TextBox5.TabIndex = 134
@@ -115,7 +115,7 @@ Partial Class FrmTenantList
         '
         'Label6
         '
-        Me.Label6.Location = New System.Drawing.Point(7, 87)
+        Me.Label6.Location = New System.Drawing.Point(7, 88)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(91, 41)
         Me.Label6.TabIndex = 138
@@ -123,7 +123,7 @@ Partial Class FrmTenantList
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(151, 134)
+        Me.Button3.Location = New System.Drawing.Point(151, 132)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(50, 22)
         Me.Button3.TabIndex = 137
@@ -132,7 +132,7 @@ Partial Class FrmTenantList
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(82, 134)
+        Me.Button2.Location = New System.Drawing.Point(82, 132)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(50, 22)
         Me.Button2.TabIndex = 136
@@ -141,7 +141,7 @@ Partial Class FrmTenantList
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(10, 134)
+        Me.Button1.Location = New System.Drawing.Point(10, 132)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(50, 22)
         Me.Button1.TabIndex = 135

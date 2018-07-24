@@ -149,6 +149,11 @@ Public Class FrmInvoicePrnGodown
         myArray = myList.ToArray()
         myYrArray = myyrList.ToArray()
         myMnArray = mymnList.ToArray()
+        If (myArray.Length < 1) Then
+            MsgBox("Please select Invoice")
+            ComboBox2.Focus()
+            Exit Sub
+        End If
         For X As Integer = 0 To myArray.Length - 1
 
         Next
@@ -248,6 +253,11 @@ Public Class FrmInvoicePrnGodown
             End If
         Next
         myArray = myList.ToArray()
+        If (myArray.Length < 1) Then
+            MsgBox("Please select Invoice")
+            ComboBox2.Focus()
+            Exit Sub
+        End If
         For X As Integer = 0 To myArray.Length - 1
             ' MsgBox(myArray(X))
             Dim strPDFFile As String = Dir(Application.StartupPath & "\Invoices\pdf\" & myyrList(X) & "\" & mymnList(X) & "\" & myArray(X) & ".pdf")

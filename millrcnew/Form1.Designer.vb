@@ -31,6 +31,7 @@ Partial Class MainMDIForm
         Me.RentToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GodownCloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OpeningAdvanceToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.GodownReopenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TransactionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BillToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
@@ -50,6 +51,9 @@ Partial Class MainMDIForm
         Me.OutstandingReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TenantsDetailToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GSTSpreadsheetsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.GSTSpreadsheetsToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.GSTSalesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.GSTAdvancesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem4 = New System.Windows.Forms.ToolStripMenuItem()
         Me.TenantMasterListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GodownMasterListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -57,14 +61,15 @@ Partial Class MainMDIForm
         Me.GodownCloseListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OutstandingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SummaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.UtilityToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ReupdateToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RegenerateBillsWithLogoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.PictureBox2 = New System.Windows.Forms.PictureBox()
         Me.PictureBox3 = New System.Windows.Forms.PictureBox()
         Me.PictureBox4 = New System.Windows.Forms.PictureBox()
-        Me.UtilityToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ReupdateToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -87,7 +92,7 @@ Partial Class MainMDIForm
         '
         'MastersToolStripMenuItem
         '
-        Me.MastersToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GroupToolStripMenuItem, Me.TenantToolStripMenuItem, Me.GodownToolStripMenuItem, Me.RentToolStripMenuItem, Me.GodownCloseToolStripMenuItem, Me.OpeningAdvanceToolStripMenuItem})
+        Me.MastersToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GroupToolStripMenuItem, Me.TenantToolStripMenuItem, Me.GodownToolStripMenuItem, Me.RentToolStripMenuItem, Me.GodownCloseToolStripMenuItem, Me.OpeningAdvanceToolStripMenuItem, Me.GodownReopenToolStripMenuItem})
         Me.MastersToolStripMenuItem.Name = "MastersToolStripMenuItem"
         Me.MastersToolStripMenuItem.Size = New System.Drawing.Size(60, 34)
         Me.MastersToolStripMenuItem.Text = "Masters"
@@ -133,6 +138,12 @@ Partial Class MainMDIForm
         Me.OpeningAdvanceToolStripMenuItem.Name = "OpeningAdvanceToolStripMenuItem"
         Me.OpeningAdvanceToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
         Me.OpeningAdvanceToolStripMenuItem.Text = "Opening Advance"
+        '
+        'GodownReopenToolStripMenuItem
+        '
+        Me.GodownReopenToolStripMenuItem.Name = "GodownReopenToolStripMenuItem"
+        Me.GodownReopenToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
+        Me.GodownReopenToolStripMenuItem.Text = "Godown Reopen"
         '
         'TransactionsToolStripMenuItem
         '
@@ -180,7 +191,7 @@ Partial Class MainMDIForm
         '
         Me.InvoicePrintingToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MonthlyInvoicePrintingToolStripMenuItem, Me.GodownwiseInvoicePrintingToolStripMenuItem})
         Me.InvoicePrintingToolStripMenuItem.Name = "InvoicePrintingToolStripMenuItem"
-        Me.InvoicePrintingToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
+        Me.InvoicePrintingToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
         Me.InvoicePrintingToolStripMenuItem.Text = "Invoice Printing"
         '
         'MonthlyInvoicePrintingToolStripMenuItem
@@ -199,7 +210,7 @@ Partial Class MainMDIForm
         '
         Me.ToolStripMenuItem2.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Format1ToolStripMenuItem, Me.Format2ToolStripMenuItem})
         Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
-        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(167, 22)
+        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(166, 22)
         Me.ToolStripMenuItem2.Text = "Invoice Checklist"
         '
         'Format1ToolStripMenuItem
@@ -217,14 +228,14 @@ Partial Class MainMDIForm
         'ToolStripMenuItem3
         '
         Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
-        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(167, 22)
+        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(166, 22)
         Me.ToolStripMenuItem3.Text = "Invoice Summary"
         '
         'ReceiptPrintingToolStripMenuItem
         '
         Me.ReceiptPrintingToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MonthlyReceiptPrintingToolStripMenuItem, Me.ReceiptPrintingForGodownToolStripMenuItem})
         Me.ReceiptPrintingToolStripMenuItem.Name = "ReceiptPrintingToolStripMenuItem"
-        Me.ReceiptPrintingToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
+        Me.ReceiptPrintingToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
         Me.ReceiptPrintingToolStripMenuItem.Text = "Receipt Printing"
         '
         'MonthlyReceiptPrintingToolStripMenuItem
@@ -242,26 +253,45 @@ Partial Class MainMDIForm
         'OutstandingReportToolStripMenuItem
         '
         Me.OutstandingReportToolStripMenuItem.Name = "OutstandingReportToolStripMenuItem"
-        Me.OutstandingReportToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
+        Me.OutstandingReportToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
         Me.OutstandingReportToolStripMenuItem.Text = "Receipt Checklist"
         '
         'TenantsDetailToolStripMenuItem
         '
         Me.TenantsDetailToolStripMenuItem.Name = "TenantsDetailToolStripMenuItem"
-        Me.TenantsDetailToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
+        Me.TenantsDetailToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
         Me.TenantsDetailToolStripMenuItem.Text = "Tenant's Detail"
         '
         'GSTSpreadsheetsToolStripMenuItem
         '
+        Me.GSTSpreadsheetsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GSTSpreadsheetsToolStripMenuItem1, Me.GSTSalesToolStripMenuItem, Me.GSTAdvancesToolStripMenuItem})
         Me.GSTSpreadsheetsToolStripMenuItem.Name = "GSTSpreadsheetsToolStripMenuItem"
-        Me.GSTSpreadsheetsToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
-        Me.GSTSpreadsheetsToolStripMenuItem.Text = "GST Spreadsheets"
+        Me.GSTSpreadsheetsToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
+        Me.GSTSpreadsheetsToolStripMenuItem.Text = "GST Reports"
+        '
+        'GSTSpreadsheetsToolStripMenuItem1
+        '
+        Me.GSTSpreadsheetsToolStripMenuItem1.Name = "GSTSpreadsheetsToolStripMenuItem1"
+        Me.GSTSpreadsheetsToolStripMenuItem1.Size = New System.Drawing.Size(167, 22)
+        Me.GSTSpreadsheetsToolStripMenuItem1.Text = "GST Spreadsheets"
+        '
+        'GSTSalesToolStripMenuItem
+        '
+        Me.GSTSalesToolStripMenuItem.Name = "GSTSalesToolStripMenuItem"
+        Me.GSTSalesToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
+        Me.GSTSalesToolStripMenuItem.Text = "GST Sales"
+        '
+        'GSTAdvancesToolStripMenuItem
+        '
+        Me.GSTAdvancesToolStripMenuItem.Name = "GSTAdvancesToolStripMenuItem"
+        Me.GSTAdvancesToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
+        Me.GSTAdvancesToolStripMenuItem.Text = "GST advances"
         '
         'ToolStripMenuItem4
         '
         Me.ToolStripMenuItem4.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TenantMasterListToolStripMenuItem, Me.GodownMasterListToolStripMenuItem, Me.TransfterOfGodownListToolStripMenuItem, Me.GodownCloseListToolStripMenuItem})
         Me.ToolStripMenuItem4.Name = "ToolStripMenuItem4"
-        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(167, 22)
+        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(166, 22)
         Me.ToolStripMenuItem4.Text = "Masters List"
         '
         'TenantMasterListToolStripMenuItem
@@ -291,14 +321,33 @@ Partial Class MainMDIForm
         'OutstandingToolStripMenuItem
         '
         Me.OutstandingToolStripMenuItem.Name = "OutstandingToolStripMenuItem"
-        Me.OutstandingToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
+        Me.OutstandingToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
         Me.OutstandingToolStripMenuItem.Text = "Outstanding "
         '
         'SummaryToolStripMenuItem
         '
         Me.SummaryToolStripMenuItem.Name = "SummaryToolStripMenuItem"
-        Me.SummaryToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
+        Me.SummaryToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
         Me.SummaryToolStripMenuItem.Text = "Summary"
+        '
+        'UtilityToolStripMenuItem
+        '
+        Me.UtilityToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReupdateToolStripMenuItem, Me.RegenerateBillsWithLogoToolStripMenuItem})
+        Me.UtilityToolStripMenuItem.Name = "UtilityToolStripMenuItem"
+        Me.UtilityToolStripMenuItem.Size = New System.Drawing.Size(50, 34)
+        Me.UtilityToolStripMenuItem.Text = "Utility"
+        '
+        'ReupdateToolStripMenuItem
+        '
+        Me.ReupdateToolStripMenuItem.Name = "ReupdateToolStripMenuItem"
+        Me.ReupdateToolStripMenuItem.Size = New System.Drawing.Size(213, 22)
+        Me.ReupdateToolStripMenuItem.Text = "Reupdate"
+        '
+        'RegenerateBillsWithLogoToolStripMenuItem
+        '
+        Me.RegenerateBillsWithLogoToolStripMenuItem.Name = "RegenerateBillsWithLogoToolStripMenuItem"
+        Me.RegenerateBillsWithLogoToolStripMenuItem.Size = New System.Drawing.Size(213, 22)
+        Me.RegenerateBillsWithLogoToolStripMenuItem.Text = "Regenerate Bills with Logo"
         '
         'Label1
         '
@@ -362,19 +411,6 @@ Partial Class MainMDIForm
         Me.PictureBox4.Size = New System.Drawing.Size(650, 53)
         Me.PictureBox4.TabIndex = 9
         Me.PictureBox4.TabStop = False
-        '
-        'UtilityToolStripMenuItem
-        '
-        Me.UtilityToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReupdateToolStripMenuItem})
-        Me.UtilityToolStripMenuItem.Name = "UtilityToolStripMenuItem"
-        Me.UtilityToolStripMenuItem.Size = New System.Drawing.Size(50, 34)
-        Me.UtilityToolStripMenuItem.Text = "Utility"
-        '
-        'ReupdateToolStripMenuItem
-        '
-        Me.ReupdateToolStripMenuItem.Name = "ReupdateToolStripMenuItem"
-        Me.ReupdateToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.ReupdateToolStripMenuItem.Text = "Reupdate"
         '
         'MainMDIForm
         '
@@ -451,4 +487,9 @@ Partial Class MainMDIForm
     Friend WithEvents OpeningAdvanceToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents UtilityToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ReupdateToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents GodownReopenToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents RegenerateBillsWithLogoToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents GSTSpreadsheetsToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents GSTSalesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents GSTAdvancesToolStripMenuItem As ToolStripMenuItem
 End Class

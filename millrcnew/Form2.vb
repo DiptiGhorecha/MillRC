@@ -105,7 +105,7 @@ Public Class FrmGodownType
             cmdAdd.Enabled = False
             cmdEdit.Enabled = False
             cmdDelete.Enabled = False
-
+            Label22.Text = "ADD"
             Exit Sub
 
         Catch ex As Exception
@@ -132,6 +132,7 @@ Public Class FrmGodownType
         Try
 
             GrpAddCorrect = "C"
+            Label22.Text = "EDIT"
             DataGridView1.Enabled = False
             'Datprimaryrs.Recordset.Edit
             oldName = TextBox1.Text
@@ -272,6 +273,7 @@ Public Class FrmGodownType
 
     Private Sub cmdCancel_Click(sender As Object, e As EventArgs) Handles cmdCancel.Click
         Try
+            Label22.Text = "VIEW"
             DataGridView1.Enabled = True
             GrpAddCorrect = ""
             cmdUpdate.Enabled = False
@@ -337,6 +339,7 @@ Public Class FrmGodownType
                 cmdDelete.Enabled = True
                 textdisable()
             End If
+            Label22.Text = "VIEW"
             navigateenable()
             LodaDataToTextBox()
         End If
@@ -568,5 +571,33 @@ Public Class FrmGodownType
         End Select
 
         MyBase.WndProc(m)
+    End Sub
+
+    Private Sub Label3_Click(sender As Object, e As EventArgs) Handles Label3.Click
+
+    End Sub
+
+    Private Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click
+
+    End Sub
+
+    Private Sub TextBox2_TextChanged(sender As Object, e As EventArgs) Handles TextBox2.TextChanged
+
+    End Sub
+
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+
+    End Sub
+
+    Private Sub GroupBox1_Enter(sender As Object, e As EventArgs) Handles GroupBox1.Enter
+
+    End Sub
+
+    Private Sub GroupBox2_Enter(sender As Object, e As EventArgs) Handles GroupBox2.Enter
+
+    End Sub
+
+    Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
+
     End Sub
 End Class

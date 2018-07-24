@@ -51,6 +51,7 @@ Public Class FrmGodownList
     Private rownum As Integer = 0
     Dim ctrlname As String = "TextBox1"
     Dim fnum As Integer
+    Dim fnumm As Integer
     Private ststatus As String
 
     Private Sub FrmGodownList_Load(sender As Object, e As EventArgs) Handles Me.Load
@@ -277,9 +278,11 @@ Public Class FrmGodownList
             Exit Sub
         End If
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
+        fnumm = 2
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
         FileOpen(fnum, Application.StartupPath & "\Reports\Godownmasterlist.dat", OpenMode.Output)
+        FileOpen(fnumm, Application.StartupPath & "\Reports\" & TextBox5.Text & ".csv", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
@@ -296,11 +299,18 @@ Public Class FrmGodownList
 
 
             If first Then
+                'globalHeader("Godown Master List", fnum, fnumm)
                 Print(fnum, GetStringToPrint(57, ComboBox2.Text & " Godown Master List for type - " & chkrs1.Fields(0).Value, "S") & vbNewLine)
                 Print(fnum, StrDup(14, " ") & vbNewLine)
                 Print(fnum, GetStringToPrint(7, "Sr. No.", "S") & " " & GetStringToPrint(10, "Godown Code", "S") & " " & GetStringToPrint(50, "Tenant Name", "S") & " " & GetStringToPrint(15, "Using From", "S") & " " & GetStringToPrint(12, "Survey No.", "S") & " " & GetStringToPrint(20, "Godown Size", "S") & " " & GetStringToPrint(10, "HSN", "S") & " " & GetStringToPrint(9, "Rent", "N") & " " & GetStringToPrint(9, "Remarks", "N") & vbNewLine)
                 Print(fnum, GetStringToPrint(7, "", "S") & " " & GetStringToPrint(10, "", "S") & " " & GetStringToPrint(50, "", "S") & " " & GetStringToPrint(15, "", "S") & " " & GetStringToPrint(12, "Census No.", "S") & " " & GetStringToPrint(20, "", "S") & " " & GetStringToPrint(10, "", "S") & " " & GetStringToPrint(9, "Pe Rent", "N") & vbNewLine)
                 Print(fnum, StrDup(210, "=") & vbNewLine)
+
+                Print(fnumm, GetStringToPrint(57, ComboBox2.Text & " Godown Master List for type - " & chkrs1.Fields(0).Value, "S") & vbNewLine)
+                Print(fnumm, StrDup(14, " ") & vbNewLine)
+                Print(fnumm, GetStringToPrint(7, "Sr. No.", "S") & "," & GetStringToPrint(10, "Godown Code", "S") & "," & GetStringToPrint(50, "Tenant Name", "S") & "," & GetStringToPrint(15, "Using From", "S") & "," & GetStringToPrint(12, "Survey No.", "S") & "," & GetStringToPrint(20, "Godown Size", "S") & "," & GetStringToPrint(10, "HSN", "S") & "," & GetStringToPrint(9, "Rent", "N") & "," & GetStringToPrint(9, "Remarks", "N") & vbNewLine)
+                Print(fnumm, GetStringToPrint(7, "", "S") & "," & GetStringToPrint(10, "", "S") & "," & GetStringToPrint(50, "", "S") & "," & GetStringToPrint(15, "", "S") & "," & GetStringToPrint(12, "Census No.", "S") & "," & GetStringToPrint(20, "", "S") & "," & GetStringToPrint(10, "", "S") & "," & GetStringToPrint(9, "Pe Rent", "N") & vbNewLine)
+                Print(fnumm, StrDup(210, "=") & vbNewLine)
                 first = False
                 xline = xline + 5
             End If
@@ -362,19 +372,23 @@ Public Class FrmGodownList
             End If
 
             Print(fnum, GetStringToPrint(7, counter, "S") & " " & GetStringToPrint(10, chkrs1.Fields(3).Value, "S") & " " & GetStringToPrint(50, chkrs1.Fields(38).Value, "S") & " " & GetStringToPrint(15, chkrs1.Fields(11).Value, "S") & " " & GetStringToPrint(12, IIf(IsDBNull(chkrs1.Fields(4).Value), " ", chkrs1.Fields(4).Value), "S") & " " & GetStringToPrint(20, gdsize, "S") & " " & GetStringToPrint(10, chkrs1.Fields(37).Value, "S") & " " & GetStringToPrint(9, Format(amt, "#####0.00"), "N") & " " & GetStringToPrint(65, rem1, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(7, counter, "S") & "," & GetStringToPrint(10, chkrs1.Fields(3).Value, "S") & "," & GetStringToPrint(50, chkrs1.Fields(38).Value, "S") & "," & GetStringToPrint(15, chkrs1.Fields(11).Value, "S") & "," & GetStringToPrint(12, IIf(IsDBNull(chkrs1.Fields(4).Value), " ", chkrs1.Fields(4).Value), "S") & "," & GetStringToPrint(20, gdsize, "S") & "," & GetStringToPrint(10, chkrs1.Fields(37).Value, "S") & "," & GetStringToPrint(9, Format(amt, "#####0.00"), "N") & "," & GetStringToPrint(65, rem1, "S") & vbNewLine)
             If IsDBNull(amt1) Or amt1 = 0 Then
             Else
                 Print(fnum, GetStringToPrint(7, "", "S") & " " & GetStringToPrint(10, "", "S") & " " & GetStringToPrint(50, "", "S") & " " & GetStringToPrint(15, "", "S") & " " & GetStringToPrint(12, IIf(IsDBNull(chkrs1.Fields(5).Value), " ", chkrs1.Fields(5).Value), "S") & " " & GetStringToPrint(20, "", "S") & " " & GetStringToPrint(10, "", "S") & " " & GetStringToPrint(9, Format(amt1, "#####0.00"), "N") & " " & GetStringToPrint(65, rem2, "S") & vbNewLine)
+                Print(fnumm, GetStringToPrint(7, "", "S") & "," & GetStringToPrint(10, "", "S") & "," & GetStringToPrint(50, "", "S") & "," & GetStringToPrint(15, "", "S") & "," & GetStringToPrint(12, IIf(IsDBNull(chkrs1.Fields(5).Value), " ", chkrs1.Fields(5).Value), "S") & "," & GetStringToPrint(20, "", "S") & "," & GetStringToPrint(10, "", "S") & "," & GetStringToPrint(9, Format(amt1, "#####0.00"), "N") & "," & GetStringToPrint(65, rem2, "S") & vbNewLine)
                 counter = counter + 1
             End If
             If IsDBNull(rem3) Or rem3.Equals("") Then
             Else
                 Print(fnum, GetStringToPrint(7, "", "S") & " " & GetStringToPrint(10, "", "S") & " " & GetStringToPrint(50, "", "S") & " " & GetStringToPrint(15, "", "S") & " " & GetStringToPrint(12, "", "S") & " " & GetStringToPrint(20, "", "S") & " " & GetStringToPrint(10, "", "S") & " " & GetStringToPrint(9, "", "N") & " " & GetStringToPrint(65, rem3, "S") & vbNewLine)
+                Print(fnumm, GetStringToPrint(7, "", "S") & "," & GetStringToPrint(10, "", "S") & "," & GetStringToPrint(50, "", "S") & "," & GetStringToPrint(15, "", "S") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(20, "", "S") & "," & GetStringToPrint(10, "", "S") & "," & GetStringToPrint(9, "", "N") & "," & GetStringToPrint(65, rem3, "S") & vbNewLine)
                 counter = counter + 1
             End If
             If IsDBNull(rem4) Or rem4.Equals("") Then
             Else
                 Print(fnum, GetStringToPrint(7, "", "S") & " " & GetStringToPrint(10, "", "S") & " " & GetStringToPrint(50, "", "S") & " " & GetStringToPrint(15, "", "S") & " " & GetStringToPrint(12, "", "S") & " " & GetStringToPrint(20, "", "S") & " " & GetStringToPrint(10, "", "S") & " " & GetStringToPrint(9, "", "N") & " " & GetStringToPrint(65, rem4, "S") & vbNewLine)
+                Print(fnumm, GetStringToPrint(7, "", "S") & "," & GetStringToPrint(10, "", "S") & "," & GetStringToPrint(50, "", "S") & "," & GetStringToPrint(15, "", "S") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(20, "", "S") & "," & GetStringToPrint(10, "", "S") & "," & GetStringToPrint(9, "", "N") & "," & GetStringToPrint(65, rem4, "S") & vbNewLine)
                 counter = counter + 1
             End If
             counter = counter + 1
@@ -386,6 +400,7 @@ Public Class FrmGodownList
         chkrs1.Close()
         MyConn.Close()
         FileClose(fnum)
+        FileClose(fnumm)
         FrmGodownListView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Godownmasterlist.dat", RichTextBoxStreamType.PlainText)
         FrmGodownListView.Show()
         CreatePDF(Application.StartupPath & "\Reports\Godownmasterlist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
@@ -483,6 +498,7 @@ Public Class FrmGodownList
 
 
             If first Then
+                globalHeader("Godown Master List", fnum, 0)
                 Print(fnum, GetStringToPrint(57, ComboBox2.Text & " Godown Master List for type - " & chkrs1.Fields(0).Value, "S") & vbNewLine)
                 Print(fnum, StrDup(14, " ") & vbNewLine)
                 Print(fnum, GetStringToPrint(7, "Sr. No.", "S") & " " & GetStringToPrint(10, "Godown Code", "S") & " " & GetStringToPrint(50, "Tenant Name", "S") & " " & GetStringToPrint(15, "Using From", "S") & " " & GetStringToPrint(12, "Survey No.", "S") & " " & GetStringToPrint(20, "Godown Size", "S") & " " & GetStringToPrint(10, "HSN", "S") & " " & GetStringToPrint(9, "Rent", "N") & " " & GetStringToPrint(9, "Remarks", "N") & vbNewLine)

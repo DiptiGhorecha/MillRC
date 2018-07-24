@@ -24,6 +24,7 @@ Public Class FrmGdTrans
     Dim ctrlname As String = "TextBox1"
     Dim formloaded As Boolean = False
     Dim fnum As Integer
+    Dim fnumm As Integer
     Private Sub FrmGdTrans_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
@@ -146,9 +147,11 @@ Public Class FrmGdTrans
         End If
 
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
+        fnum = 2
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
         FileOpen(fnum, Application.StartupPath & "\Reports\Gdtranslist.dat", OpenMode.Output)
+        FileOpen(fnumm, Application.StartupPath & "\Reports\" & TextBox5.Text & ".csv", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
@@ -165,16 +168,21 @@ Public Class FrmGdTrans
 
 
             If first Then
+
                 Print(fnum, GetStringToPrint(107, "Godown Transfer List From Date : " & DateTimePicker1.Value.ToShortDateString & " to " & DateTimePicker2.Value.ToShortDateString, "S") & vbNewLine)
                 Print(fnum, StrDup(14, " ") & vbNewLine)
                 Print(fnum, GetStringToPrint(7, "Sr. No.", "S") & " " & GetStringToPrint(10, "Godown Type", "S") & " " & GetStringToPrint(10, "Godown Code", "S") & " " & GetStringToPrint(15, "Transfer Date", "S") & " " & GetStringToPrint(50, "Old Tenant Name", "S") & " " & GetStringToPrint(50, "New Tenant Name", "S") & vbNewLine)
                 Print(fnum, StrDup(130, "=") & vbNewLine)
+                Print(fnumm, GetStringToPrint(107, "Godown Transfer List From Date : " & DateTimePicker1.Value.ToShortDateString & " to " & DateTimePicker2.Value.ToShortDateString, "S") & vbNewLine)
+                Print(fnumm, StrDup(14, " ") & vbNewLine)
+                Print(fnumm, GetStringToPrint(7, "Sr. No.", "S") & "," & GetStringToPrint(10, "Godown Type", "S") & "," & GetStringToPrint(10, "Godown Code", "S") & "," & GetStringToPrint(15, "Transfer Date", "S") & "," & GetStringToPrint(50, "Old Tenant Name", "S") & "," & GetStringToPrint(50, "New Tenant Name", "S") & vbNewLine)
+                Print(fnumm, StrDup(130, "=") & vbNewLine)
                 first = False
                 xline = xline + 5
             End If
 
-
             Print(fnum, GetStringToPrint(7, counter, "S") & " " & GetStringToPrint(10, chkrs1.Fields(0).Value, "S") & " " & GetStringToPrint(10, chkrs1.Fields(1).Value, "S") & " " & GetStringToPrint(15, chkrs1.Fields(6).Value, "S") & " " & GetStringToPrint(50, chkrs1.Fields(7).Value, "S") & " " & GetStringToPrint(50, chkrs1.Fields(8).Value, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(7, counter, "S") & "," & GetStringToPrint(10, chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(10, chkrs1.Fields(1).Value, "S") & "," & GetStringToPrint(15, chkrs1.Fields(6).Value, "S") & "," & GetStringToPrint(50, chkrs1.Fields(7).Value, "S") & "," & GetStringToPrint(50, chkrs1.Fields(8).Value, "S") & vbNewLine)
 
             counter = counter + 1
             If chkrs1.EOF = False Then
@@ -185,6 +193,7 @@ Public Class FrmGdTrans
         chkrs1.Close()
         MyConn.Close()
         FileClose(fnum)
+        FileClose(fnumm)
         FrmGdTransView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Gdtranslist.dat", RichTextBoxStreamType.PlainText)
         FrmGdTransView.Show()
         CreatePDF(Application.StartupPath & "\Reports\Gdtranslist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)

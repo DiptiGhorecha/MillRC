@@ -28,6 +28,7 @@ Partial Class FrmInvoice
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.DateTimePicker2 = New System.Windows.Forms.DateTimePicker()
+        Me.ChkLogo = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'Label1
@@ -42,9 +43,9 @@ Partial Class FrmInvoice
         'DateTimePicker1
         '
         Me.DateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.DateTimePicker1.Location = New System.Drawing.Point(103, 25)
+        Me.DateTimePicker1.Location = New System.Drawing.Point(93, 25)
         Me.DateTimePicker1.Name = "DateTimePicker1"
-        Me.DateTimePicker1.Size = New System.Drawing.Size(141, 20)
+        Me.DateTimePicker1.Size = New System.Drawing.Size(188, 20)
         Me.DateTimePicker1.TabIndex = 1
         '
         'Button1
@@ -74,11 +75,22 @@ Partial Class FrmInvoice
         Me.DateTimePicker2.TabIndex = 4
         Me.DateTimePicker2.Visible = False
         '
+        'ChkLogo
+        '
+        Me.ChkLogo.AutoSize = True
+        Me.ChkLogo.Location = New System.Drawing.Point(15, 50)
+        Me.ChkLogo.Name = "ChkLogo"
+        Me.ChkLogo.Size = New System.Drawing.Size(75, 17)
+        Me.ChkLogo.TabIndex = 6
+        Me.ChkLogo.Text = "With Logo"
+        Me.ChkLogo.UseVisualStyleBackColor = True
+        '
         'FrmInvoice
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(367, 144)
+        Me.ClientSize = New System.Drawing.Size(294, 111)
+        Me.Controls.Add(Me.ChkLogo)
         Me.Controls.Add(Me.DateTimePicker2)
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.Button1)
@@ -99,4 +111,5 @@ Partial Class FrmInvoice
     Friend WithEvents Button1 As Button
     Friend WithEvents Button2 As Button
     Friend WithEvents DateTimePicker2 As DateTimePicker
+    Friend WithEvents ChkLogo As CheckBox
 End Class

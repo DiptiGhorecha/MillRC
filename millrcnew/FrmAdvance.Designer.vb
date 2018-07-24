@@ -51,6 +51,7 @@ Partial Class FrmAdvance
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
+        Me.Label23 = New System.Windows.Forms.Label()
         CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox4.SuspendLayout()
         Me.GroupBox5.SuspendLayout()
@@ -329,11 +330,22 @@ Partial Class FrmAdvance
         Me.TextBox1.Size = New System.Drawing.Size(52, 20)
         Me.TextBox1.TabIndex = 82
         '
+        'Label23
+        '
+        Me.Label23.AutoSize = True
+        Me.Label23.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label23.Location = New System.Drawing.Point(425, 7)
+        Me.Label23.Name = "Label23"
+        Me.Label23.Size = New System.Drawing.Size(66, 29)
+        Me.Label23.TabIndex = 129
+        Me.Label23.Text = "View"
+        '
         'FrmAdvance
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(517, 478)
+        Me.Controls.Add(Me.Label23)
         Me.Controls.Add(Me.TextBox1)
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.DateTimePicker2)
@@ -397,4 +409,5 @@ Partial Class FrmAdvance
     Friend WithEvents Label5 As Label
     Friend WithEvents Label6 As Label
     Friend WithEvents TextBox1 As TextBox
+    Friend WithEvents Label23 As Label
 End Class

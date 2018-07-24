@@ -30,6 +30,9 @@ Partial Class FrmOutstanding
         Me.Button1 = New System.Windows.Forms.Button()
         Me.TextBox5 = New System.Windows.Forms.TextBox()
         Me.Label6 = New System.Windows.Forms.Label()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.DateTimePicker1 = New System.Windows.Forms.DateTimePicker()
+        Me.CheckBox1 = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'RadioGodown
@@ -56,7 +59,7 @@ Partial Class FrmOutstanding
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(162, 126)
+        Me.Button3.Location = New System.Drawing.Point(162, 193)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(50, 22)
         Me.Button3.TabIndex = 11
@@ -65,7 +68,7 @@ Partial Class FrmOutstanding
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(93, 126)
+        Me.Button2.Location = New System.Drawing.Point(93, 193)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(50, 22)
         Me.Button2.TabIndex = 10
@@ -74,7 +77,7 @@ Partial Class FrmOutstanding
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(21, 126)
+        Me.Button1.Location = New System.Drawing.Point(21, 193)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(50, 22)
         Me.Button1.TabIndex = 9
@@ -83,7 +86,7 @@ Partial Class FrmOutstanding
         '
         'TextBox5
         '
-        Me.TextBox5.Location = New System.Drawing.Point(139, 64)
+        Me.TextBox5.Location = New System.Drawing.Point(139, 131)
         Me.TextBox5.Name = "TextBox5"
         Me.TextBox5.Size = New System.Drawing.Size(132, 20)
         Me.TextBox5.TabIndex = 151
@@ -91,17 +94,46 @@ Partial Class FrmOutstanding
         '
         'Label6
         '
-        Me.Label6.Location = New System.Drawing.Point(22, 64)
+        Me.Label6.Location = New System.Drawing.Point(22, 131)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(91, 41)
         Me.Label6.TabIndex = 152
         Me.Label6.Text = "Report File Name (Without Extn)"
         '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(22, 67)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(69, 13)
+        Me.Label1.TabIndex = 153
+        Me.Label1.Text = "As on Date : "
+        '
+        'DateTimePicker1
+        '
+        Me.DateTimePicker1.Location = New System.Drawing.Point(139, 67)
+        Me.DateTimePicker1.Name = "DateTimePicker1"
+        Me.DateTimePicker1.Size = New System.Drawing.Size(177, 20)
+        Me.DateTimePicker1.TabIndex = 154
+        '
+        'CheckBox1
+        '
+        Me.CheckBox1.AutoSize = True
+        Me.CheckBox1.Location = New System.Drawing.Point(21, 100)
+        Me.CheckBox1.Name = "CheckBox1"
+        Me.CheckBox1.Size = New System.Drawing.Size(119, 17)
+        Me.CheckBox1.TabIndex = 155
+        Me.CheckBox1.Text = "Skip with 0 balance"
+        Me.CheckBox1.UseVisualStyleBackColor = True
+        '
         'FrmOutstanding
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(383, 165)
+        Me.ClientSize = New System.Drawing.Size(383, 228)
+        Me.Controls.Add(Me.CheckBox1)
+        Me.Controls.Add(Me.DateTimePicker1)
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.TextBox5)
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.Button3)
@@ -127,4 +159,7 @@ Partial Class FrmOutstanding
     Friend WithEvents Button1 As Button
     Friend WithEvents TextBox5 As TextBox
     Friend WithEvents Label6 As Label
+    Friend WithEvents Label1 As Label
+    Friend WithEvents DateTimePicker1 As DateTimePicker
+    Friend WithEvents CheckBox1 As CheckBox
 End Class

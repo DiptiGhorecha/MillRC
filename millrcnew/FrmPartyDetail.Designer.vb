@@ -31,6 +31,8 @@ Partial Class FrmPartyDetail
         Me.Button1 = New System.Windows.Forms.Button()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.TxtSrch = New System.Windows.Forms.TextBox()
+        Me.TextBox5 = New System.Windows.Forms.TextBox()
+        Me.Label6 = New System.Windows.Forms.Label()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox3.SuspendLayout()
         Me.SuspendLayout()
@@ -46,9 +48,9 @@ Partial Class FrmPartyDetail
         '
         'TextBox1
         '
-        Me.TextBox1.Location = New System.Drawing.Point(95, 23)
+        Me.TextBox1.Location = New System.Drawing.Point(138, 23)
         Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(115, 20)
+        Me.TextBox1.Size = New System.Drawing.Size(132, 20)
         Me.TextBox1.TabIndex = 1
         '
         'DataGridView1
@@ -67,7 +69,7 @@ Partial Class FrmPartyDetail
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(160, 53)
+        Me.Button3.Location = New System.Drawing.Point(160, 104)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(50, 22)
         Me.Button3.TabIndex = 28
@@ -76,7 +78,7 @@ Partial Class FrmPartyDetail
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(91, 53)
+        Me.Button2.Location = New System.Drawing.Point(91, 104)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(50, 22)
         Me.Button2.TabIndex = 27
@@ -85,7 +87,7 @@ Partial Class FrmPartyDetail
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(19, 53)
+        Me.Button1.Location = New System.Drawing.Point(19, 104)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(50, 22)
         Me.Button1.TabIndex = 26
@@ -109,11 +111,29 @@ Partial Class FrmPartyDetail
         Me.TxtSrch.Size = New System.Drawing.Size(172, 20)
         Me.TxtSrch.TabIndex = 0
         '
+        'TextBox5
+        '
+        Me.TextBox5.Location = New System.Drawing.Point(138, 55)
+        Me.TextBox5.Name = "TextBox5"
+        Me.TextBox5.Size = New System.Drawing.Size(132, 20)
+        Me.TextBox5.TabIndex = 151
+        Me.TextBox5.Text = "Party_detail"
+        '
+        'Label6
+        '
+        Me.Label6.Location = New System.Drawing.Point(21, 55)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(91, 41)
+        Me.Label6.TabIndex = 152
+        Me.Label6.Text = "Report File Name (Without Extn)"
+        '
         'FrmPartyDetail
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(697, 451)
+        Me.Controls.Add(Me.TextBox5)
+        Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.Button2)
@@ -141,4 +161,6 @@ Partial Class FrmPartyDetail
     Friend WithEvents Button1 As Button
     Friend WithEvents GroupBox3 As GroupBox
     Friend WithEvents TxtSrch As TextBox
+    Friend WithEvents TextBox5 As TextBox
+    Friend WithEvents Label6 As Label
 End Class

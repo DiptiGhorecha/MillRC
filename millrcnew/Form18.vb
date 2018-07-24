@@ -124,6 +124,7 @@ Public Class FrmInvMultiple
         DateTimePicker1.Enabled = False
         DateTimePicker2.Enabled = False
         DateTimePicker3.Enabled = False
+        ChkLogo.Enabled = False
     End Function
     Private Sub ShowData()
         '  konek() 'open our connection
@@ -196,7 +197,21 @@ Public Class FrmInvMultiple
             '  DateTimePicker3.Text = ""
             ComboBox3.Text = ""
             ComboBox4.Text = ""
-            DateTimePicker1.Text = ""
+            ' DateTimePicker1.Text = ""
+            ' ComboBox4.Text = ""
+            Dim iDate As String
+            Dim fDate As DateTime
+            Dim oDate As String
+            Dim foDate As DateTime
+            Dim MyDate As Date = Now
+            Dim DaysInMonth As Integer
+            If DateTime.Now.Month = 1 Then
+                DaysInMonth = Date.DaysInMonth(MyDate.Year - 1, 12)
+                DateTimePicker1.Value = Convert.ToDateTime(DaysInMonth.ToString + "/" + (12).ToString + "/" + (MyDate.Year - 1).ToString)
+            Else
+                DaysInMonth = Date.DaysInMonth(MyDate.Year, MyDate.Month - 1)
+                DateTimePicker1.Value = Convert.ToDateTime(DaysInMonth.ToString + "/" + (MyDate.Month - 1).ToString + "/" + MyDate.Year.ToString)
+            End If
             If DataGridView2.RowCount > 0 Then
                 i = DataGridView2.CurrentRow.Index
 
@@ -400,7 +415,8 @@ Public Class FrmInvMultiple
         MyConn = New OleDbConnection(connString)
         'If MyConn.State = ConnectionState.Closed Then
         MyConn.Open()
-        da = New OleDb.OleDbDataAdapter("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE,[PARTY].P_NAME from [BILL] INNER JOIN [PARTY] on [BILL].P_CODE=[PARTY].P_CODE where " & indexorder & " Like '%" & TxtSrch.Text & "%' ORDER BY [BILL].GROUP,[BILL].GODWN_NO,[BILL].BILL_DATE", MyConn)
+        '''da = New OleDb.OleDbDataAdapter("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE,[PARTY].P_NAME from [BILL] INNER JOIN [PARTY] on [BILL].P_CODE=[PARTY].P_CODE where " & indexorder & " Like '%" & TxtSrch.Text & "%' ORDER BY [BILL].GROUP,[BILL].GODWN_NO,[BILL].BILL_DATE", MyConn)
+        da = New OleDb.OleDbDataAdapter("SELECT [BILL_TR].INVOICE_NO,[BILL_TR].GROUP,[BILL_TR].GODWN_NO,[BILL_TR].P_CODE,[BILL_TR].BILL_DATE,[BILL_TR].BILL_AMOUNT,[BILL_TR].CGST_RATE,[BILL_TR].CGST_AMT,[BILL_TR].SGST_RATE,[BILL_TR].SGST_AMT,[BILL_TR].NET_AMOUNT,[BILL_TR].HSN,SRNO,[BILL_TR].REC_NO,[BILL_TR].REC_DATE,FROM_DATE,TO_DATE,[PARTY].P_NAME from [BILL_TR] INNER JOIN [PARTY] on [BILL_TR].P_CODE=[PARTY].P_CODE where " & indexorder & " Like '%" & TxtSrch.Text & "%' order by [BILL_TR].BILL_DATE,[BILL_TR].GROUP,[BILL_TR].GODWN_NO", MyConn)
         'da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where [GODOWN].GROUP Like '%" & TxtSrch.Text & "%' ORDER BY [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
         ds = New DataSet
         ds.Clear()
@@ -465,6 +481,7 @@ Public Class FrmInvMultiple
             navigateenable()
             ShowData()
             LodaDataToTextBox()
+            Label23.Text = "VIEW"
             Exit Sub
 
         Catch ex As Exception
@@ -500,7 +517,25 @@ Public Class FrmInvMultiple
             Else
                 xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
             End If
-            chkrs1.Open("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE FROM BILL where Month([BILL].bill_date)='" & Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' and Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' order by [BILL].SRNO", xcon)
+            Dim iDate As String
+            Dim fDate As DateTime
+            Dim oDate As String
+            Dim foDate As DateTime
+            Dim MyDate As Date = Now
+            Dim DaysInMonth As Integer
+            If (Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) >= 4) Then
+                iDate = "30/04/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                fDate = Convert.ToDateTime(iDate)
+                oDate = "31/03/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) + 1))
+                foDate = Convert.ToDateTime(oDate)
+            Else
+                iDate = "30/04/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) - 1))
+                fDate = Convert.ToDateTime(iDate)
+                oDate = "31/03/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                foDate = Convert.ToDateTime(oDate)
+            End If
+            Dim str As String = "SELECT [BILL].INVOICE_NO, [BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE FROM BILL where [BILL].bill_date>=Format('" & fDate & "', 'dd/mm/yyyy') and [BILL].bill_date<=Format('" & foDate & "', 'dd/mm/yyyy') order by [BILL].SRNO"
+            chkrs1.Open("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE FROM BILL where [BILL].bill_date>=Format('" & fDate & "', 'dd/mm/yyyy') and [BILL].bill_date<=Format('" & foDate & "', 'dd/mm/yyyy') order by [BILL].INVOICE_NO", xcon)
             ' chkrs1.MoveLast()
             Do While chkrs1.EOF = False
 
@@ -521,6 +556,7 @@ Public Class FrmInvMultiple
     Private Sub cmdAdd_Click(sender As Object, e As EventArgs) Handles cmdAdd.Click
         Try
             GrpAddCorrect = "A"
+            Label23.Text = "ADD"
             DataGridView2.Enabled = False
             cmdUpdate.Enabled = True
             cmdCancel.Enabled = True
@@ -539,19 +575,41 @@ Public Class FrmInvMultiple
             TextBox10.Text = ""
             TextBox11.Text = ""
             TextBox12.Text = ""
+            ChkLogo.Enabled = True
+            ChkLogo.Checked = False
             DateTimePicker1.Enabled = True
             ComboBox3.Enabled = True
-            '  ComboBox1.SelectedIndex = ComboBox1.Items.IndexOf("")
-            ''  ComboBox1.Text = ""
-            ' ComboBox2.SelectedIndex = ComboBox2.Items.IndexOf("")
-            '  ComboBox2.Text = ""
             ComboBox3.SelectedIndex = ComboBox3.Items.IndexOf("")
             ComboBox3.Text = ""
             ComboBox4.Enabled = True
             ComboBox4.SelectedIndex = ComboBox4.Items.IndexOf("")
             ComboBox4.Text = ""
-            'ComboBox3.Select()
-            DateTimePicker1.Value = Date.Today
+            Dim iDate As String
+            Dim fDate As DateTime
+            Dim oDate As String
+            Dim foDate As DateTime
+            Dim MyDate As Date = Now
+            Dim DaysInMonth As Integer
+            If DateTime.Now.Month = 1 Then
+                DaysInMonth = Date.DaysInMonth(MyDate.Year - 1, 12)
+                DateTimePicker1.Value = Convert.ToDateTime(DaysInMonth.ToString + "/" + (12).ToString + "/" + (MyDate.Year - 1).ToString)
+            Else
+                DaysInMonth = Date.DaysInMonth(MyDate.Year, MyDate.Month - 1)
+                DateTimePicker1.Value = Convert.ToDateTime(DaysInMonth.ToString + "/" + (MyDate.Month - 1).ToString + "/" + MyDate.Year.ToString)
+            End If
+            'DateTimePicker1.Value = Date.Today
+            If (Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) >= 4) Then
+                iDate = "30/04/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                fDate = Convert.ToDateTime(iDate)
+                oDate = "31/03/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) + 1))
+                foDate = Convert.ToDateTime(oDate)
+            Else
+                iDate = "30/04/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) - 1))
+                fDate = Convert.ToDateTime(iDate)
+                oDate = "31/03/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                foDate = Convert.ToDateTime(oDate)
+            End If
+            DateTimePicker1.MaxDate = DateTimePicker1.Value
             DateTimePicker1.Focus()
             Label13.Text = ""
             Label18.Text = ""
@@ -640,7 +698,7 @@ Public Class FrmInvMultiple
             If MyConn.State = ConnectionState.Closed Then
                 MyConn.Open()
             End If
-            dag = New OleDb.OleDbDataAdapter("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE from [BILL] where [INVOICE_NO]='" & Trim(TextBox2.Text) & "'", MyConn)
+            dag = New OleDb.OleDbDataAdapter("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE from [BILL] where Month([BILL].bill_date)='" & Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' and Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' and [INVOICE_NO]='" & Trim(TextBox2.Text) & "'", MyConn)
             dsg = New DataSet
             dsg.Clear()
             dag.Fill(dsg, "BILL")
@@ -685,8 +743,25 @@ Public Class FrmInvMultiple
             Else
                 xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
             End If
-            Dim STR As String = "SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE FROM BILL where Month([BILL].bill_date)='" & Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' and Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' order by [BILL].SRNO"
-            chkrs1.Open("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE FROM BILL where Month([BILL].bill_date)='" & Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' and Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' order by [BILL].SRNO", xcon)
+            Dim iDate As String
+            Dim fDate As DateTime
+            Dim oDate As String
+            Dim foDate As DateTime
+            Dim MyDate As Date = Now
+            Dim DaysInMonth As Integer
+            If (Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) >= 4) Then
+                iDate = "30/04/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                fDate = Convert.ToDateTime(iDate)
+                oDate = "31/03/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) + 1))
+                foDate = Convert.ToDateTime(oDate)
+            Else
+                iDate = "30/04/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) - 1))
+                fDate = Convert.ToDateTime(iDate)
+                oDate = "31/03/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                foDate = Convert.ToDateTime(oDate)
+            End If
+            Dim STR As String = "SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE FROM BILL where [BILL].bill_date >='" & fDate & "' and [BILL].bill_date <='" & foDate & "'" ' order by [BILL].SRNO"
+            chkrs1.Open("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE FROM BILL where [BILL].bill_date>=Format('" & fDate & "', 'dd/mm/yyyy') and [BILL].bill_date<=Format('" & foDate & "', 'dd/mm/yyyy') order by [BILL].SRNO", xcon)
             ' chkrs1.MoveLast()
             Do While chkrs1.EOF = False
 
@@ -924,8 +999,6 @@ Public Class FrmInvMultiple
         'End Try
     End Function
     Function print_display_data()
-
-
         Dim objPRNSetup = New clsPrinterSetup
         'set Paper Lines and Left Margin
         prnmaxpagelines = objPRNSetup.LinesPerPage
@@ -1346,6 +1419,7 @@ Public Class FrmInvMultiple
                 cmdDelete.Enabled = True
                 disablefields()
             End If
+            Label23.Text = "VIEW"
             GrpAddCorrect = ""
             navigateenable()
             LodaDataToTextBox()
@@ -1381,7 +1455,10 @@ Public Class FrmInvMultiple
             Dim pdfPage As PdfPage = pdf.AddPage
             pdfPage.TrimMargins.Left = 15
             Dim graph As XGraphics = XGraphics.FromPdfPage(pdfPage)
-
+            If ChkLogo.Checked Then
+                Dim image As XImage = image.FromFile(Application.StartupPath & "\logo.png")
+                graph.DrawImage(image, 0, 0, image.Width, image.Height)
+            End If
 
             Dim font As XFont = New XFont("COURIER NEW", 9, XFontStyle.Regular)
 
@@ -1412,6 +1489,7 @@ Public Class FrmInvMultiple
     Private Sub cmdEdit_Click(sender As Object, e As EventArgs) Handles cmdEdit.Click
         Try
             GrpAddCorrect = "C"
+            Label23.Text = "EDIT"
             DataGridView2.Enabled = False
             cmdUpdate.Enabled = True
             cmdCancel.Enabled = True
@@ -1434,50 +1512,50 @@ Public Class FrmInvMultiple
     End Sub
 
     Private Sub DateTimePicker1_Validating(sender As Object, e As CancelEventArgs) Handles DateTimePicker1.Validating
-        If bValidatedate = True And GrpAddCorrect <> "" Then
-            MyConn = New OleDbConnection(connString)
-            If MyConn.State = ConnectionState.Closed Then
-                MyConn.Open()
-            End If
-            dag = New OleDb.OleDbDataAdapter("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE FROM BILL where Month([BILL].bill_date)='" & Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' and Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "'", MyConn)
-            dsg = New DataSet
-            dsg.Clear()
-            dag.Fill(dsg, "BILL")
-            If dsg.Tables(0).Rows.Count = 0 And GrpAddCorrect <> "C" Then
-                Dim errorMsg As String = "Please use Invoice Generate option from menu..."
-                e.Cancel = True
-                DateTimePicker1.Select()
-                ' Set the ErrorProvider error with the text to display. 
-                Me.ErrorProvider1.SetError(DateTimePicker1, errorMsg)
-            End If
-            dag.Dispose()
-            dsg.Dispose()
-            MyConn.Close() ' close connection
-            If xcon.State = ConnectionState.Open Then
-            Else
-                xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
-            End If
+        'If bValidatedate = True And GrpAddCorrect <> "" Then
+        '    MyConn = New OleDbConnection(connString)
+        '    If MyConn.State = ConnectionState.Closed Then
+        '        MyConn.Open()
+        '    End If
+        '    dag = New OleDb.OleDbDataAdapter("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE FROM BILL where Month([BILL].bill_date)='" & Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' and Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "'", MyConn)
+        '    dsg = New DataSet
+        '    dsg.Clear()
+        '    dag.Fill(dsg, "BILL")
+        '    If dsg.Tables(0).Rows.Count = 0 And GrpAddCorrect <> "C" Then
+        '        Dim errorMsg As String = "Please use Invoice Generate option from menu..."
+        '        e.Cancel = True
+        '        DateTimePicker1.Select()
+        '        ' Set the ErrorProvider error with the text to display. 
+        '        Me.ErrorProvider1.SetError(DateTimePicker1, errorMsg)
+        '    End If
+        '    dag.Dispose()
+        '    dsg.Dispose()
+        '    MyConn.Close() ' close connection
+        '    If xcon.State = ConnectionState.Open Then
+        '    Else
+        '        xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
+        '    End If
 
-            Dim array() As String = {"AE", "AA", "AB", "AC"}
+        '    Dim array() As String = {"AE", "AA", "AB", "AC"}
 
-            '''commented temporary
-            '''
-            'Dim subsql As String
-            'subsql = "SELECT * FROM BILL where Month([BILL].bill_date)='" & Month(Convert.ToDateTime(DateTimePicker1.Value.ToString).AddMonths(1)) & "' and Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString).AddMonths(1)) & "'"
-            'chkrs1.Open("SELECT * FROM BILL where Month([BILL].bill_date)='" & Month(Convert.ToDateTime(DateTimePicker1.Value.ToString).AddMonths(1)) & "' and Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString).AddMonths(1)) & "'", xcon)
+        '    '''commented temporary
+        '    '''
+        '    'Dim subsql As String
+        '    'subsql = "SELECT * FROM BILL where Month([BILL].bill_date)='" & Month(Convert.ToDateTime(DateTimePicker1.Value.ToString).AddMonths(1)) & "' and Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString).AddMonths(1)) & "'"
+        '    'chkrs1.Open("SELECT * FROM BILL where Month([BILL].bill_date)='" & Month(Convert.ToDateTime(DateTimePicker1.Value.ToString).AddMonths(1)) & "' and Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString).AddMonths(1)) & "'", xcon)
 
-            'If chkrs1.EOF = False Then
-            '    Dim errorMsg As String = "You can't add previous month's bill, Bills for date " + Convert.ToDateTime(DateTimePicker1.Value.ToString).AddMonths(1) + " are already generated "
-            '    e.Cancel = True
-            '    DateTimePicker1.Select()
-            '    ' Set the ErrorProvider error with the text to display. 
-            '    Me.ErrorProvider1.SetError(DateTimePicker1, errorMsg)
-            '    ' MsgBox("You can't add previous month's bill, Bills for date " + Convert.ToDateTime(DateTimePicker1.Value.ToString).AddMonths(1) + " are already generated ")
-            '    chkrs1.Close()
-            '    Exit Sub
-            'End If
-            'chkrs1.Close()
-        End If
+        '    'If chkrs1.EOF = False Then
+        '    '    Dim errorMsg As String = "You can't add previous month's bill, Bills for date " + Convert.ToDateTime(DateTimePicker1.Value.ToString).AddMonths(1) + " are already generated "
+        '    '    e.Cancel = True
+        '    '    DateTimePicker1.Select()
+        '    '    ' Set the ErrorProvider error with the text to display. 
+        '    '    Me.ErrorProvider1.SetError(DateTimePicker1, errorMsg)
+        '    '    ' MsgBox("You can't add previous month's bill, Bills for date " + Convert.ToDateTime(DateTimePicker1.Value.ToString).AddMonths(1) + " are already generated ")
+        '    '    chkrs1.Close()
+        '    '    Exit Sub
+        '    'End If
+        '    'chkrs1.Close()
+        'End If
     End Sub
     Private Sub DateTimePicker1_ValueChanged(sender As Object, e As EventArgs) Handles DateTimePicker1.ValueChanged
         Dim selectedDate As Date = DateTimePicker1.Value

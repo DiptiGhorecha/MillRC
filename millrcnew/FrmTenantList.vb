@@ -24,6 +24,7 @@ Public Class FrmTenantList
     Dim ctrlname As String = "TextBox1"
     Dim formloaded As Boolean = False
     Dim fnum As Integer
+    Dim fnumm As Integer
 
     Private Sub FrmTenantList_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.MdiParent = MainMDIForm
@@ -243,9 +244,11 @@ Public Class FrmTenantList
             Exit Sub
         End If
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
+        fnumm = 2
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
         FileOpen(fnum, Application.StartupPath & "\Reports\Tenantmasterlist.dat", OpenMode.Output)
+        FileOpen(fnumm, Application.StartupPath & "\Reports\" & TextBox5.Text & ".csv", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
@@ -262,8 +265,11 @@ Public Class FrmTenantList
 
 
             If first Then
+                globalHeader("Tenant Master List", fnum, fnumm)
                 Print(fnum, GetStringToPrint(7, "Sr. No.", "S") & " " & GetStringToPrint(12, "Tenant Code", "S") & " " & GetStringToPrint(55, "Tenant Name", "S") & " " & GetStringToPrint(25, "Office Phone No", "S") & " " & GetStringToPrint(25, "Resi. Phone Number", "S") & " " & GetStringToPrint(55, "Contact Person", "S") & " " & GetStringToPrint(30, "Email_ID", "S") & " " & GetStringToPrint(15, "GST", "S") & vbNewLine)
                 Print(fnum, StrDup(230, "=") & vbNewLine)
+                Print(fnumm, GetStringToPrint(7, "Sr. No.", "S") & "," & GetStringToPrint(12, "Tenant Code", "S") & "," & GetStringToPrint(55, "Tenant Name", "S") & "," & GetStringToPrint(25, "Office Phone No", "S") & "," & GetStringToPrint(25, "Resi. Phone Number", "S") & "," & GetStringToPrint(55, "Contact Person", "S") & "," & GetStringToPrint(30, "Email_ID", "S") & "," & GetStringToPrint(15, "GST", "S") & vbNewLine)
+                Print(fnumm, StrDup(230, "=") & vbNewLine)
                 first = False
                 xline = xline + 5
             End If
@@ -402,6 +408,7 @@ Public Class FrmTenantList
         chkrs1.Close()
         MyConn.Close()
         FileClose(fnum)
+        FileClose(fnumm)
         FrmTenantListView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Tenantmasterlist.dat", RichTextBoxStreamType.PlainText)
         FrmTenantListView.Show()
         CreatePDF(Application.StartupPath & "\Reports\Tenantmasterlist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
@@ -484,9 +491,11 @@ Public Class FrmTenantList
             Exit Sub
         End If
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
+        fnumm = 2
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
         FileOpen(fnum, Application.StartupPath & "\Reports\Tenantmasterlist.dat", OpenMode.Output)
+
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
@@ -503,6 +512,7 @@ Public Class FrmTenantList
 
 
             If first Then
+                globalHeader("Tenant Master List", fnum, 0)
                 Print(fnum, GetStringToPrint(7, "Sr. No.", "S") & " " & GetStringToPrint(12, "Tenant Code", "S") & " " & GetStringToPrint(55, "Tenant Name", "S") & " " & GetStringToPrint(25, "Office Phone No", "S") & " " & GetStringToPrint(25, "Resi. Phone Number", "S") & " " & GetStringToPrint(55, "Contact Person", "S") & " " & GetStringToPrint(30, "Email_ID", "S") & " " & GetStringToPrint(15, "GST", "S") & vbNewLine)
                 Print(fnum, StrDup(231, "=") & vbNewLine)
                 first = False

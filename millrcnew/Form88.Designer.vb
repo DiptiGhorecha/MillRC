@@ -76,6 +76,8 @@ Partial Class FrmInvSingle
         Me.ErrorProvider1 = New System.Windows.Forms.ErrorProvider(Me.components)
         Me.ComboBox4 = New System.Windows.Forms.ComboBox()
         Me.TextBox13 = New System.Windows.Forms.TextBox()
+        Me.ChkLogo = New System.Windows.Forms.CheckBox()
+        Me.Label23 = New System.Windows.Forms.Label()
         CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox5.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
@@ -287,9 +289,9 @@ Partial Class FrmInvSingle
         Me.DataGridView2.AllowUserToAddRows = False
         Me.DataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DataGridView2.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically
-        Me.DataGridView2.Location = New System.Drawing.Point(347, 18)
+        Me.DataGridView2.Location = New System.Drawing.Point(347, 38)
         Me.DataGridView2.Name = "DataGridView2"
-        Me.DataGridView2.Size = New System.Drawing.Size(450, 391)
+        Me.DataGridView2.Size = New System.Drawing.Size(450, 371)
         Me.DataGridView2.TabIndex = 24
         '
         'GroupBox5
@@ -312,7 +314,7 @@ Partial Class FrmInvSingle
         'Label21
         '
         Me.Label21.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.Label21.Location = New System.Drawing.Point(355, 481)
+        Me.Label21.Location = New System.Drawing.Point(355, 501)
         Me.Label21.Name = "Label21"
         Me.Label21.Size = New System.Drawing.Size(87, 21)
         Me.Label21.TabIndex = 65
@@ -321,7 +323,7 @@ Partial Class FrmInvSingle
         '
         'cmdClose
         '
-        Me.cmdClose.Location = New System.Drawing.Point(298, 479)
+        Me.cmdClose.Location = New System.Drawing.Point(298, 499)
         Me.cmdClose.Name = "cmdClose"
         Me.cmdClose.Size = New System.Drawing.Size(51, 23)
         Me.cmdClose.TabIndex = 22
@@ -330,7 +332,7 @@ Partial Class FrmInvSingle
         '
         'cmdCancel
         '
-        Me.cmdCancel.Location = New System.Drawing.Point(241, 479)
+        Me.cmdCancel.Location = New System.Drawing.Point(241, 499)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(51, 23)
         Me.cmdCancel.TabIndex = 21
@@ -339,7 +341,7 @@ Partial Class FrmInvSingle
         '
         'cmdUpdate
         '
-        Me.cmdUpdate.Location = New System.Drawing.Point(184, 479)
+        Me.cmdUpdate.Location = New System.Drawing.Point(184, 499)
         Me.cmdUpdate.Name = "cmdUpdate"
         Me.cmdUpdate.Size = New System.Drawing.Size(51, 23)
         Me.cmdUpdate.TabIndex = 20
@@ -348,7 +350,7 @@ Partial Class FrmInvSingle
         '
         'cmdDelete
         '
-        Me.cmdDelete.Location = New System.Drawing.Point(128, 479)
+        Me.cmdDelete.Location = New System.Drawing.Point(128, 499)
         Me.cmdDelete.Name = "cmdDelete"
         Me.cmdDelete.Size = New System.Drawing.Size(51, 23)
         Me.cmdDelete.TabIndex = 19
@@ -357,7 +359,7 @@ Partial Class FrmInvSingle
         '
         'cmdEdit
         '
-        Me.cmdEdit.Location = New System.Drawing.Point(71, 479)
+        Me.cmdEdit.Location = New System.Drawing.Point(71, 499)
         Me.cmdEdit.Name = "cmdEdit"
         Me.cmdEdit.Size = New System.Drawing.Size(51, 23)
         Me.cmdEdit.TabIndex = 18
@@ -366,7 +368,7 @@ Partial Class FrmInvSingle
         '
         'cmdAdd
         '
-        Me.cmdAdd.Location = New System.Drawing.Point(14, 479)
+        Me.cmdAdd.Location = New System.Drawing.Point(14, 499)
         Me.cmdAdd.Name = "cmdAdd"
         Me.cmdAdd.Size = New System.Drawing.Size(51, 23)
         Me.cmdAdd.TabIndex = 17
@@ -535,17 +537,39 @@ Partial Class FrmInvSingle
         'TextBox13
         '
         Me.TextBox13.Enabled = False
-        Me.TextBox13.Location = New System.Drawing.Point(501, 485)
+        Me.TextBox13.Location = New System.Drawing.Point(501, 505)
         Me.TextBox13.Name = "TextBox13"
         Me.TextBox13.Size = New System.Drawing.Size(176, 20)
         Me.TextBox13.TabIndex = 77
         Me.TextBox13.Visible = False
         '
+        'ChkLogo
+        '
+        Me.ChkLogo.AutoSize = True
+        Me.ChkLogo.Location = New System.Drawing.Point(17, 476)
+        Me.ChkLogo.Name = "ChkLogo"
+        Me.ChkLogo.Size = New System.Drawing.Size(133, 17)
+        Me.ChkLogo.TabIndex = 78
+        Me.ChkLogo.Text = "Generate pdf with logo"
+        Me.ChkLogo.UseVisualStyleBackColor = True
+        '
+        'Label23
+        '
+        Me.Label23.AutoSize = True
+        Me.Label23.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label23.Location = New System.Drawing.Point(731, 4)
+        Me.Label23.Name = "Label23"
+        Me.Label23.Size = New System.Drawing.Size(66, 29)
+        Me.Label23.TabIndex = 128
+        Me.Label23.Text = "View"
+        '
         'FrmInvSingle
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(813, 517)
+        Me.ClientSize = New System.Drawing.Size(812, 533)
+        Me.Controls.Add(Me.Label23)
+        Me.Controls.Add(Me.ChkLogo)
         Me.Controls.Add(Me.TextBox13)
         Me.Controls.Add(Me.ComboBox4)
         Me.Controls.Add(Me.Label13)
@@ -659,4 +683,6 @@ Partial Class FrmInvSingle
     Friend WithEvents ErrorProvider1 As ErrorProvider
     Friend WithEvents ComboBox4 As ComboBox
     Friend WithEvents TextBox13 As TextBox
+    Friend WithEvents ChkLogo As CheckBox
+    Friend WithEvents Label23 As Label
 End Class

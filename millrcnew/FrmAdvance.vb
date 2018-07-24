@@ -178,6 +178,7 @@ Public Class FrmAdvance
     Private Sub cmdAdd_Click(sender As Object, e As EventArgs) Handles cmdAdd.Click
         Try
             GrpAddCorrect = "A"
+            Label23.Text = "ADD"
             DataGridView2.Enabled = False
             cmdUpdate.Enabled = True
             cmdCancel.Enabled = True
@@ -223,6 +224,7 @@ Public Class FrmAdvance
     Private Sub cmdEdit_Click(sender As Object, e As EventArgs) Handles cmdEdit.Click
         Try
             GrpAddCorrect = "C"
+            Label23.Text = "EDIT"
             DataGridView2.Enabled = False
             oldDate = DateTimePicker1.Value.ToString
             DateTimePicker1.Enabled = True
@@ -263,6 +265,7 @@ Public Class FrmAdvance
                 cmdDelete.Enabled = True
                 textdisable()
             End If
+            Label23.Text = "VIEW"
             GrpAddCorrect = ""
             navigateenable()
             LodaDataToTextBox()
@@ -617,7 +620,7 @@ Public Class FrmAdvance
             DataGridView2.Columns(6).HeaderText = "Tenant"
             DataGridView2.Columns(3).HeaderText = "Advance till date"
             DataGridView2.Columns(4).HeaderText = "Receipt Date"
-            DataGridView2.Columns(3).HeaderText = "Receipt No."
+            DataGridView2.Columns(5).HeaderText = "Receipt No."
             DataGridView2.Columns(4).Width = 71
             DataGridView2.Columns(5).Width = 57
             DataGridView2.Columns(6).Width = 139
@@ -696,6 +699,7 @@ Public Class FrmAdvance
             navigateenable()
             ShowData()
             LodaDataToTextBox()
+            Label23.Text = "VIEW"
             Exit Sub
 
         Catch ex As Exception
@@ -709,5 +713,14 @@ Public Class FrmAdvance
 
         DateTimePicker2.Value = Convert.ToDateTime(DateTimePicker2.Value.Day.ToString + "/" + DateTimePicker2.Value.Month.ToString + "/" + DateTimePicker2.Value.Year.ToString)
         ' End If
+    End Sub
+
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+
+    End Sub
+
+    Private Sub DataGridView2_Click(sender As Object, e As EventArgs) Handles DataGridView2.Click
+        rownum = DataGridView2.CurrentRow.Index
+        LodaDataToTextBox()
     End Sub
 End Class

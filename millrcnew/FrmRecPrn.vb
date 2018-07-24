@@ -147,7 +147,7 @@ Public Class FrmRecPrn
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
-        FileOpen(fnum, Application.StartupPath & "\Recprint.dat", OpenMode.Output)
+        FileOpen(fnum, Application.StartupPath & "\Reports\Recprint.dat", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
@@ -554,10 +554,10 @@ Public Class FrmRecPrn
         chkrs1.Close()
         xcon.Close()
         FileClose(fnum)
-        Form15.RichTextBox1.LoadFile(Application.StartupPath & "\Recprint.dat", RichTextBoxStreamType.PlainText)
+        Form15.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Recprint.dat", RichTextBoxStreamType.PlainText)
 
         Form15.Show()
-        CreatePDF(Application.StartupPath & "\Recprint.dat", Application.StartupPath & "\" & TextBox5.Text)
+        CreatePDF(Application.StartupPath & "\Reports\Recprint.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
     End Sub
     Private Function CreatePDF(strReportFilePath As String, invoice_no As String)
         Try
@@ -647,7 +647,7 @@ Public Class FrmRecPrn
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
-        FileOpen(fnum, Application.StartupPath & "\Recprint.dat", OpenMode.Output)
+        FileOpen(fnum, Application.StartupPath & "\Reports\Recprint.dat", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
@@ -1073,14 +1073,14 @@ Public Class FrmRecPrn
             'Form15.PrintDocument1.PrinterSettings = Form7.PrintDialog1.PrinterSettings
             'Form7.PrintDocument1.Print()
         End If
-        Form15.RichTextBox1.LoadFile(Application.StartupPath & "\Recprint.dat", RichTextBoxStreamType.PlainText)
-        CreatePDF(Application.StartupPath & "\Recprint.dat", Application.StartupPath & "\" & TextBox5.Text)
+        Form15.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Recprint.dat", RichTextBoxStreamType.PlainText)
+        CreatePDF(Application.StartupPath & "\Reports\Recprint.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
         Form15.Show()
         Dim PrintPDFFile As New ProcessStartInfo
         PrintPDFFile.UseShellExecute = True
         PrintPDFFile.Verb = "print"
         PrintPDFFile.WindowStyle = ProcessWindowStyle.Hidden
-        PrintPDFFile.FileName = Application.StartupPath & "\" & TextBox5.Text & ".pdf"
+        PrintPDFFile.FileName = Application.StartupPath & "\Reports\" & TextBox5.Text & ".pdf"
         Process.Start(PrintPDFFile)
     End Sub
 

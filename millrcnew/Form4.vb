@@ -578,6 +578,7 @@ Public Class FrmGodown
     Private Sub cmdCancel_Click(sender As Object, e As EventArgs) Handles cmdCancel.Click
         Try
             GrpAddCorrect = ""
+            Label23.Text = "VIEW"
             ErrorProvider1.Clear()
             DataGridView2.Enabled = True
             frmload = True
@@ -628,6 +629,7 @@ Public Class FrmGodown
     Private Sub cmdAdd_Click(sender As Object, e As EventArgs) Handles cmdAdd.Click
         Try
             GrpAddCorrect = "A"
+            Label23.Text = "ADD"
             DataGridView2.Enabled = False
             DataGridView1.Enabled = False
             cmdUpdate.Enabled = True
@@ -685,6 +687,7 @@ Public Class FrmGodown
     Private Sub cmdEdit_Click(sender As Object, e As EventArgs) Handles cmdEdit.Click
         Try
             GrpAddCorrect = "C"
+            Label23.Text = "EDIT"
             DataGridView2.Enabled = False
             DataGridView1.Enabled = False
             DateTimePicker2.Enabled = True
@@ -734,6 +737,7 @@ Public Class FrmGodown
                 cmdDelete.Enabled = True
                 textdisable()
             End If
+            Label23.Text = "VIEW"
             GrpAddCorrect = ""
             navigateenable()
             LodaDataToTextBox()
@@ -767,7 +771,7 @@ Public Class FrmGodown
         objcmd.Transaction = transaction
         objcmd.CommandType = CommandType.Text
         If GrpAddCorrect = "C" Then
-            save = "UPDATE [GODOWN] SET [GROUP]='" & ComboBox1.SelectedValue.ToString & "',P_CODE='" & TextBox10.Text & "',GODWN_NO='" & TextBox2.Text & "',SURVEY='" & TextBox1.Text & "',CENSES='" & TextBox3.Text & "',STATUS='" & stus & "',FROM_D='" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "',MONTH_FR='" & DateTimePicker2.Value.Month & "',YEAR_FR='" & DateTimePicker2.Value.Year & "',WIDTH='" & TextBox4.Text & "',LENGTH='" & TextBox5.Text & "',SQ='" & TextBox6.Text & "',MY_FLG='" & RichTextBox1.Text & "',REMARK1='',REMARK2='',REMARK3='',GST='" & gsttype & "' WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & TextBox2.Text & "' AND P_CODE='" & ComboBox2.SelectedValue.ToString & "'"  ' sorry about that
+            save = "UPDATE [GODOWN] SET [GROUP]='" & ComboBox1.SelectedValue.ToString & "',P_CODE='" & TextBox10.Text & "',GODWN_NO='" & TextBox2.Text & "',SURVEY='" & TextBox1.Text & "',CENSES='" & TextBox3.Text & "',STATUS='" & stus & "',FROM_D='" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "',MONTH_FR='" & DateTimePicker2.Value.Month & "',YEAR_FR='" & DateTimePicker2.Value.Year & "',OUTST=" & TextBox9.Text & ",WIDTH='" & TextBox4.Text & "',LENGTH='" & TextBox5.Text & "',SQ='" & TextBox6.Text & "',MY_FLG='" & RichTextBox1.Text & "',REMARK1='',REMARK2='',REMARK3='',GST='" & gsttype & "' WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & TextBox2.Text & "' AND P_CODE='" & ComboBox2.SelectedValue.ToString & "'"  ' sorry about that
         Else
             save = "INSERT INTO [GODOWN]([GROUP],P_CODE,GODWN_NO,SURVEY,CENSES,STATUS,FROM_D,MONTH_FR,YEAR_FR,WIDTH,LENGTH,SQ,MY_FLG,GST) VALUES('" & ComboBox1.SelectedValue.ToString & "','" & TextBox10.Text & "','" & TextBox2.Text & "','" & TextBox1.Text & "','" & TextBox3.Text & "','" & stus & "','" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','" & DateTimePicker2.Value.Month & "','" & DateTimePicker2.Value.Year & "','" & TextBox4.Text & "','" & TextBox5.Text & "','" & TextBox6.Text & "','" & RichTextBox1.Text & "','" & gsttype & "')"
         End If
@@ -1119,5 +1123,9 @@ Public Class FrmGodown
         End Select
 
         MyBase.WndProc(m)
+    End Sub
+
+    Private Sub DataGridView2_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView2.CellContentClick
+
     End Sub
 End Class

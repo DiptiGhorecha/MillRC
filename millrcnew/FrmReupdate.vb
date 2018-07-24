@@ -14,6 +14,7 @@ Public Class FrmReupdate
     Dim chkrs4 As New ADODB.Recordset
     Dim chkrs5 As New ADODB.Recordset
     Dim chkrs6 As New ADODB.Recordset
+    Dim chkrs22 As New ADODB.Recordset
     Dim xcon As New ADODB.Connection    ''''''''variable is used to open a connection
     Dim xrs As New ADODB.Recordset      '''''''' variable is use to open a Recordset
     Dim xtemp As New ADODB.Recordset    '''''''' used to open a temparory Recordset
@@ -109,8 +110,10 @@ Public Class FrmReupdate
             Dim CGST_RT As Double
             Dim SGST_RT As Double
             Dim FILE_NOtmp As String
+            Dim fdate As Date
+            Dim radate As Date
+            Dim rano As Integer
             chkrs1.Open("SELECT * FROM BILL ORDER BY BILL_DATE,INVOICE_NO", xcon)
-
             Do While chkrs1.EOF = False
                 BLDT = chkrs1.Fields(4).Value
                 GRP = chkrs1.Fields(1).Value
@@ -125,18 +128,33 @@ Public Class FrmReupdate
                 CGST_RT = chkrs1.Fields(6).Value
                 SGST_RT = chkrs1.Fields(8).Value
                 FILE_NOtmp = chkrs1.Fields(12).Value
-                Dim str As String = "SELECT * FROM RECEIPT WHERE GROUP='" & GRP & "' AND GODWN_NO='" & GDN & "' AND ADJ_AMT>0 ORDER BY [GROUP],GODWN_NO,REC_DATE,REC_NO"
-                chkrs2.Open("SELECT TOP 1 * FROM RECEIPT WHERE [GROUP]='" & GRP & "' AND GODWN_NO='" & GDN & "' AND ADJ_AMT>0 ORDER BY [GROUP],GODWN_NO,REC_DATE,REC_NO", xcon)
-                If chkrs2.EOF = False Then
-                    ' chkrs2.MoveFirst()
-                    RCDT = chkrs2.Fields(3).Value
-                    RCNO = chkrs2.Fields(4).Value
-                    REMAINING = chkrs2.Fields(13).Value - BLAMT
-                    If (RCDT < BLDT) Then
+                fdate = Nothing
+                radate = Nothing
+                rano = 0
+                ADV = False
+                ''''''''''''''''''''''''''opening advance
+                chkrs22.Open("SELECT [ADVANCES].* from [ADVANCES] WHERE [GROUP]='" & GRP & "' AND [GODWN_NO]='" & GDN & "' AND [ADVANCES].P_CODE='" & PCD & "' order by [advances].[GROUP],[advances].GODWN_NO", xcon)
+                While Not chkrs22.EOF
+                    If (chkrs22.Fields(0).Value = GRP And chkrs22.Fields(1).Value = GDN) Then
                         ADV = True
-                    Else
-                        ADV = False
+                        fdate = chkrs22.Fields(3).Value
+                        radate = chkrs22.Fields(4).Value
+                        rano = chkrs22.Fields(5).Value
                     End If
+                    If chkrs22.EOF = False Then
+                        chkrs22.MoveNext()
+                    End If
+                    If chkrs22.EOF = True Then
+                        Exit While
+                    End If
+                End While
+                chkrs22.Close()
+                Dim tstdt As Date = Nothing
+                If (fdate <> Nothing) Then
+                    tstdt = fdate
+                End If
+                '''''''''''''''''''''''''opening 
+                If (BLDT <= tstdt) Then
                     MyConn = New OleDbConnection(connString)
                     If MyConn.State = ConnectionState.Closed Then
                         MyConn.Open()
@@ -146,26 +164,56 @@ Public Class FrmReupdate
                     objcmd1.Connection = MyConn
                     objcmd1.Transaction = transaction
                     objcmd1.CommandType = CommandType.Text
-                    If ADV = False Then
-                        objcmd1.CommandText = "INSERT INTO [RECIPTBILL](REC_NO,INVOICE_NO,AMT,REC_DATE) VALUES('" & RCNO & "','" & INVNO & "','" & BLAMT & "',Format('" & Convert.ToDateTime(RCDT) & "','dd/mm/yyyy'))"
-                        objcmd1.ExecuteNonQuery()
-                    End If
-                    save = "UPDATE [BILL] SET REC_NO=" & RCNO & ", REC_DATE=format('" & Convert.ToDateTime(RCDT) & "','dd/mm/yyyy'),ADVANCE=" & ADV & " WHERE INVOICE_NO='" & INVNO & "' AND [GROUP]='" & GRP & "' AND GODWN_NO='" & GDN & "'"  ''' sorry about that
+                    save = "UPDATE [BILL] SET REC_NO=" & rano & ", REC_DATE=format('" & Convert.ToDateTime(radate) & "','dd/mm/yyyy'),ADVANCE=" & ADV & " WHERE INVOICE_NO='" & INVNO & "' AND [GROUP]='" & GRP & "' AND GODWN_NO='" & GDN & "' AND BILL_DATE=format('" & Convert.ToDateTime(BLDT) & "','dd/mm/yyyy')"  ''' sorry about that
                     objcmd1.CommandText = save
-                    objcmd1.ExecuteNonQuery()
-                    ' str = "UPDATE [RECEIPT] SET ADJ_AMT=" & REMAINING & " WHERE REC_DATE=format('" & Convert.ToDateTime(RCDT) & "','dd/mm/yyyy') AND REC_NO=" & RCNO
-                    objcmd1.CommandText = "UPDATE [RECEIPT] SET ADJ_AMT=" & REMAINING & " WHERE REC_DATE=format('" & Convert.ToDateTime(RCDT) & "','dd/mm/yyyy') AND REC_NO=" & RCNO  ' sorry about that
                     objcmd1.ExecuteNonQuery()
                     transaction.Commit()
                     objcmd1.Dispose()
                     MyConn.Close()
-                    '''''' System.Threading.Thread.Sleep(500)
+                Else
+                    Dim str As String = "SELECT * FROM RECEIPT WHERE GROUP='" & GRP & "' AND GODWN_NO='" & GDN & "' AND ADJ_AMT>0 ORDER BY [GROUP],GODWN_NO,REC_DATE,REC_NO"
+                    chkrs2.Open("SELECT TOP 1 * FROM RECEIPT WHERE [GROUP]='" & GRP & "' AND GODWN_NO='" & GDN & "' AND ADJ_AMT>0 ORDER BY [GROUP],GODWN_NO,REC_DATE,REC_NO", xcon)
+                    If chkrs2.EOF = False Then
+                        ' chkrs2.MoveFirst()
+                        RCDT = chkrs2.Fields(3).Value
+                        RCNO = chkrs2.Fields(4).Value
+                        REMAINING = chkrs2.Fields(13).Value - BLAMT
+                        If (RCDT < BLDT) Then
+                            ADV = True
+                        Else
+                            ADV = False
+                        End If
+                        MyConn = New OleDbConnection(connString)
+                        If MyConn.State = ConnectionState.Closed Then
+                            MyConn.Open()
+                        End If
+                        transaction = MyConn.BeginTransaction(IsolationLevel.ReadUncommitted)
+                        Dim objcmd1 As New OleDb.OleDbCommand
+                        objcmd1.Connection = MyConn
+                        objcmd1.Transaction = transaction
+                        objcmd1.CommandType = CommandType.Text
+                        If ADV = False Then
+                            objcmd1.CommandText = "INSERT INTO [RECIPTBILL](REC_NO,INVOICE_NO,AMT,REC_DATE) VALUES('" & RCNO & "','" & INVNO & "','" & BLAMT & "',Format('" & Convert.ToDateTime(RCDT) & "','dd/mm/yyyy'))"
+                            objcmd1.ExecuteNonQuery()
+                        End If
+                        save = "UPDATE [BILL] SET REC_NO=" & RCNO & ", REC_DATE=format('" & Convert.ToDateTime(RCDT) & "','dd/mm/yyyy'),ADVANCE=" & ADV & " WHERE INVOICE_NO='" & INVNO & "' AND [GROUP]='" & GRP & "' AND GODWN_NO='" & GDN & "' AND BILL_DATE=format('" & Convert.ToDateTime(BLDT) & "','dd/mm/yyyy')"  ''' sorry about that
+                        objcmd1.CommandText = save
+                        objcmd1.ExecuteNonQuery()
+                        ' str = "UPDATE [RECEIPT] SET ADJ_AMT=" & REMAINING & " WHERE REC_DATE=format('" & Convert.ToDateTime(RCDT) & "','dd/mm/yyyy') AND REC_NO=" & RCNO
+                        objcmd1.CommandText = "UPDATE [RECEIPT] SET ADJ_AMT=" & REMAINING & " WHERE REC_DATE=format('" & Convert.ToDateTime(RCDT) & "','dd/mm/yyyy') AND REC_NO=" & RCNO  ' sorry about that
+                        objcmd1.ExecuteNonQuery()
+                        transaction.Commit()
+                        objcmd1.Dispose()
+                        MyConn.Close()
+                        '''''' System.Threading.Thread.Sleep(500)
+                    End If
+                    chkrs2.Close()
                 End If
                 'Dim i As Integer
                 'For i = 1 To 5000
 
                 'Next
-                chkrs2.Close()
+
                 ''''''''''''''''''''''''''''''''invoice reprint start
                 fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
                 If (Not System.IO.Directory.Exists(Application.StartupPath & "\Invoices\dat\" & BLDT.Year.ToString & "\" & MonthName(BLDT.Month))) Then
@@ -429,7 +477,10 @@ Public Class FrmReupdate
 
 
             Dim font As XFont = New XFont("COURIER NEW", 9, XFontStyle.Regular)
-
+            If ChkLogo.Checked Then
+                Dim image As XImage = image.FromFile(Application.StartupPath & "\logo.png")
+                graph.DrawImage(image, 0, 0, image.Width, image.Height)
+            End If
 
             While True
                 line = readFile.ReadLine()

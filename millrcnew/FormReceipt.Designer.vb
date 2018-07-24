@@ -85,6 +85,7 @@ Partial Class FormReceipt
         Me.Label19 = New System.Windows.Forms.Label()
         Me.Label20 = New System.Windows.Forms.Label()
         Me.RentComboBox = New System.Windows.Forms.ComboBox()
+        Me.Label22 = New System.Windows.Forms.Label()
         CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox5.SuspendLayout()
@@ -673,13 +674,24 @@ Partial Class FormReceipt
         Me.RentComboBox.Location = New System.Drawing.Point(281, 357)
         Me.RentComboBox.Name = "RentComboBox"
         Me.RentComboBox.Size = New System.Drawing.Size(201, 21)
-        Me.RentComboBox.TabIndex = 124
+        Me.RentComboBox.TabIndex = 5
+        '
+        'Label22
+        '
+        Me.Label22.AutoSize = True
+        Me.Label22.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label22.Location = New System.Drawing.Point(855, 10)
+        Me.Label22.Name = "Label22"
+        Me.Label22.Size = New System.Drawing.Size(66, 29)
+        Me.Label22.TabIndex = 124
+        Me.Label22.Text = "View"
         '
         'FormReceipt
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(929, 550)
+        Me.Controls.Add(Me.Label22)
         Me.Controls.Add(Me.Label14)
         Me.Controls.Add(Me.RentComboBox)
         Me.Controls.Add(Me.Label20)
@@ -806,4 +818,5 @@ Partial Class FormReceipt
     Friend WithEvents Label18 As Label
     Friend WithEvents Label20 As Label
     Friend WithEvents RentComboBox As ComboBox
+    Friend WithEvents Label22 As Label
 End Class

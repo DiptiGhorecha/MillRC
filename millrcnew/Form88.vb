@@ -42,6 +42,7 @@ Public Class FrmInvSingle
     Dim strReportFilePath As String
     Public FILE_NO As String
     Public cmdClicked As Boolean = False
+    Public gridline As Integer = 0
 
     Private Sub FrmInvSingle_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.MdiParent = MainMDIForm
@@ -123,6 +124,7 @@ Public Class FrmInvSingle
         ComboBox2.Enabled = False
         ComboBox3.Enabled = False
         ComboBox4.Enabled = False
+        ChkLogo.Enabled = False
         DateTimePicker1.Enabled = False
     End Function
     Private Sub ShowData()
@@ -194,8 +196,14 @@ Public Class FrmInvSingle
             ComboBox4.Text = ""
             DateTimePicker1.Text = ""
             If DataGridView2.RowCount > 1 Then
-                i = DataGridView2.CurrentRow.Index
+                If gridline > 0 Then
+                    i = gridline
+                Else
+                    i = DataGridView2.CurrentRow.Index
 
+                End If
+
+                gridline = i
                 If Not IsDBNull(DataGridView2.Item(4, i).Value) Then
                     DateTimePicker1.Value = GetValue(DataGridView2.Item(4, i).Value)
                     ComboBox1.Text = DateTimePicker1.Value.Month
@@ -494,7 +502,7 @@ Public Class FrmInvSingle
             Else
                 xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
             End If
-            chkrs1.Open("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE FROM BILL where Month([BILL].bill_date)='" & Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' and Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' order by [BILL].SRNO", xcon)
+            chkrs1.Open("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE FROM BILL where Month([BILL].bill_date)='" & Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' and Year([BILL].bill_date)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' order by [BILL].INVOICE_NO", xcon)
             ' chkrs1.MoveLast()
             Do While chkrs1.EOF = False
 
@@ -515,6 +523,7 @@ Public Class FrmInvSingle
     Private Sub cmdAdd_Click(sender As Object, e As EventArgs) Handles cmdAdd.Click
         Try
             GrpAddCorrect = "A"
+            Label23.Text = "ADD"
             DataGridView2.Enabled = False
             cmdUpdate.Enabled = True
             cmdCancel.Enabled = True
@@ -544,6 +553,8 @@ Public Class FrmInvSingle
             ComboBox4.Enabled = True
             ComboBox4.SelectedIndex = ComboBox4.Items.IndexOf("")
             ComboBox4.Text = ""
+            ChkLogo.Enabled = True
+            ChkLogo.Checked = False
             'ComboBox3.Select()
             DateTimePicker1.Value = Date.Today
             DateTimePicker1.Focus()
@@ -619,13 +630,27 @@ Public Class FrmInvSingle
     Private Sub TextBox2_Validating(sender As Object, e As CancelEventArgs) Handles TextBox2.Validating
 
         If bValidateinvoice = True And GrpAddCorrect <> "" Then
-
+            Dim iDate As String
+            Dim fDate As DateTime
+            Dim oDate As String
+            Dim foDate As DateTime
+            If (Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) >= 4) Then
+                iDate = "30/04/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                fDate = Convert.ToDateTime(iDate)
+                oDate = "31/03/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) + 1))
+                foDate = Convert.ToDateTime(oDate)
+            Else
+                iDate = "30/04/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) - 1))
+                fDate = Convert.ToDateTime(iDate)
+                oDate = "31/03/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                foDate = Convert.ToDateTime(oDate)
+            End If
 
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
                 MyConn.Open()
             End If
-            dag = New OleDb.OleDbDataAdapter("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE from [BILL] where [INVOICE_NO]='" & Trim(TextBox2.Text) & "'", MyConn)
+            dag = New OleDb.OleDbDataAdapter("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE from [BILL] where [BILL].bill_date>=Format('" & fDate & "', 'dd/mm/yyyy') and [BILL].bill_date<=Format('" & foDate & "', 'dd/mm/yyyy') and [INVOICE_NO]='" & Trim(TextBox2.Text) & "'", MyConn)
             dsg = New DataSet
             dsg.Clear()
             dag.Fill(dsg, "BILL")
@@ -1361,7 +1386,10 @@ Public Class FrmInvSingle
 
 
             Dim font As XFont = New XFont("COURIER NEW", 9, XFontStyle.Regular)
-
+            If ChkLogo.Checked Then
+                Dim image As XImage = image.FromFile(Application.StartupPath & "\logo.png")
+                graph.DrawImage(image, 0, 0, image.Width, image.Height)
+            End If
 
             While True
                 line = readFile.ReadLine()
@@ -1389,6 +1417,7 @@ Public Class FrmInvSingle
     Private Sub cmdEdit_Click(sender As Object, e As EventArgs) Handles cmdEdit.Click
         Try
             GrpAddCorrect = "C"
+            Label23.Text = "EDIT"
             DataGridView2.Enabled = False
             cmdUpdate.Enabled = True
             cmdCancel.Enabled = True
@@ -1397,7 +1426,7 @@ Public Class FrmInvSingle
             cmdEdit.Enabled = False
             cmdDelete.Enabled = False
             '  rownum = DataGridView2.CurrentRow.Index
-
+            ChkLogo.Enabled = True
             TextBox12.Focus()
             Exit Sub
         Catch ex As Exception
@@ -1488,5 +1517,13 @@ Public Class FrmInvSingle
             ComboBox3.SelectionStart = ComboBox3.Text.Length
 
         End If
+    End Sub
+
+    Private Sub DataGridView2_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView2.CellContentClick
+
+    End Sub
+
+    Private Sub Label23_Click(sender As Object, e As EventArgs) Handles Label23.Click
+
     End Sub
 End Class

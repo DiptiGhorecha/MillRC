@@ -301,6 +301,7 @@ Public Class FrmTenant
 
     Private Sub cmdCancel_Click(sender As Object, e As EventArgs) Handles cmdCancel.Click
         Try
+            Label22.Text = "VIEW"
             Me.ErrorProvider1.Clear()
             DataGridView1.Enabled = True
             GrpAddCorrect = ""
@@ -355,7 +356,7 @@ Public Class FrmTenant
     Private Sub cmdAdd_Click(sender As Object, e As EventArgs) Handles cmdAdd.Click
         Try
             GrpAddCorrect = "A"
-
+            Label22.Text = "ADD"
             DataGridView1.Enabled = False
             cmdUpdate.Enabled = True
             cmdCancel.Enabled = True
@@ -399,6 +400,7 @@ Public Class FrmTenant
     Private Sub cmdEdit_Click(sender As Object, e As EventArgs) Handles cmdEdit.Click
         Try
             GrpAddCorrect = "C"
+            Label22.Text = "EDIT"
             'Datprimaryrs.Recordset.Edit
             DataGridView1.Enabled = False
             oldName = TextBox1.Text
@@ -447,6 +449,7 @@ Public Class FrmTenant
                 cmdDelete.Enabled = True
                 textdisable()
             End If
+            Label22.Text = "VIEW"
             navigateenable()
             LodaDataToTextBox()
         End If
@@ -700,6 +703,54 @@ Public Class FrmTenant
     End Sub
 
     Private Sub TxtSrch_TextChanged(sender As Object, e As EventArgs) Handles TxtSrch.TextChanged
+
+    End Sub
+
+    Private Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click
+
+    End Sub
+
+    Private Sub TextBox2_TextChanged(sender As Object, e As EventArgs) Handles TextBox2.TextChanged
+
+    End Sub
+
+    Private Sub Label2_Click(sender As Object, e As EventArgs) Handles Label2.Click
+
+    End Sub
+
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+
+    End Sub
+
+    Private Sub GroupBox1_Enter(sender As Object, e As EventArgs) Handles GroupBox1.Enter
+
+    End Sub
+
+    Private Sub GroupBox2_Enter(sender As Object, e As EventArgs) Handles GroupBox2.Enter
+
+    End Sub
+
+    Private Sub Label15_Click(sender As Object, e As EventArgs) Handles Label15.Click
+
+    End Sub
+
+    Private Sub TextBox10_TextChanged(sender As Object, e As EventArgs) Handles TextBox10.TextChanged
+
+    End Sub
+
+    Private Sub Label12_Click(sender As Object, e As EventArgs) Handles Label12.Click
+
+    End Sub
+
+    Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
+
+    End Sub
+
+    Private Sub GroupBox3_Enter(sender As Object, e As EventArgs) Handles GroupBox3.Enter
+
+    End Sub
+
+    Private Sub GroupBox4_Enter(sender As Object, e As EventArgs) Handles GroupBox4.Enter
 
     End Sub
 End Class

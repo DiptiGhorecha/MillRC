@@ -76,6 +76,8 @@ Partial Class FrmInvMultiple
         Me.TextBox5 = New System.Windows.Forms.TextBox()
         Me.Label19 = New System.Windows.Forms.Label()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
+        Me.ChkLogo = New System.Windows.Forms.CheckBox()
+        Me.Label23 = New System.Windows.Forms.Label()
         Me.GroupBox4.SuspendLayout()
         Me.GroupBox5.SuspendLayout()
         CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -348,7 +350,7 @@ Partial Class FrmInvMultiple
         'TextBox13
         '
         Me.TextBox13.Enabled = False
-        Me.TextBox13.Location = New System.Drawing.Point(477, 517)
+        Me.TextBox13.Location = New System.Drawing.Point(477, 543)
         Me.TextBox13.Name = "TextBox13"
         Me.TextBox13.Size = New System.Drawing.Size(176, 20)
         Me.TextBox13.TabIndex = 115
@@ -437,15 +439,15 @@ Partial Class FrmInvMultiple
         Me.DataGridView2.AllowUserToAddRows = False
         Me.DataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DataGridView2.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically
-        Me.DataGridView2.Location = New System.Drawing.Point(341, 16)
+        Me.DataGridView2.Location = New System.Drawing.Point(341, 46)
         Me.DataGridView2.Name = "DataGridView2"
-        Me.DataGridView2.Size = New System.Drawing.Size(450, 391)
+        Me.DataGridView2.Size = New System.Drawing.Size(450, 361)
         Me.DataGridView2.TabIndex = 112
         '
         'Label21
         '
         Me.Label21.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.Label21.Location = New System.Drawing.Point(354, 517)
+        Me.Label21.Location = New System.Drawing.Point(354, 543)
         Me.Label21.Name = "Label21"
         Me.Label21.Size = New System.Drawing.Size(87, 21)
         Me.Label21.TabIndex = 122
@@ -454,7 +456,7 @@ Partial Class FrmInvMultiple
         '
         'cmdClose
         '
-        Me.cmdClose.Location = New System.Drawing.Point(297, 515)
+        Me.cmdClose.Location = New System.Drawing.Point(297, 541)
         Me.cmdClose.Name = "cmdClose"
         Me.cmdClose.Size = New System.Drawing.Size(51, 23)
         Me.cmdClose.TabIndex = 121
@@ -463,7 +465,7 @@ Partial Class FrmInvMultiple
         '
         'cmdCancel
         '
-        Me.cmdCancel.Location = New System.Drawing.Point(240, 515)
+        Me.cmdCancel.Location = New System.Drawing.Point(240, 541)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(51, 23)
         Me.cmdCancel.TabIndex = 120
@@ -472,7 +474,7 @@ Partial Class FrmInvMultiple
         '
         'cmdUpdate
         '
-        Me.cmdUpdate.Location = New System.Drawing.Point(183, 515)
+        Me.cmdUpdate.Location = New System.Drawing.Point(183, 541)
         Me.cmdUpdate.Name = "cmdUpdate"
         Me.cmdUpdate.Size = New System.Drawing.Size(51, 23)
         Me.cmdUpdate.TabIndex = 119
@@ -481,7 +483,7 @@ Partial Class FrmInvMultiple
         '
         'cmdDelete
         '
-        Me.cmdDelete.Location = New System.Drawing.Point(127, 515)
+        Me.cmdDelete.Location = New System.Drawing.Point(127, 541)
         Me.cmdDelete.Name = "cmdDelete"
         Me.cmdDelete.Size = New System.Drawing.Size(51, 23)
         Me.cmdDelete.TabIndex = 118
@@ -490,7 +492,7 @@ Partial Class FrmInvMultiple
         '
         'cmdEdit
         '
-        Me.cmdEdit.Location = New System.Drawing.Point(70, 515)
+        Me.cmdEdit.Location = New System.Drawing.Point(70, 541)
         Me.cmdEdit.Name = "cmdEdit"
         Me.cmdEdit.Size = New System.Drawing.Size(51, 23)
         Me.cmdEdit.TabIndex = 117
@@ -499,7 +501,7 @@ Partial Class FrmInvMultiple
         '
         'cmdAdd
         '
-        Me.cmdAdd.Location = New System.Drawing.Point(13, 515)
+        Me.cmdAdd.Location = New System.Drawing.Point(13, 541)
         Me.cmdAdd.Name = "cmdAdd"
         Me.cmdAdd.Size = New System.Drawing.Size(51, 23)
         Me.cmdAdd.TabIndex = 116
@@ -549,11 +551,33 @@ Partial Class FrmInvMultiple
         Me.TextBox1.TabIndex = 127
         Me.TextBox1.Visible = False
         '
+        'ChkLogo
+        '
+        Me.ChkLogo.AutoSize = True
+        Me.ChkLogo.Location = New System.Drawing.Point(15, 511)
+        Me.ChkLogo.Name = "ChkLogo"
+        Me.ChkLogo.Size = New System.Drawing.Size(133, 17)
+        Me.ChkLogo.TabIndex = 128
+        Me.ChkLogo.Text = "Generate pdf with logo"
+        Me.ChkLogo.UseVisualStyleBackColor = True
+        '
+        'Label23
+        '
+        Me.Label23.AutoSize = True
+        Me.Label23.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label23.Location = New System.Drawing.Point(725, 6)
+        Me.Label23.Name = "Label23"
+        Me.Label23.Size = New System.Drawing.Size(66, 29)
+        Me.Label23.TabIndex = 129
+        Me.Label23.Text = "View"
+        '
         'FrmInvMultiple
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(803, 554)
+        Me.ClientSize = New System.Drawing.Size(804, 578)
+        Me.Controls.Add(Me.Label23)
+        Me.Controls.Add(Me.ChkLogo)
         Me.Controls.Add(Me.TextBox1)
         Me.Controls.Add(Me.TextBox5)
         Me.Controls.Add(Me.Label19)
@@ -666,4 +690,6 @@ Partial Class FrmInvMultiple
     Friend WithEvents TextBox5 As TextBox
     Friend WithEvents Label19 As Label
     Friend WithEvents TextBox1 As TextBox
+    Friend WithEvents ChkLogo As CheckBox
+    Friend WithEvents Label23 As Label
 End Class

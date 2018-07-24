@@ -89,6 +89,7 @@ Partial Class FrmGodown
         Me.cmdEdit = New System.Windows.Forms.Button()
         Me.cmdAdd = New System.Windows.Forms.Button()
         Me.ErrorProvider1 = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.Label23 = New System.Windows.Forms.Label()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox3, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -182,7 +183,7 @@ Partial Class FrmGodown
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(12, 16)
+        Me.Label2.Location = New System.Drawing.Point(12, 27)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(74, 13)
         Me.Label2.TabIndex = 33
@@ -193,7 +194,7 @@ Partial Class FrmGodown
         Me.ComboBox1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append
         Me.ComboBox1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource
         Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(107, 16)
+        Me.ComboBox1.Location = New System.Drawing.Point(107, 27)
         Me.ComboBox1.Name = "ComboBox1"
         Me.ComboBox1.Size = New System.Drawing.Size(121, 21)
         Me.ComboBox1.Sorted = True
@@ -202,7 +203,7 @@ Partial Class FrmGodown
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(12, 44)
+        Me.Label3.Location = New System.Drawing.Point(12, 55)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(87, 13)
         Me.Label3.TabIndex = 45
@@ -210,7 +211,7 @@ Partial Class FrmGodown
         '
         'TextBox2
         '
-        Me.TextBox2.Location = New System.Drawing.Point(107, 44)
+        Me.TextBox2.Location = New System.Drawing.Point(107, 55)
         Me.TextBox2.MaxLength = 10
         Me.TextBox2.Name = "TextBox2"
         Me.TextBox2.Size = New System.Drawing.Size(270, 20)
@@ -245,7 +246,7 @@ Partial Class FrmGodown
         Me.GroupBox1.Controls.Add(Me.Label5)
         Me.GroupBox1.Controls.Add(Me.Label4)
         Me.GroupBox1.Controls.Add(Me.ComboBox2)
-        Me.GroupBox1.Location = New System.Drawing.Point(15, 71)
+        Me.GroupBox1.Location = New System.Drawing.Point(15, 82)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(459, 94)
         Me.GroupBox1.TabIndex = 3
@@ -329,7 +330,7 @@ Partial Class FrmGodown
         Me.GroupBox2.Controls.Add(Me.TextBox1)
         Me.GroupBox2.Controls.Add(Me.Label8)
         Me.GroupBox2.Controls.Add(Me.Label7)
-        Me.GroupBox2.Location = New System.Drawing.Point(15, 176)
+        Me.GroupBox2.Location = New System.Drawing.Point(15, 187)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(459, 140)
         Me.GroupBox2.TabIndex = 7
@@ -518,7 +519,7 @@ Partial Class FrmGodown
         Me.GroupBox3.Controls.Add(Me.Label17)
         Me.GroupBox3.Controls.Add(Me.Label16)
         Me.GroupBox3.Controls.Add(Me.Label15)
-        Me.GroupBox3.Location = New System.Drawing.Point(480, 16)
+        Me.GroupBox3.Location = New System.Drawing.Point(480, 27)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(386, 149)
         Me.GroupBox3.TabIndex = 15
@@ -582,7 +583,7 @@ Partial Class FrmGodown
         '
         'RichTextBox1
         '
-        Me.RichTextBox1.Location = New System.Drawing.Point(485, 187)
+        Me.RichTextBox1.Location = New System.Drawing.Point(485, 198)
         Me.RichTextBox1.Name = "RichTextBox1"
         Me.RichTextBox1.Size = New System.Drawing.Size(377, 123)
         Me.RichTextBox1.TabIndex = 19
@@ -591,7 +592,7 @@ Partial Class FrmGodown
         'Label20
         '
         Me.Label20.AutoSize = True
-        Me.Label20.Location = New System.Drawing.Point(484, 171)
+        Me.Label20.Location = New System.Drawing.Point(484, 182)
         Me.Label20.Name = "Label20"
         Me.Label20.Size = New System.Drawing.Size(49, 13)
         Me.Label20.TabIndex = 54
@@ -605,7 +606,7 @@ Partial Class FrmGodown
         Me.DataGridView2.AllowUserToResizeRows = False
         Me.DataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DataGridView2.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically
-        Me.DataGridView2.Location = New System.Drawing.Point(15, 326)
+        Me.DataGridView2.Location = New System.Drawing.Point(15, 337)
         Me.DataGridView2.MultiSelect = False
         Me.DataGridView2.Name = "DataGridView2"
         Me.DataGridView2.Size = New System.Drawing.Size(588, 177)
@@ -618,7 +619,7 @@ Partial Class FrmGodown
         Me.GroupBox4.Controls.Add(Me.cmdNext)
         Me.GroupBox4.Controls.Add(Me.cmdPrev)
         Me.GroupBox4.Controls.Add(Me.cmdFirst)
-        Me.GroupBox4.Location = New System.Drawing.Point(615, 453)
+        Me.GroupBox4.Location = New System.Drawing.Point(615, 464)
         Me.GroupBox4.Name = "GroupBox4"
         Me.GroupBox4.Size = New System.Drawing.Size(200, 50)
         Me.GroupBox4.TabIndex = 57
@@ -676,7 +677,7 @@ Partial Class FrmGodown
         'GroupBox5
         '
         Me.GroupBox5.Controls.Add(Me.TxtSrch)
-        Me.GroupBox5.Location = New System.Drawing.Point(615, 397)
+        Me.GroupBox5.Location = New System.Drawing.Point(615, 408)
         Me.GroupBox5.Name = "GroupBox5"
         Me.GroupBox5.Size = New System.Drawing.Size(200, 50)
         Me.GroupBox5.TabIndex = 56
@@ -693,7 +694,7 @@ Partial Class FrmGodown
         'Label21
         '
         Me.Label21.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.Label21.Location = New System.Drawing.Point(356, 513)
+        Me.Label21.Location = New System.Drawing.Point(356, 524)
         Me.Label21.Name = "Label21"
         Me.Label21.Size = New System.Drawing.Size(87, 21)
         Me.Label21.TabIndex = 30
@@ -702,7 +703,7 @@ Partial Class FrmGodown
         '
         'cmdClose
         '
-        Me.cmdClose.Location = New System.Drawing.Point(299, 511)
+        Me.cmdClose.Location = New System.Drawing.Point(299, 522)
         Me.cmdClose.Name = "cmdClose"
         Me.cmdClose.Size = New System.Drawing.Size(51, 23)
         Me.cmdClose.TabIndex = 29
@@ -711,7 +712,7 @@ Partial Class FrmGodown
         '
         'cmdCancel
         '
-        Me.cmdCancel.Location = New System.Drawing.Point(242, 511)
+        Me.cmdCancel.Location = New System.Drawing.Point(242, 522)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(51, 23)
         Me.cmdCancel.TabIndex = 28
@@ -720,7 +721,7 @@ Partial Class FrmGodown
         '
         'cmdUpdate
         '
-        Me.cmdUpdate.Location = New System.Drawing.Point(185, 511)
+        Me.cmdUpdate.Location = New System.Drawing.Point(185, 522)
         Me.cmdUpdate.Name = "cmdUpdate"
         Me.cmdUpdate.Size = New System.Drawing.Size(51, 23)
         Me.cmdUpdate.TabIndex = 27
@@ -729,7 +730,7 @@ Partial Class FrmGodown
         '
         'cmdDelete
         '
-        Me.cmdDelete.Location = New System.Drawing.Point(129, 511)
+        Me.cmdDelete.Location = New System.Drawing.Point(129, 522)
         Me.cmdDelete.Name = "cmdDelete"
         Me.cmdDelete.Size = New System.Drawing.Size(51, 23)
         Me.cmdDelete.TabIndex = 26
@@ -738,7 +739,7 @@ Partial Class FrmGodown
         '
         'cmdEdit
         '
-        Me.cmdEdit.Location = New System.Drawing.Point(72, 511)
+        Me.cmdEdit.Location = New System.Drawing.Point(72, 522)
         Me.cmdEdit.Name = "cmdEdit"
         Me.cmdEdit.Size = New System.Drawing.Size(51, 23)
         Me.cmdEdit.TabIndex = 25
@@ -747,7 +748,7 @@ Partial Class FrmGodown
         '
         'cmdAdd
         '
-        Me.cmdAdd.Location = New System.Drawing.Point(15, 511)
+        Me.cmdAdd.Location = New System.Drawing.Point(15, 522)
         Me.cmdAdd.Name = "cmdAdd"
         Me.cmdAdd.Size = New System.Drawing.Size(51, 23)
         Me.cmdAdd.TabIndex = 24
@@ -758,11 +759,22 @@ Partial Class FrmGodown
         '
         Me.ErrorProvider1.ContainerControl = Me
         '
+        'Label23
+        '
+        Me.Label23.AutoSize = True
+        Me.Label23.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label23.Location = New System.Drawing.Point(800, -1)
+        Me.Label23.Name = "Label23"
+        Me.Label23.Size = New System.Drawing.Size(66, 29)
+        Me.Label23.TabIndex = 127
+        Me.Label23.Text = "View"
+        '
         'FrmGodown
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(881, 544)
+        Me.ClientSize = New System.Drawing.Size(881, 555)
+        Me.Controls.Add(Me.Label23)
         Me.Controls.Add(Me.Label21)
         Me.Controls.Add(Me.cmdClose)
         Me.Controls.Add(Me.cmdCancel)
@@ -879,4 +891,5 @@ Partial Class FrmGodown
     Friend WithEvents ErrorProvider1 As ErrorProvider
     Friend WithEvents RadioButton3 As RadioButton
     Friend WithEvents TextBox10 As TextBox
+    Friend WithEvents Label23 As Label
 End Class

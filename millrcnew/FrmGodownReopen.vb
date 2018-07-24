@@ -3,7 +3,7 @@ Imports System.Data.OleDb
 Imports System.Globalization
 Imports PdfSharp.Drawing
 Imports PdfSharp.Pdf
-Public Class FrmGodownClose
+Public Class FrmGodownReopen
     Dim chkrs As New ADODB.Recordset
     Dim chkrs1 As New ADODB.Recordset
     Dim chkrs2 As New ADODB.Recordset
@@ -42,7 +42,7 @@ Public Class FrmGodownClose
     Public FILE_NO As String
     Public lastdate As Date = DateTime.Today
 
-    Private Sub FrmGodownClose_Load(sender As Object, e As EventArgs) Handles Me.Load
+    Private Sub FrmGodownReopen_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
         Me.Left = 0
@@ -115,7 +115,7 @@ Public Class FrmGodownClose
             'If MyConn.State = ConnectionState.Closed Then
             MyConn.Open()
             ' End If
-            da = New OleDb.OleDbDataAdapter("SELECT [CLGDWN].*,[PARTY].P_NAME from [CLGDWN] INNER JOIN [PARTY] on [CLGDWN].P_CODE=[PARTY].P_CODE order by [CLGDWN].TO_D,[CLGDWN].GROUP,[CLGDWN].GODWN_NO", MyConn)
+            da = New OleDb.OleDbDataAdapter("SELECT [CLGDWN].*,[PARTY].P_NAME from [CLGDWN] INNER JOIN [PARTY] on [CLGDWN].P_CODE=[PARTY].P_CODE where [CLGDWN].[CLOSE_SUSPEND]<>'C' order by [CLGDWN].TO_D,[CLGDWN].GROUP,[CLGDWN].GODWN_NO", MyConn)
             ds = New DataSet
             ds.Clear()
             da.Fill(ds)
@@ -380,7 +380,7 @@ Public Class FrmGodownClose
     Private Sub cmdCancel_Click(sender As Object, e As EventArgs) Handles cmdCancel.Click
         Try
             GrpAddCorrect = ""
-            ErrorProvider1.Clear()
+            '''  ErrorProvider1.Clear()
             DataGridView2.Enabled = True
             cmdUpdate.Enabled = False
             cmdCancel.Enabled = False
@@ -403,30 +403,16 @@ Public Class FrmGodownClose
     Private Sub cmdAdd_Click(sender As Object, e As EventArgs) Handles cmdAdd.Click
         Try
             GrpAddCorrect = "A"
-            Label23.Text = "ADD"
+            Label23.Text = "REOPEN"
             DataGridView2.Enabled = False
             cmdUpdate.Enabled = True
             cmdCancel.Enabled = True
-            ComboBox3.Enabled = True
-            RadioButton1.Enabled = True
-            RadioButton1.Checked = True
-            RadioButton2.Enabled = True
-            TextBox1.Text = ""
-            ComboBox3.SelectedIndex = ComboBox3.Items.IndexOf("")
-            ComboBox3.Text = ""
-            ComboBox4.Enabled = True
-            ComboBox4.SelectedIndex = ComboBox4.Items.IndexOf("")
-            ComboBox4.Text = ""
-            ComboBox3.Select()
-            Label13.Text = ""
-            RichTextBox1.Text = ""
-            RichTextBox1.Enabled = True
-            DateTimePicker1.Enabled = True
+            DateTimePicker2.Enabled = True
             If IsDBNull(lastdate) Then
-                DateTimePicker1.Value = DateTime.Today
-                lastdate = DateTimePicker1.Value
+                DateTimePicker2.Value = DateTime.Today
+                lastdate = DateTimePicker2.Value
             Else
-                DateTimePicker1.Value = lastdate
+                DateTimePicker2.Value = lastdate
             End If
             '  DateTimePicker1.Value = Date.Today
             navigatedisable()
@@ -437,7 +423,7 @@ Public Class FrmGodownClose
             MessageBox.Show("Error Add module: " & ex.Message)
         End Try
     End Sub
-    Private Sub DateTimePicker1_ValueChanged(sender As Object, e As EventArgs) Handles DateTimePicker1.ValueChanged
+    Private Sub DateTimePicker2_ValueChanged(sender As Object, e As EventArgs) Handles DateTimePicker2.ValueChanged
         If GrpAddCorrect = "A" Then
             lastdate = DateTimePicker1.Value
         End If
@@ -446,7 +432,7 @@ Public Class FrmGodownClose
         Try
             GrpAddCorrect = "C"
             DataGridView2.Enabled = False
-            cmdUpdate.Enabled = True
+            ' cmdUpdate.Enabled = True
             cmdCancel.Enabled = True
             navigatedisable()
             cmdAdd.Enabled = False
@@ -469,8 +455,8 @@ Public Class FrmGodownClose
         If GrpAddCorrect = "C" Then
             ' save = "UPDATE [GODOWN] SET [GROUP]='" & ComboBox1.SelectedValue.ToString & "',P_CODE='" & TextBox10.Text & "',GODWN_NO='" & TextBox2.Text & "',SURVEY='" & TextBox1.Text & "',CENSES='" & TextBox3.Text & "',STATUS='" & stus & "',FROM_D='" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "',MONTH_FR='" & DateTimePicker2.Value.Month & "',YEAR_FR='" & DateTimePicker2.Value.Year & "',WIDTH='" & TextBox4.Text & "',LENGTH='" & TextBox5.Text & "',SQ='" & TextBox6.Text & "',MY_FLG='" & RichTextBox1.Text & "',REMARK1='',REMARK2='',REMARK3='',GST='" & ComboBox3.SelectedValue.ToString & "' WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & TextBox2.Text & "' AND P_CODE='" & ComboBox2.SelectedValue.ToString & "'"  ' sorry about that
         Else
-            save = "INSERT INTO [CLGDWN]([GROUP],P_CODE,GODWN_NO,TO_D,FROM_D,REASON,CLOSE_SUSPEND) VALUES('" & ComboBox3.SelectedValue.ToString & "','" & TextBox1.Text & "','" & ComboBox4.SelectedValue.ToString & "','" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','" & Convert.ToDateTime(DateTimePicker2.Value.ToString) & "','" & RichTextBox1.Text & "','" & stus & "')"
-            saveold = "UPDATE [GODOWN] SET [STATUS]='" & stus & "' WHERE [GROUP]='" & ComboBox3.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox4.Text & "' AND P_CODE='" & TextBox1.Text & "'"  ' sorry about that
+            save = "UPDATE[CLGDWN] SET [CLOSE_SUSPEND]='C',REOPEN_DATE='" & Convert.ToDateTime(DateTimePicker2.Value.ToString) & "' WHERE [GROUP]='" & ComboBox3.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox4.Text & "' AND P_CODE='" & TextBox1.Text & "'"
+            saveold = "UPDATE [GODOWN] SET [STATUS]='C' WHERE [GROUP]='" & ComboBox3.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox4.Text & "' AND P_CODE='" & TextBox1.Text & "'"  ' sorry about that
         End If
         doSQL(save)
         doSQL(saveold)
@@ -495,7 +481,7 @@ Public Class FrmGodownClose
             ' MsgBox("Data Inserted successfully in database", vbInformation)
             objcmd.Dispose()
         Catch ex As Exception
-            MsgBox("Exception: Data Insertion Transfer of godown " & ex.Message)
+            MsgBox("Exception: Data Insertion Reopen godown " & ex.Message)
         End Try
     End Sub
     Private Sub textdisable()
@@ -570,78 +556,78 @@ Public Class FrmGodownClose
         If ComboBox4.SelectedIndex >= 0 Then
             chkrs1.Open("SELECT * FROM GODOWN WHERE [GROUP]='" & ComboBox3.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox4.SelectedValue.ToString & "' AND [STATUS]='C'", xcon)
             Do While chkrs1.EOF = False
-            Dim PCOD As String = chkrs1.Fields(1).Value
-            TextBox1.Text = PCOD
-            '''''''''party detail start
-            chkrs4.Open("SELECT * FROM PARTY WHERE P_CODE='" & PCOD & "'", xcon)
-            Label13.Text = chkrs4.Fields(1).Value
-            Dim TAD1 As String
-            Dim TAD2 As String
-            Dim TAD3 As String
-            Dim TCITY As String
-            Dim TSTATE As String
-            If chkrs4.EOF = False Then
-                If IsDBNull(chkrs4.Fields(2).Value) Then
-                    TAD1 = ""
-                Else
-                    If Trim(chkrs4.Fields(2).Value).Equals("") Then
+                Dim PCOD As String = chkrs1.Fields(1).Value
+                TextBox1.Text = PCOD
+                '''''''''party detail start
+                chkrs4.Open("SELECT * FROM PARTY WHERE P_CODE='" & PCOD & "'", xcon)
+                Label13.Text = chkrs4.Fields(1).Value
+                Dim TAD1 As String
+                Dim TAD2 As String
+                Dim TAD3 As String
+                Dim TCITY As String
+                Dim TSTATE As String
+                If chkrs4.EOF = False Then
+                    If IsDBNull(chkrs4.Fields(2).Value) Then
                         TAD1 = ""
                     Else
-                        TAD1 = chkrs4.Fields(2).Value.replace("& vbLf & vbLf", "")
-                        Label13.Text = Label13.Text + Environment.NewLine + chkrs4.Fields(2).Value
+                        If Trim(chkrs4.Fields(2).Value).Equals("") Then
+                            TAD1 = ""
+                        Else
+                            TAD1 = chkrs4.Fields(2).Value.replace("& vbLf & vbLf", "")
+                            Label13.Text = Label13.Text + Environment.NewLine + chkrs4.Fields(2).Value
+                        End If
                     End If
-                End If
-                If IsDBNull(chkrs4.Fields(3).Value) Then
-                    TAD2 = ""
-                Else
-                    If Trim(chkrs4.Fields(3).Value).Equals("") Then
+                    If IsDBNull(chkrs4.Fields(3).Value) Then
                         TAD2 = ""
                     Else
-                        TAD2 = chkrs4.Fields(3).Value
-                        Label13.Text = Label13.Text + Environment.NewLine + chkrs4.Fields(3).Value
+                        If Trim(chkrs4.Fields(3).Value).Equals("") Then
+                            TAD2 = ""
+                        Else
+                            TAD2 = chkrs4.Fields(3).Value
+                            Label13.Text = Label13.Text + Environment.NewLine + chkrs4.Fields(3).Value
+                        End If
                     End If
-                End If
-                If IsDBNull(chkrs4.Fields(4).Value) Then
-                    TAD3 = ""
-                Else
-                    If Trim(chkrs4.Fields(4).Value).Equals("") Then
+                    If IsDBNull(chkrs4.Fields(4).Value) Then
                         TAD3 = ""
                     Else
-                        TAD3 = chkrs4.Fields(4).Value
-                        Label13.Text = Label13.Text + Environment.NewLine + chkrs4.Fields(4).Value
+                        If Trim(chkrs4.Fields(4).Value).Equals("") Then
+                            TAD3 = ""
+                        Else
+                            TAD3 = chkrs4.Fields(4).Value
+                            Label13.Text = Label13.Text + Environment.NewLine + chkrs4.Fields(4).Value
+                        End If
                     End If
-                End If
-                If IsDBNull(chkrs4.Fields(5).Value) Then
-                    TCITY = ""
-                Else
-                    If Trim(chkrs4.Fields(5).Value).Equals("") Then
+                    If IsDBNull(chkrs4.Fields(5).Value) Then
                         TCITY = ""
                     Else
-                        TCITY = chkrs4.Fields(5).Value
-                        Label13.Text = Label13.Text + Environment.NewLine + chkrs4.Fields(5).Value
+                        If Trim(chkrs4.Fields(5).Value).Equals("") Then
+                            TCITY = ""
+                        Else
+                            TCITY = chkrs4.Fields(5).Value
+                            Label13.Text = Label13.Text + Environment.NewLine + chkrs4.Fields(5).Value
+                        End If
                     End If
-                End If
-                If IsDBNull(chkrs4.Fields(17).Value) Then
-                    TSTATE = ""
-                Else
-                    If Trim(chkrs4.Fields(17).Value).Equals("") Then
+                    If IsDBNull(chkrs4.Fields(17).Value) Then
                         TSTATE = ""
                     Else
-                        TSTATE = chkrs4.Fields(17).Value
-                        Label13.Text = Label13.Text + Environment.NewLine + chkrs4.Fields(17).Value
+                        If Trim(chkrs4.Fields(17).Value).Equals("") Then
+                            TSTATE = ""
+                        Else
+                            TSTATE = chkrs4.Fields(17).Value
+                            Label13.Text = Label13.Text + Environment.NewLine + chkrs4.Fields(17).Value
+                        End If
                     End If
                 End If
-            End If
-            chkrs4.Close()
-            ''''''''party detail end
-            DateTimePicker2.Value = chkrs1.Fields(11).Value
-            If chkrs1.EOF = False Then
-                chkrs1.MoveNext()
-            End If
-            If chkrs1.EOF = True Then
-                Exit Do
-            End If
-        Loop
+                chkrs4.Close()
+                ''''''''party detail end
+                DateTimePicker2.Value = chkrs1.Fields(11).Value
+                If chkrs1.EOF = False Then
+                    chkrs1.MoveNext()
+                End If
+                If chkrs1.EOF = True Then
+                    Exit Do
+                End If
+            Loop
             chkrs1.Close()
         End If
         xcon.Close()
@@ -654,12 +640,12 @@ Public Class FrmGodownClose
             e.Cancel = True
             ComboBox3.Select(0, ComboBox3.Text.Length)
             ' Set the ErrorProvider error with the text to display. 
-            Me.ErrorProvider1.SetError(ComboBox3, errorMsg)
+            '    Me.ErrorProvider1.SetError(ComboBox3, errorMsg)
         End If
     End Sub
 
     Private Sub ComboBox3_Validated(sender As Object, e As EventArgs) Handles ComboBox3.Validated
-        ErrorProvider1.SetError(ComboBox3, "")
+        '    ErrorProvider1.SetError(ComboBox3, "")
     End Sub
     Private Sub ComboBox4_Validating(sender As Object, e As CancelEventArgs) Handles ComboBox4.Validating
         Dim errorMsg As String = "Please Select godown Number"
@@ -668,17 +654,17 @@ Public Class FrmGodownClose
             e.Cancel = True
             ComboBox4.Select(0, ComboBox4.Text.Length)
             ' Set the ErrorProvider error with the text to display. 
-            Me.ErrorProvider1.SetError(ComboBox4, errorMsg)
+            '  Me.ErrorProvider1.SetError(ComboBox4, errorMsg)
         End If
 
 
     End Sub
 
     Private Sub ComboBox4_Validated(sender As Object, e As EventArgs) Handles ComboBox4.Validated
-        ErrorProvider1.SetError(ComboBox4, "")
+        '  ErrorProvider1.SetError(ComboBox4, "")
     End Sub
 
-    Private Sub FrmGodownClose_Move(sender As Object, e As EventArgs) Handles Me.Move
+    Private Sub FrmGodownReopen_Move(sender As Object, e As EventArgs) Handles Me.Move
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height

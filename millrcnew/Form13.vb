@@ -159,6 +159,7 @@ Public Class FrmGodownTransfer
             navigateenable()
             ShowData()
             LodaDataToTextBox()
+            Label23.Text = "VIEW"
             Exit Sub
 
         Catch ex As Exception
@@ -275,6 +276,7 @@ Public Class FrmGodownTransfer
     Private Sub cmdAdd_Click(sender As Object, e As EventArgs) Handles cmdAdd.Click
         Try
             GrpAddCorrect = "A"
+            Label23.Text = "ADD"
             DataGridView2.Enabled = False
             cmdUpdate.Enabled = True
             cmdCancel.Enabled = True
@@ -820,6 +822,7 @@ Public Class FrmGodownTransfer
                 cmdAdd.Enabled = True
                 textdisable()
             End If
+            Label23.Text = "VIEW"
             GrpAddCorrect = ""
             navigateenable()
             LodaDataToTextBox()
@@ -990,6 +993,10 @@ Public Class FrmGodownTransfer
     End Sub
 
     Private Sub TxtSrch_TextChanged(sender As Object, e As EventArgs) Handles TxtSrch.TextChanged
+
+    End Sub
+
+    Private Sub Label23_Click(sender As Object, e As EventArgs) Handles Label23.Click
 
     End Sub
 End Class

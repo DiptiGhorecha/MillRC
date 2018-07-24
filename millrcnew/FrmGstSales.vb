@@ -4,7 +4,7 @@ Imports System.IO
 Imports PdfSharp.Drawing
 Imports PdfSharp.Pdf
 Imports PdfSharp.Pdf.IO
-Public Class Form11
+Public Class FrmGstSales
     Dim chkrs As New ADODB.Recordset
     Dim chkrs1 As New ADODB.Recordset
     Dim xcon As New ADODB.Connection    ''''''''variable is used to open a connection
@@ -25,7 +25,8 @@ Public Class Form11
     Dim xpage
     Dim pwidth As Integer
     Dim formloaded As Boolean = False
-    Private Sub FrmInvSummary_Load(sender As Object, e As EventArgs) Handles Me.Load
+
+    Private Sub FrmGstSales_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
         Me.Left = 0
@@ -59,16 +60,6 @@ Public Class Form11
     Private Sub KeyDownHandler(ByVal o As Object, ByVal e As KeyEventArgs)
         e.SuppressKeyPress = True
 
-    End Sub
-    Private Sub FrmInvSumkmary_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyCode = Keys.F1 And (Me.ActiveControl.Name = "TextBox1" Or Me.ActiveControl.Name = "TextBox2") Then
-            DataGridView2.Visible = True
-            GroupBox5.Visible = True
-            Me.Width = Me.Width + DataGridView2.Width - 15
-            Me.Height = Me.Height + 145
-            ctrlname = Me.ActiveControl.Name
-            ShowData(DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month, ComboBox4.Text)
-        End If
     End Sub
     Private Sub DataGridView2_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGridView2.ColumnHeaderMouseClick
         TxtSrch.Text = ""
@@ -136,11 +127,6 @@ Public Class Form11
         End Try
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        If DataGridView2.RowCount < 1 Then
-            MsgBox("No data exist for selected month")
-            ComboBox3.Focus()
-            Exit Sub
-        End If
         If (TextBox1.Text = "") Then
             MsgBox("Please enter From Invoice number")
             TextBox1.Focus()
@@ -179,30 +165,16 @@ Public Class Form11
         If (Not System.IO.Directory.Exists(Application.StartupPath & "\Reports")) Then
             System.IO.Directory.CreateDirectory(Application.StartupPath & "\Reports")
         End If
-        FileOpen(fnum, Application.StartupPath & "\Reports\Invoices_summary.dat", OpenMode.Output)
+        FileOpen(fnum, Application.StartupPath & "\Reports\GST_sales.dat", OpenMode.Output)
         FileOpen(fnumm, Application.StartupPath & "\Reports\" & TextBox5.Text & ".csv", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
-        Dim title As String = "Invoice"
-        If B2BRadio1.Checked Then
-            title = title & " B2B " & "Checklist - Format2"
-        Else
-            If B2BRadio2.Checked Then
-                title = title & " B2C " & "Checklist - Format2"
-            Else
-                title = title & " Checklist - Format2"
-            End If
-        End If
-
-
-        title = title & " GST Type - " & ComboBox1.Text
-
+        B2BRadio3.Checked = True
         If ComboBox1.Text = "All" Then
             chkrs1.Open("SELECT * FROM GST ORDER BY HSN_NO", xcon)
             HSNRadio1.Checked = False
-
         Else
             chkrs1.Open("SELECT * FROM GST where GST_DESC='" & ComboBox1.Text & "' ORDER BY HSN_NO", xcon)
             HSNRadio1.Checked = True
@@ -217,9 +189,10 @@ Public Class Form11
             For X As Integer = strbill To edbill
 
                 If xcount = 0 Then
-                    globalHeader(title, fnum, fnumm)
-                    Print(fnum, GetStringToPrint(35, "Invoice No", "S") & GetStringToPrint(13, "Godown Type", "S") & GetStringToPrint(15, "Godown Number", "S") & GetStringToPrint(13, "Bill Date   ", "S") & GetStringToPrint(12, " Bill Amount", "S") & GetStringToPrint(12, "   CGST Rate", "S") & GetStringToPrint(12, " CGST Amount", "S") & GetStringToPrint(12, "   SGST Rate", "S") & GetStringToPrint(12, " SGST Amount", "N") & GetStringToPrint(15, "     Net Amount", "S") & GetStringToPrint(17, "  HSN Number", "S") & GetStringToPrint(55, "Tenant Name", "S") & GetStringToPrint(35, "GST No", "S") & vbNewLine)
-                    Print(fnumm, GetStringToPrint(35, "Invoice No", "S") & "," & GetStringToPrint(13, "Godown Type", "S") & "," & GetStringToPrint(13, "Godown Number", "S") & "," & GetStringToPrint(13, "Bill Date    ", "S") & "," & GetStringToPrint(12, "Bill Amount ", "S") & "," & GetStringToPrint(13, "CGST Rate ", "S") & "," & GetStringToPrint(13, "CGST Amount", "S") & "," & GetStringToPrint(12, "SGST Rate ", "S") & "," & GetStringToPrint(12, "SGST Amount ", "N") & "," & GetStringToPrint(15, "Net Amount", "S") & "," & GetStringToPrint(15, "HSN Number", "S") & "," & GetStringToPrint(55, "Tenant Name", "S") & "," & GetStringToPrint(35, "GST No", "S") & vbNewLine)
+                    globalHeader("GST - Sales Report " & ComboBox3.Text & " - " & ComboBox4.Text, fnum, fnumm)
+                    Print(fnum, GetStringToPrint(13, "Date   ", "S") & GetStringToPrint(20, "Invoice No", "S") & GetStringToPrint(55, "Party Name", "S") & GetStringToPrint(15, "GST No", "S") & GetStringToPrint(13, "State Code", "S") & GetStringToPrint(13, "State", "S") & GetStringToPrint(15, "HSN /SAC ", "S") & GetStringToPrint(13, "Type", "S") & GetStringToPrint(12, "    Tax Rate", "S") & GetStringToPrint(12, " Quantity", "S") & GetStringToPrint(12, " Basic", "N") & GetStringToPrint(12, "        CGST ", "N") & GetStringToPrint(12, "     SGST ", "N") & GetStringToPrint(12, "     IGST ", "N") & GetStringToPrint(15, "     Total", "N") & GetStringToPrint(15, "    Month", "S") & GetStringToPrint(25, "   Remark", "S") & vbNewLine)
+                    Print(fnumm, GetStringToPrint(13, "Date   ", "S") & "," & GetStringToPrint(20, "Invoice No", "S") & "," & GetStringToPrint(55, "Party Name", "S") & "," & GetStringToPrint(15, "GST No", "S") & "," & GetStringToPrint(13, "State Code", "S") & "," & GetStringToPrint(13, "State", "S") & "," & GetStringToPrint(15, "HSN /SAC ", "S") & "," & GetStringToPrint(13, "Type", "S") & "," & GetStringToPrint(12, "    Tax Rate", "S") & "," & GetStringToPrint(12, " Quantity", "S") & "," & GetStringToPrint(12, " Basic", "N") & "," & GetStringToPrint(12, "        CGST ", "N") & "," & GetStringToPrint(12, "     SGST ", "N") & "," & GetStringToPrint(12, "     IGST ", "N") & "," & GetStringToPrint(15, "     Total", "N") & "," & GetStringToPrint(15, "    Month", "S") & "," & GetStringToPrint(25, "   Remark", "S") & "," & vbNewLine)
+
                     Print(fnum, " " & vbNewLine)
                     Print(fnumm, " " & vbNewLine)
                     xcount = xcount + 3
@@ -236,14 +209,15 @@ Public Class Form11
                         If B2BRadio1.Checked = True Then
                             If partyGST.Trim <> "" Then
                                 If HSNRadio1.Checked = True And HSNPRINT = True Then
-                                    Print(fnum, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
-                                    Print(fnumm, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
+                                    ' Print(fnum, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
+                                    'Print(fnumm, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
                                     HSNPRINT = False
-                                    xcount = xcount + 1
+                                    ' xcount = xcount + 1
                                 End If
                                 If DataGridView2.Item(15, X).Value = True Then
-                                    Print(fnum, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, "  " + DataGridView2.Item(11, X).Value, "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & GetStringToPrint(15, partyGST, "S") & " " & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
-                                    Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & GetStringToPrint(15, partyGST, "S") & GetStringToPrint(13, "   24", "S") & GetStringToPrint(13, "Gujarat", "S") & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & " " & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(13, "   24", "S") & "," & GetStringToPrint(13, "Gujarat", "S") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & "," & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & "," & " " & GetStringToPrint(25, "Against Advance", "S") & "," & vbNewLine)
+                                    'Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
                                     atotnet = atotnet + DataGridView2.Item(10, X).Value
                                     atotcgst = atotcgst + DataGridView2.Item(7, X).Value
                                     atotsgst = atotsgst + DataGridView2.Item(9, X).Value
@@ -254,8 +228,8 @@ Public Class Form11
                                     agroupsgst = agroupsgst + DataGridView2.Item(9, X).Value
                                     xcount = xcount + 1
                                 Else
-                                    Print(fnum, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, "  " + DataGridView2.Item(11, X).Value, "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & GetStringToPrint(15, partyGST, "S") & vbNewLine)
-                                    Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & GetStringToPrint(15, partyGST, "S") & GetStringToPrint(13, "   24", "S") & GetStringToPrint(13, "Gujarat", "S") & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & " " & GetStringToPrint(25, " ", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(13, "   24", "S") & "," & GetStringToPrint(13, "Gujarat", "S") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & "," & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & "," & " " & "," & vbNewLine)
                                     totnet = totnet + DataGridView2.Item(10, X).Value
                                     totcgst = totcgst + DataGridView2.Item(7, X).Value
                                     totsgst = totsgst + DataGridView2.Item(9, X).Value
@@ -271,14 +245,14 @@ Public Class Form11
                             If B2BRadio2.Checked = True Then
                                 If partyGST.Trim.Equals("") Then
                                     If HSNRadio1.Checked = True And HSNPRINT = True Then
-                                        Print(fnum, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
-                                        Print(fnumm, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
+                                        'Print(fnum, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
+                                        'Print(fnumm, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
                                         HSNPRINT = False
-                                        xcount = xcount + 1
+                                        'xcount = xcount + 1
                                     End If
                                     If DataGridView2.Item(15, X).Value = True Then
-                                        Print(fnum, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, "  " + DataGridView2.Item(11, X).Value, "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & GetStringToPrint(15, partyGST, "S") & " " & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
-                                        Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
+                                        Print(fnum, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & GetStringToPrint(15, partyGST, "S") & GetStringToPrint(13, "   24", "S") & GetStringToPrint(13, "Gujarat", "S") & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & " " & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
+                                        Print(fnumm, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(13, "   24", "S") & "," & GetStringToPrint(13, "Gujarat", "S") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & "," & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & "," & " " & GetStringToPrint(25, "Against Advance", "S") & "," & vbNewLine)
                                         atotnet = atotnet + DataGridView2.Item(10, X).Value
                                         atotcgst = atotcgst + DataGridView2.Item(7, X).Value
                                         atotsgst = atotsgst + DataGridView2.Item(9, X).Value
@@ -289,8 +263,8 @@ Public Class Form11
                                         agroupsgst = agroupsgst + DataGridView2.Item(9, X).Value
                                         xcount = xcount + 1
                                     Else
-                                        Print(fnum, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, "  " + DataGridView2.Item(11, X).Value, "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & GetStringToPrint(15, partyGST, "S") & vbNewLine)
-                                        Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & vbNewLine)
+                                        Print(fnum, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & GetStringToPrint(15, partyGST, "S") & GetStringToPrint(13, "   24", "S") & GetStringToPrint(13, "Gujarat", "S") & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & " " & GetStringToPrint(25, " ", "S") & vbNewLine)
+                                        Print(fnumm, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(13, "   24", "S") & "," & GetStringToPrint(13, "Gujarat", "S") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & "," & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & "," & " " & "," & vbNewLine)
                                         totnet = totnet + DataGridView2.Item(10, X).Value
                                         totcgst = totcgst + DataGridView2.Item(7, X).Value
                                         totsgst = totsgst + DataGridView2.Item(9, X).Value
@@ -304,14 +278,14 @@ Public Class Form11
                                 End If
                             Else
                                 If HSNRadio1.Checked = True And HSNPRINT = True Then
-                                    Print(fnum, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
-                                    Print(fnumm, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
+                                    ' Print(fnum, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
+                                    ' Print(fnumm, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
                                     HSNPRINT = False
-                                    xcount = xcount + 1
+                                    ' xcount = xcount + 1
                                 End If
                                 If DataGridView2.Item(15, X).Value = True Then
-                                    Print(fnum, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, "  " + DataGridView2.Item(11, X).Value, "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & GetStringToPrint(15, partyGST, "S") & " " & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
-                                    Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & GetStringToPrint(15, partyGST, "S") & GetStringToPrint(13, "   24", "S") & GetStringToPrint(13, "Gujarat", "S") & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & " " & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(13, "   24", "S") & "," & GetStringToPrint(13, "Gujarat", "S") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & "," & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & "," & " " & GetStringToPrint(25, "Against Advance", "S") & "," & vbNewLine)
                                     atotnet = atotnet + DataGridView2.Item(10, X).Value
                                     atotcgst = atotcgst + DataGridView2.Item(7, X).Value
                                     atotsgst = atotsgst + DataGridView2.Item(9, X).Value
@@ -322,8 +296,8 @@ Public Class Form11
                                     agroupsgst = agroupsgst + DataGridView2.Item(9, X).Value
                                     xcount = xcount + 1
                                 Else
-                                    Print(fnum, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, "  " + DataGridView2.Item(11, X).Value, "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & GetStringToPrint(15, partyGST, "S") & vbNewLine)
-                                    Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & GetStringToPrint(15, partyGST, "S") & GetStringToPrint(13, "   24", "S") & GetStringToPrint(13, "Gujarat", "S") & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & " " & GetStringToPrint(25, " ", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(13, "   24", "S") & "," & GetStringToPrint(13, "Gujarat", "S") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & "," & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & "," & " " & "," & vbNewLine)
                                     totnet = totnet + DataGridView2.Item(10, X).Value
                                     totcgst = totcgst + DataGridView2.Item(7, X).Value
                                     totsgst = totsgst + DataGridView2.Item(9, X).Value
@@ -349,8 +323,8 @@ Public Class Form11
                     If B2BRadio1.Checked = True Then
                         If partyGST.Trim <> "" Then
                             If DataGridView2.Item(15, X).Value = True Then
-                                Print(fnum, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, "  " + DataGridView2.Item(11, X).Value, "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & GetStringToPrint(15, partyGST, "S") & " " & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
+                                Print(fnum, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & GetStringToPrint(15, partyGST, "S") & GetStringToPrint(13, "   24", "S") & GetStringToPrint(13, "Gujarat", "S") & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & " " & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(13, "   24", "S") & "," & GetStringToPrint(13, "Gujarat", "S") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & "," & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & "," & " " & GetStringToPrint(25, "Against Advance", "S") & "," & vbNewLine)
                                 atotnet = atotnet + DataGridView2.Item(10, X).Value
                                 atotcgst = atotcgst + DataGridView2.Item(7, X).Value
                                 atotsgst = atotsgst + DataGridView2.Item(9, X).Value
@@ -361,8 +335,8 @@ Public Class Form11
                                 agroupsgst = agroupsgst + DataGridView2.Item(9, X).Value
                                 xcount = xcount + 1
                             Else
-                                Print(fnum, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, "  " + DataGridView2.Item(11, X).Value, "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & GetStringToPrint(15, partyGST, "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & vbNewLine)
+                                Print(fnum, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & GetStringToPrint(15, partyGST, "S") & GetStringToPrint(13, "   24", "S") & GetStringToPrint(13, "Gujarat", "S") & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & " " & GetStringToPrint(25, " ", "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(13, "   24", "S") & "," & GetStringToPrint(13, "Gujarat", "S") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & "," & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & "," & " " & "," & vbNewLine)
                                 totnet = totnet + DataGridView2.Item(10, X).Value
                                 totcgst = totcgst + DataGridView2.Item(7, X).Value
                                 totsgst = totsgst + DataGridView2.Item(9, X).Value
@@ -378,8 +352,8 @@ Public Class Form11
                         If B2BRadio2.Checked = True Then
                             If partyGST.Trim.Equals("") Then
                                 If DataGridView2.Item(15, X).Value = True Then
-                                    Print(fnum, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, "  " + DataGridView2.Item(11, X).Value, "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & GetStringToPrint(15, partyGST, "S") & " " & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
-                                    Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & GetStringToPrint(15, partyGST, "S") & GetStringToPrint(13, "   24", "S") & GetStringToPrint(13, "Gujarat", "S") & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & " " & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(13, "   24", "S") & "," & GetStringToPrint(13, "Gujarat", "S") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & "," & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & "," & " " & GetStringToPrint(25, "Against Advance", "S") & "," & vbNewLine)
                                     atotnet = atotnet + DataGridView2.Item(10, X).Value
                                     atotcgst = atotcgst + DataGridView2.Item(7, X).Value
                                     atotsgst = atotsgst + DataGridView2.Item(9, X).Value
@@ -390,8 +364,8 @@ Public Class Form11
                                     agroupsgst = agroupsgst + DataGridView2.Item(9, X).Value
                                     xcount = xcount + 1
                                 Else
-                                    Print(fnum, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, "  " + DataGridView2.Item(11, X).Value, "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & GetStringToPrint(15, partyGST, "S") & vbNewLine)
-                                    Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & GetStringToPrint(15, partyGST, "S") & GetStringToPrint(13, "   24", "S") & GetStringToPrint(13, "Gujarat", "S") & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & " " & GetStringToPrint(25, " ", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(13, "   24", "S") & "," & GetStringToPrint(13, "Gujarat", "S") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & "," & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & "," & " " & "," & vbNewLine)
                                     totnet = totnet + DataGridView2.Item(10, X).Value
                                     totcgst = totcgst + DataGridView2.Item(7, X).Value
                                     totsgst = totsgst + DataGridView2.Item(9, X).Value
@@ -405,8 +379,8 @@ Public Class Form11
                             End If
                         Else
                             If DataGridView2.Item(15, X).Value = True Then
-                                Print(fnum, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, "  " + DataGridView2.Item(11, X).Value, "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & GetStringToPrint(15, partyGST, "S") & " " & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
+                                Print(fnum, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & GetStringToPrint(15, partyGST, "S") & GetStringToPrint(13, "   24", "S") & GetStringToPrint(13, "Gujarat", "S") & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & " " & GetStringToPrint(25, "Against Advance", "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(13, "   24", "S") & "," & GetStringToPrint(13, "Gujarat", "S") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & "," & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & "," & " " & GetStringToPrint(25, "Against Advance", "S") & "," & vbNewLine)
                                 atotnet = atotnet + DataGridView2.Item(10, X).Value
                                 atotcgst = atotcgst + DataGridView2.Item(7, X).Value
                                 atotsgst = atotsgst + DataGridView2.Item(9, X).Value
@@ -417,8 +391,8 @@ Public Class Form11
                                 agroupsgst = agroupsgst + DataGridView2.Item(9, X).Value
                                 xcount = xcount + 1
                             Else
-                                Print(fnum, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, "  " + DataGridView2.Item(11, X).Value, "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & GetStringToPrint(15, partyGST, "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(1, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(2, X).Value, "S") & "," & GetStringToPrint(15, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(6, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(8, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(17, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & "," & GetStringToPrint(15, partyGST, "S") & vbNewLine)
+                                Print(fnum, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & GetStringToPrint(15, partyGST, "S") & GetStringToPrint(13, "   24", "S") & GetStringToPrint(13, "Gujarat", "S") & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & " " & GetStringToPrint(25, " ", "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(20, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value.ToString.Replace(",", ""), "S") & "," & GetStringToPrint(15, partyGST, "S") & "," & GetStringToPrint(13, "   24", "S") & "," & GetStringToPrint(13, "Gujarat", "S") & "," & GetStringToPrint(15, DataGridView2.Item(11, X).Value, "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, Format((DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value), "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(DataGridView2.Item(5, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(7, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, Format(DataGridView2.Item(9, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(DataGridView2.Item(10, X).Value, "###########0.00"), "N") & "," & GetStringToPrint(15, " " & ComboBox3.Text & "-" & ComboBox4.Text, "S") & "," & " " & "," & vbNewLine)
                                 totnet = totnet + DataGridView2.Item(10, X).Value
                                 totcgst = totcgst + DataGridView2.Item(7, X).Value
                                 totsgst = totsgst + DataGridView2.Item(9, X).Value
@@ -438,22 +412,6 @@ Public Class Form11
             Next
             If HSNRadio1.Checked = True Then
                 If chkrs1.EOF = False Then
-                    If groupnet > 0 Then
-                        Print(fnum, " " & vbNewLine)
-                        Print(fnumm, " " & vbNewLine)
-                        Print(fnum, GetStringToPrint(35, "Group Total --> ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format(grouptaxable, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(groupcgst, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(groupsgst, "######0.00"), "N") & GetStringToPrint(15, Format(groupnet, "###########0.00"), "N") & GetStringToPrint(15, "  ", "S") & " " & GetStringToPrint(55, " ", "S") & GetStringToPrint(15, " ", "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(35, "Group Total --> ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(12, Format(grouptaxable, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(groupcgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(groupsgst, "######0.00"), "N") & "," & GetStringToPrint(17, Format(groupnet, "######0.00"), "N") & "," & GetStringToPrint(15, "  ", "S") & ", " & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & vbNewLine)
-                        Print(fnum, GetStringToPrint(35, "Advance adjusted --> ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format(agrouptaxable, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(agroupcgst, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(agroupsgst, "######0.00"), "N") & GetStringToPrint(15, Format(agroupnet, "###########0.00"), "N") & GetStringToPrint(15, "  ", "S") & " " & GetStringToPrint(55, " ", "S") & GetStringToPrint(15, " ", "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(35, "Advance adjusted --> ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(12, Format(agrouptaxable, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(agroupcgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(agroupsgst, "######0.00"), "N") & "," & GetStringToPrint(17, Format(agroupnet, "######0.00"), "N") & "," & GetStringToPrint(15, "  ", "S") & ", " & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & vbNewLine)
-                        groupnet = 0
-                        grouptaxable = 0
-                        groupcgst = 0
-                        groupsgst = 0
-                        agroupnet = 0
-                        agrouptaxable = 0
-                        agroupcgst = 0
-                        agroupsgst = 0
-                    End If
                     chkrs1.MoveNext()
                 End If
                 If chkrs1.EOF = True Then
@@ -466,29 +424,24 @@ Public Class Form11
         chkrs1.Close()
         Print(fnum, " " & vbNewLine)
         Print(fnumm, " " & vbNewLine)
-        Print(fnum, GetStringToPrint(35, "Total --> ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format(tottaxable + atottaxable, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(totcgst + atotcgst, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(totsgst + atotsgst, "######0.00"), "N") & GetStringToPrint(15, Format(totnet + atotnet, "###########0.00"), "N") & GetStringToPrint(15, "  ", "S") & " " & GetStringToPrint(55, " ", "S") & GetStringToPrint(15, " ", "S") & vbNewLine)
-        Print(fnumm, GetStringToPrint(35, "Total --> ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(12, Format(tottaxable + atottaxable, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(totcgst + atotcgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(totsgst + atotsgst, "######0.00"), "N") & "," & GetStringToPrint(17, Format(totnet + atotnet, "######0.00"), "N") & "," & GetStringToPrint(15, "  ", "S") & ", " & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & vbNewLine)
+        Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(20, "Total with Advance >", "S") & GetStringToPrint(55, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(tottaxable + atottaxable, "######0.00"), "N") & GetStringToPrint(12, Format(totcgst + atotcgst, "######0.00"), "N") & GetStringToPrint(12, Format(totsgst + atotsgst, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(totnet + atotnet, "###########0.00"), "N") & GetStringToPrint(15, " ", "S") & GetStringToPrint(25, " ", "S") & vbNewLine)
+        Print(fnumm, GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(20, "Total with Advance >", "S") & "," & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(tottaxable + atottaxable, "######0.00"), "N") & "," & GetStringToPrint(12, Format(totcgst + atotcgst, "######0.00"), "N") & "," & GetStringToPrint(12, Format(totsgst + atotsgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(totnet + atotnet, "###########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(25, " ", "S") & "," & vbNewLine)
         Print(fnum, " " & vbNewLine)
         Print(fnumm, " " & vbNewLine)
-        Print(fnum, GetStringToPrint(35, "Advance adjusted --> ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format(atottaxable, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(atotcgst, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(atotsgst, "######0.00"), "N") & GetStringToPrint(15, Format(atotnet, "###########0.00"), "N") & GetStringToPrint(15, "  ", "S") & " " & GetStringToPrint(55, " ", "S") & GetStringToPrint(15, " ", "S") & vbNewLine)
-        Print(fnumm, GetStringToPrint(35, "Advance adjusted --> ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(12, Format(atottaxable, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(atotcgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(atotsgst, "######0.00"), "N") & "," & GetStringToPrint(17, Format(atotnet, "######0.00"), "N") & "," & GetStringToPrint(15, "  ", "S") & ", " & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & vbNewLine)
+        Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(20, "Total Advance >", "S") & GetStringToPrint(55, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(atottaxable, "######0.00"), "N") & GetStringToPrint(12, Format(atotcgst, "######0.00"), "N") & GetStringToPrint(12, Format(atotsgst, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(atotnet, "###########0.00"), "N") & GetStringToPrint(15, " ", "S") & GetStringToPrint(25, " ", "S") & vbNewLine)
+        Print(fnumm, GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(20, "Total Advance >", "S") & "," & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(atottaxable, "######0.00"), "N") & "," & GetStringToPrint(12, Format(atotcgst, "######0.00"), "N") & "," & GetStringToPrint(12, Format(atotsgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(atotnet, "###########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(25, " ", "S") & "," & vbNewLine)
         Print(fnum, " " & vbNewLine)
         Print(fnumm, " " & vbNewLine)
-        Print(fnum, GetStringToPrint(35, "Total --> ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format(tottaxable, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(totcgst, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(totsgst, "######0.00"), "N") & GetStringToPrint(15, Format(totnet, "###########0.00"), "N") & GetStringToPrint(15, "  ", "S") & " " & GetStringToPrint(55, " ", "S") & GetStringToPrint(15, " ", "S") & vbNewLine)
-        Print(fnumm, GetStringToPrint(35, "Total --> ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(12, Format(tottaxable, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(totcgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(totsgst, "######0.00"), "N") & "," & GetStringToPrint(17, Format(totnet, "######0.00"), "N") & "," & GetStringToPrint(15, "  ", "S") & ", " & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & vbNewLine)
+        Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(20, "Total >", "S") & GetStringToPrint(55, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(tottaxable, "######0.00"), "N") & GetStringToPrint(12, Format(totcgst, "######0.00"), "N") & GetStringToPrint(12, Format(totsgst, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(15, Format(totnet, "###########0.00"), "N") & GetStringToPrint(15, " ", "S") & GetStringToPrint(25, " ", "S") & vbNewLine)
+        Print(fnumm, GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(20, "Total >", "S") & "," & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(tottaxable, "######0.00"), "N") & "," & GetStringToPrint(12, Format(totcgst, "######0.00"), "N") & "," & GetStringToPrint(12, Format(totsgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(15, Format(totnet, "###########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(25, " ", "S") & "," & vbNewLine)
         FileClose(fnum)
         FileClose(fnumm)
-        Form12.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Invoices_summary.dat", RichTextBoxStreamType.PlainText)
-        Form12.Show()
+        FrmGSTSalesView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\GST_sales.dat", RichTextBoxStreamType.PlainText)
+        FrmGSTSalesView.Show()
         MsgBox(Application.StartupPath + " \Reports\" & TextBox5.Text & ".CSV file is generated")
     End Sub
 
     Public Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        If DataGridView2.RowCount < 1 Then
-            MsgBox("No data exist for selected month")
-            ComboBox3.Focus()
-            Exit Sub
-        End If
         If (TextBox1.Text = "") Then
             MsgBox("Please enter From Invoice number")
             TextBox1.Focus()
@@ -527,12 +480,13 @@ Public Class Form11
         If (Not System.IO.Directory.Exists(Application.StartupPath & "\Reports")) Then
             System.IO.Directory.CreateDirectory(Application.StartupPath & "\Reports")
         End If
-        FileOpen(fnum, Application.StartupPath & "\Reports\Invoices_summary.dat", OpenMode.Output)
+        FileOpen(fnum, Application.StartupPath & "\Reports\GST_sales.dat", OpenMode.Output)
         FileOpen(fnumm, Application.StartupPath & "\Reports\" & TextBox5.Text & ".csv", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
+        B2BRadio3.Checked = True
         If ComboBox1.Text = "All" Then
             chkrs1.Open("SELECT * FROM GST ORDER BY HSN_NO", xcon)
             HSNRadio1.Checked = False
@@ -540,19 +494,6 @@ Public Class Form11
             chkrs1.Open("SELECT * FROM GST where GST_DESC='" & ComboBox1.Text & "' ORDER BY HSN_NO", xcon)
             HSNRadio1.Checked = True
         End If
-        Dim title As String = "Invoice"
-        If B2BRadio1.Checked Then
-            title = title & " B2B " & "Checklist - Format2"
-        Else
-            If B2BRadio2.Checked Then
-                title = title & " B2C " & "Checklist - Format2"
-            Else
-                title = title & " Checklist - Format2"
-            End If
-        End If
-
-
-        title = title & " GST Type - " & ComboBox1.Text
         Dim HSN As String
         Dim HSNPRINT As Boolean
         Dim totnet, tottaxable, totcgst, totsgst, groupnet, grouptaxable, groupcgst, groupsgst As Double
@@ -561,8 +502,9 @@ Public Class Form11
             HSN = chkrs1.Fields(0).Value
             HSNPRINT = True
             For X As Integer = strbill To edbill
+
                 If xcount = 0 Then
-                    globalHeader(title, fnum, fnumm)
+                    globalHeader("GST - Sales Report", fnum, fnumm)
                     Print(fnum, GetStringToPrint(35, "Invoice No", "S") & GetStringToPrint(13, "Godown Type", "S") & GetStringToPrint(15, "Godown Number", "S") & GetStringToPrint(13, "Bill Date   ", "S") & GetStringToPrint(12, " Bill Amount", "S") & GetStringToPrint(12, "   CGST Rate", "S") & GetStringToPrint(12, " CGST Amount", "S") & GetStringToPrint(12, "   SGST Rate", "S") & GetStringToPrint(12, " SGST Amount", "N") & GetStringToPrint(15, "     Net Amount", "S") & GetStringToPrint(17, "  HSN Number", "S") & GetStringToPrint(55, "Tenant Name", "S") & GetStringToPrint(35, "GST No", "S") & vbNewLine)
                     Print(fnumm, GetStringToPrint(35, "Invoice No", "S") & "," & GetStringToPrint(13, "Godown Type", "S") & "," & GetStringToPrint(13, "Godown Number", "S") & "," & GetStringToPrint(13, "Bill Date    ", "S") & "," & GetStringToPrint(12, "Bill Amount ", "S") & "," & GetStringToPrint(13, "CGST Rate ", "S") & "," & GetStringToPrint(13, "CGST Amount", "S") & "," & GetStringToPrint(12, "SGST Rate ", "S") & "," & GetStringToPrint(12, "SGST Amount ", "N") & "," & GetStringToPrint(15, "Net Amount", "S") & "," & GetStringToPrint(15, "HSN Number", "S") & "," & GetStringToPrint(55, "Tenant Name", "S") & "," & GetStringToPrint(35, "GST No", "S") & vbNewLine)
                     Print(fnum, " " & vbNewLine)
@@ -783,22 +725,22 @@ Public Class Form11
             Next
             If HSNRadio1.Checked = True Then
                 If chkrs1.EOF = False Then
-                    If groupnet > 0 Then
-                        Print(fnum, " " & vbNewLine)
-                        Print(fnumm, " " & vbNewLine)
-                        Print(fnum, GetStringToPrint(35, "Group Total --> ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format(grouptaxable, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(groupcgst, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(groupsgst, "######0.00"), "N") & GetStringToPrint(15, Format(groupnet, "###########0.00"), "N") & GetStringToPrint(15, "  ", "S") & " " & GetStringToPrint(55, " ", "S") & GetStringToPrint(15, " ", "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(35, "Group Total --> ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(12, Format(grouptaxable, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(groupcgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(groupsgst, "######0.00"), "N") & "," & GetStringToPrint(17, Format(groupnet, "######0.00"), "N") & "," & GetStringToPrint(15, "  ", "S") & ", " & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & vbNewLine)
-                        Print(fnum, GetStringToPrint(35, "Advance adjusted --> ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format(agrouptaxable, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(agroupcgst, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(agroupsgst, "######0.00"), "N") & GetStringToPrint(15, Format(agroupnet, "###########0.00"), "N") & GetStringToPrint(15, "  ", "S") & " " & GetStringToPrint(55, " ", "S") & GetStringToPrint(15, " ", "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(35, "Advance adjusted --> ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(12, Format(agrouptaxable, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(agroupcgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(agroupsgst, "######0.00"), "N") & "," & GetStringToPrint(17, Format(agroupnet, "######0.00"), "N") & "," & GetStringToPrint(15, "  ", "S") & ", " & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & vbNewLine)
-                        groupnet = 0
-                        grouptaxable = 0
-                        groupcgst = 0
-                        groupsgst = 0
-                        agroupnet = 0
-                        agrouptaxable = 0
-                        agroupcgst = 0
-                        agroupsgst = 0
-                    End If
+                    'If groupnet > 0 Then
+                    '    Print(fnum, " " & vbNewLine)
+                    '    Print(fnumm, " " & vbNewLine)
+                    '    Print(fnum, GetStringToPrint(35, "Group Total --> ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format(grouptaxable, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(groupcgst, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(groupsgst, "######0.00"), "N") & GetStringToPrint(15, Format(groupnet, "###########0.00"), "N") & GetStringToPrint(15, "  ", "S") & " " & GetStringToPrint(55, " ", "S") & GetStringToPrint(15, " ", "S") & vbNewLine)
+                    '    Print(fnumm, GetStringToPrint(35, "Group Total --> ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(12, Format(grouptaxable, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(groupcgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(groupsgst, "######0.00"), "N") & "," & GetStringToPrint(17, Format(groupnet, "######0.00"), "N") & "," & GetStringToPrint(15, "  ", "S") & ", " & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & vbNewLine)
+                    '    Print(fnum, GetStringToPrint(35, "Advance adjusted --> ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, Format(agrouptaxable, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(agroupcgst, "######0.00"), "N") & GetStringToPrint(12, " ", "S") & GetStringToPrint(12, Format(agroupsgst, "######0.00"), "N") & GetStringToPrint(15, Format(agroupnet, "###########0.00"), "N") & GetStringToPrint(15, "  ", "S") & " " & GetStringToPrint(55, " ", "S") & GetStringToPrint(15, " ", "S") & vbNewLine)
+                    '    Print(fnumm, GetStringToPrint(35, "Advance adjusted --> ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(12, Format(agrouptaxable, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(agroupcgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(agroupsgst, "######0.00"), "N") & "," & GetStringToPrint(17, Format(agroupnet, "######0.00"), "N") & "," & GetStringToPrint(15, "  ", "S") & ", " & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & vbNewLine)
+                    '    groupnet = 0
+                    '    grouptaxable = 0
+                    '    groupcgst = 0
+                    '    groupsgst = 0
+                    '    agroupnet = 0
+                    '    agrouptaxable = 0
+                    '    agroupcgst = 0
+                    '    agroupsgst = 0
+                    'End If
                     chkrs1.MoveNext()
                 End If
                 If chkrs1.EOF = True Then
@@ -823,9 +765,9 @@ Public Class Form11
         Print(fnumm, GetStringToPrint(35, "Total --> ", "S") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(12, Format(tottaxable, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(totcgst, "######0.00"), "N") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(12, Format(totsgst, "######0.00"), "N") & "," & GetStringToPrint(17, Format(totnet, "######0.00"), "N") & "," & GetStringToPrint(15, "  ", "S") & ", " & GetStringToPrint(55, " ", "S") & "," & GetStringToPrint(15, " ", "S") & vbNewLine)
         FileClose(fnum)
         FileClose(fnumm)
-        Form12.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Invoices_summary.dat", RichTextBoxStreamType.PlainText)
-        Form12.Show()
-        CreatePDF(Application.StartupPath & "\Reports\Invoices_summary.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
+        FrmGSTSalesView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\GST_sales.dat", RichTextBoxStreamType.PlainText)
+        FrmGSTSalesView.Show()
+        CreatePDF(Application.StartupPath & "\Reports\GST_sales.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
         Dim PrintPDFFile As New ProcessStartInfo
         PrintPDFFile.UseShellExecute = True
         PrintPDFFile.Verb = "print"
@@ -931,27 +873,25 @@ Public Class Form11
 
 
     Private Sub DataGridView2_DoubleClick(sender As Object, e As EventArgs) Handles DataGridView2.DoubleClick
-        If DataGridView2.RowCount > 1 Then
-            Dim i As Integer = DataGridView2.CurrentRow.Index
+        Dim i As Integer = DataGridView2.CurrentRow.Index
         CType(Me.Controls.Find(ctrlname, False)(0), TextBox).Text = GetValue(DataGridView2.Item(0, i).Value)
         If (TextBox2.Text = "") Then
             TextBox2.Text = GetValue(DataGridView2.Item(0, i).Value)
             TextBox4.Text = DataGridView2.CurrentCell.RowIndex
         End If
-            ' GroupBox5.Visible = False
-            ' DataGridView2.Visible = False
-            ' Me.Width = Me.Width - DataGridView2.Width + 15
-            ' Me.Height = Me.Height - 145
-            If ctrlname = "TextBox1" Then
-                TextBox3.Text = DataGridView2.CurrentCell.RowIndex
-                TextBox2.Focus()
+        ' GroupBox5.Visible = False
+        ' DataGridView2.Visible = False
+        ' Me.Width = Me.Width - DataGridView2.Width + 15
+        ' Me.Height = Me.Height - 145
+        If ctrlname = "TextBox1" Then
+            TextBox3.Text = DataGridView2.CurrentCell.RowIndex
+            TextBox2.Focus()
+        Else
+            If ctrlname = "TextBox2" Then
+                TextBox4.Text = DataGridView2.CurrentCell.RowIndex
+                Button1.Focus()
             Else
-                If ctrlname = "TextBox2" Then
-                    TextBox4.Text = DataGridView2.CurrentCell.RowIndex
-                    Button1.Focus()
-                Else
-                    TextBox1.Focus()
-                End If
+                TextBox1.Focus()
             End If
         End If
     End Sub
@@ -972,14 +912,6 @@ Public Class Form11
         da.Dispose()
         ds.Dispose()
         MyConn.Close() ' clouse connection
-        If DataGridView2.RowCount >= 1 Then
-            TextBox1.Text = DataGridView2.Item(0, 0).Value
-            TextBox2.Text = DataGridView2.Item(0, DataGridView2.RowCount - 1).Value
-            TextBox3.Text = 0
-            'TextBox4.Text = Convert.ToInt32(DataGridView2.Item(12, DataGridView2.RowCount - 2).Value.Substring(12, 3)) - 1
-            TextBox4.Text = DataGridView2.RowCount - 1
-
-        End If
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
@@ -994,38 +926,47 @@ Public Class Form11
     End Sub
 
     Private Sub DataGridView2_Click(sender As Object, e As EventArgs) Handles DataGridView2.Click
-        If DataGridView2.RowCount > 1 Then
-            Dim i As Integer = DataGridView2.CurrentRow.Index
-            CType(Me.Controls.Find(ctrlname, False)(0), TextBox).Text = GetValue(DataGridView2.Item(0, i).Value)
-            If (TextBox2.Text = "") Then
-                TextBox2.Text = GetValue(DataGridView2.Item(0, i).Value)
+        Dim i As Integer = DataGridView2.CurrentRow.Index
+        CType(Me.Controls.Find(ctrlname, False)(0), TextBox).Text = GetValue(DataGridView2.Item(0, i).Value)
+        If (TextBox2.Text = "") Then
+            TextBox2.Text = GetValue(DataGridView2.Item(0, i).Value)
+            TextBox4.Text = DataGridView2.CurrentCell.RowIndex
+        End If
+        ' GroupBox5.Visible = False
+        ' DataGridView2.Visible = False
+        ' Me.Width = Me.Width - DataGridView2.Width + 15
+        ' Me.Height = Me.Height - 145
+        If ctrlname = "TextBox1" Then
+            TextBox3.Text = DataGridView2.CurrentCell.RowIndex
+            TextBox2.Focus()
+        Else
+            If ctrlname = "TextBox2" Then
                 TextBox4.Text = DataGridView2.CurrentCell.RowIndex
-            End If
-            ' GroupBox5.Visible = False
-            ' DataGridView2.Visible = False
-            ' Me.Width = Me.Width - DataGridView2.Width + 15
-            ' Me.Height = Me.Height - 145
-            If ctrlname = "TextBox1" Then
-                TextBox3.Text = DataGridView2.CurrentCell.RowIndex
-                TextBox2.Focus()
+                Button1.Focus()
             Else
-                If ctrlname = "TextBox2" Then
-                    TextBox4.Text = DataGridView2.CurrentCell.RowIndex
-                    Button1.Focus()
-                Else
-                    TextBox1.Focus()
-                End If
+                TextBox1.Focus()
             End If
         End If
     End Sub
 
-    Private Sub Form11_Move(sender As Object, e As EventArgs) Handles Me.Move
+    Private Sub FrmGstSales_Move(sender As Object, e As EventArgs) Handles Me.Move
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height
             If (Left < 0) Then Left = 0
             If (Top < 0) Then Top = 0
             If (Top < 87) Then Top = 87
+        End If
+    End Sub
+
+    Private Sub FrmGstSales_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        If e.KeyCode = Keys.F1 And (Me.ActiveControl.Name = "TextBox1" Or Me.ActiveControl.Name = "TextBox2") Then
+            DataGridView2.Visible = True
+            GroupBox5.Visible = True
+            Me.Width = Me.Width + DataGridView2.Width - 15
+            Me.Height = Me.Height + 145
+            ctrlname = Me.ActiveControl.Name
+            ShowData(DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month, ComboBox4.Text)
         End If
     End Sub
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
@@ -1134,4 +1075,5 @@ Public Class Form11
             ComboBox3.SelectionStart = ComboBox3.Text.Length
         End If
     End Sub
+
 End Class

@@ -14,7 +14,7 @@ Public Class FormReceipt
     Dim xtemp As New ADODB.Recordset    '''''''' used to open a temparory Recordset
     Dim XComp As New ADODB.Recordset
     Dim connString As String = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;"
-    Dim rownum As Integer = 0
+    Public rownum As Integer = 0
     Dim MyConn As OleDbConnection
     Dim da As OleDbDataAdapter
     Dim ds As DataSet
@@ -46,6 +46,8 @@ Public Class FormReceipt
     Dim groupfilled As Boolean = False
     Dim godownfilled As Boolean = False
     Public lastdate As Date = DateTime.Today
+    Public gridline As Integer
+    Public rentsuggestion As Boolean = False
 
     Private Sub FormReceipt_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = MainMDIForm
@@ -66,6 +68,9 @@ Public Class FormReceipt
         godownfilled = True
         fillgroupbox2()
         ShowData()
+        If DataGridView1.RowCount >= 1 Then
+            rownum = DataGridView1.RowCount - 1
+        End If
         LodaDataToTextBox()
         ' GroupBox1.Visible = True
         '  cmdFirst_Click(Nothing, Nothing)
@@ -291,20 +296,27 @@ Public Class FormReceipt
                 DataGridView1.FirstDisplayedScrollingRowIndex = rownum
                 DataGridView1.CurrentCell = DataGridView1.Rows(rownum).Cells(1)
 
-                If frmload = True Then
-                    i = 0
-                    frmload = False
+                'If frmload = True Then
+                '    i = 0
+                '    frmload = False
+                'Else
+                '    i = DataGridView1.CurrentRow.Index
+                'End If
+                If rownum > 0 Then
+                    i = rownum
                 Else
                     i = DataGridView1.CurrentRow.Index
+
                 End If
+
                 '  i = DataGridView1.CurrentRow.Index
 
-
+                '    fillgrid2(DataGridView1.Item(1, i).Value, DataGridView1.Item(2, i).Value, DataGridView1.Item(4, i).Value, DataGridView1.Item(3, i).Value.ToString)
                 If Not IsDBNull(DataGridView1.Item(1, i).Value) Then
                     ComboBox3.Text = GetValue(DataGridView1.Item(1, i).Value)
                 End If
                 If Not IsDBNull(DataGridView1.Item(2, i).Value) Then
-                    TextBox1.Text = GetValue(DataGridView1.Item(2, i).Value)
+                    '    TextBox1.Text = GetValue(DataGridView1.Item(2, i).Value)
                     ComboBox4.Text = GetValue(DataGridView1.Item(2, i).Value)
                 End If
                 If Not IsDBNull(DataGridView1.Item(3, i).Value) Then
@@ -314,9 +326,11 @@ Public Class FormReceipt
                     TextBox2.Text = GetValue(DataGridView1.Item(4, i).Value)
                 End If
                 If Not IsDBNull(DataGridView1.Item(5, i).Value) Then
+
                     TextBox1.Text = Format(CSng(GetValue(DataGridView1.Item(5, i).Value)), "#####0.00")
-                End If
-                If Not IsDBNull(DataGridView1.Item(6, i).Value) Then
+
+                    End If
+                    If Not IsDBNull(DataGridView1.Item(6, i).Value) Then
                     CheckBox1.Checked = Convert.ToBoolean(DataGridView1.Item(6, i).Value)
                 End If
                 If Not IsDBNull(DataGridView1.Item(7, i).Value) Then
@@ -452,6 +466,16 @@ Public Class FormReceipt
                 End If
             Next
             checkinserted = True
+            RentComboBox.DisplayMember = "Rent"
+            RentComboBox.ValueMember = "Month"
+            Dim tb As New DataTable
+            tb.Columns.Add("Month", GetType(Integer))
+            tb.Columns.Add("Rent", GetType(String))
+            For i As Integer = 1 To 24
+                tb.Rows.Add(i, Convert.ToDateTime(DataGridView2.Item(5, (DataGridView2.RowCount - 1)).Value).AddMonths(i) & " - " & (Convert.ToDouble(DataGridView2.Item(17, DataGridView2.RowCount - 1).Value) + (Convert.ToDouble(DataGridView2.Item(11, 0).Value) * i)).ToString)
+            Next
+            RentComboBox.DataSource = tb
+
         Else
             '''''''''''''''''all bills paid than check net_amount of previous bill and store as paayble
 
@@ -467,6 +491,7 @@ Public Class FormReceipt
             chkrs.Close()
             xcon.Close()
         End If
+
     End Function
     Private Sub cmdFirst_Click(sender As Object, e As EventArgs) Handles cmdFirst.Click
         DataGridView1.CurrentRow.Selected = False
@@ -536,6 +561,10 @@ Public Class FormReceipt
             End If
             ' Dim STR As String = "SELECT [RECEIPT].*,[S].[P_CODE]  from [RECEIPT] INNER JOIN (SELECT [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE] FROM [BILL] GROUP BY [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE]) AS S ON [RECEIPT].[REC_DATE]=[S].[REC_DATE] AND TRIM(STR([RECEIPT].[REC_NO]))=[S].[REC_NO] order by [RECEIPT].[REC_DATE],[RECEIPT].REC_NO"
             Dim STR As String = "SELECT [RECEIPT].*,[S].[P_CODE] from [RECEIPT] LEFT OUTER JOIN (SELECT [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE] FROM [BILL] GROUP BY [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE]) AS S ON [RECEIPT].[REC_DATE]=[S].[REC_DATE] AND TRIM(STR([RECEIPT].[REC_NO]))=[S].[REC_NO] order by [RECEIPT].[REC_DATE],[RECEIPT].REC_NO"
+            If TxtSrch.Text.Trim <> "" Then
+                TxtSrch.Text = ""
+                'STR = "SELECT [RECEIPT].*,[S].[P_CODE] from [RECEIPT] LEFT OUTER JOIN (SELECT [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE] FROM [BILL] GROUP BY [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE]) AS S ON [RECEIPT].[REC_DATE]=[S].[REC_DATE] AND TRIM(STR([RECEIPT].[REC_NO]))=[S].[REC_NO] where " & indexorder & " Like '%" & TxtSrch.Text & "%'  order by [RECEIPT].[REC_DATE],[RECEIPT].REC_NO"
+            End If
 
             da = New OleDb.OleDbDataAdapter(STR, MyConn)
             ds = New DataSet
@@ -546,6 +575,7 @@ Public Class FormReceipt
             ds.Dispose()
             MyConn.Close()
             DataGridView1.Columns(0).Visible = False
+
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
@@ -605,6 +635,7 @@ Public Class FormReceipt
     Private Sub cmdAdd_Click(sender As Object, e As EventArgs) Handles cmdAdd.Click
         Try
             GrpAddCorrect = "A"
+            Label22.Text = "Add"
             DataGridView2.Enabled = True
             DataGridView1.Enabled = False
             cmdUpdate.Enabled = True
@@ -672,12 +703,29 @@ Public Class FormReceipt
             Dim INVNOTMP As String
             Dim nom As Integer
 
+            Dim iDate As String
+            Dim fDate As DateTime
+            Dim oDate As String
+            Dim foDate As DateTime
+            If (Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) >= 4) Then
+                iDate = "01/04/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                fDate = Convert.ToDateTime(iDate)
+                oDate = "31/03/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) + 1))
+                foDate = Convert.ToDateTime(oDate)
+            Else
+                iDate = "01/04/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) - 1))
+                fDate = Convert.ToDateTime(iDate)
+                oDate = "31/03/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                foDate = Convert.ToDateTime(oDate)
+            End If
+
             If xcon.State = ConnectionState.Open Then
             Else
                 xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
             End If
             '  Dim SRD As String = "SELECT [RECEIPT].* from [RECEIPT] where [GROUP]='" & ComboBox3.Text & "' AND GODWN_NO='" & ComboBox4.Text & "' AND Year([RECEIPT].REC_DATE)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' order by [RECEIPT].REC_NO"
-            chkrs1.Open("SELECT [RECEIPT].* from [RECEIPT] where Year([RECEIPT].REC_DATE)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' order by [RECEIPT].REC_NO", xcon)
+            'chkrs1.Open("SELECT [RECEIPT].* from [RECEIPT] where Year([RECEIPT].REC_DATE)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' order by [RECEIPT].REC_NO", xcon)
+            chkrs1.Open("SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].REC_DATE>=Format('" & fDate & "', 'dd/mm/yyyy') and [RECEIPT].REC_DATE<=Format('" & foDate & "', 'dd/mm/yyyy') order by [RECEIPT].REC_NO", xcon)
             ' chkrs1.MoveLast()
             Do While chkrs1.EOF = False
                 INVNO = chkrs1.Fields(4).Value.ToString
@@ -700,7 +748,7 @@ Public Class FormReceipt
             If godownfilled Then
                 If ComboBox4.Text.Equals("") Then
                 Else
-
+                    rentsuggestion = False
                     MyConn = New OleDbConnection(connString)
                     If MyConn.State = ConnectionState.Closed Then
                         MyConn.Open()
@@ -892,13 +940,20 @@ Public Class FormReceipt
                         Dim tb As New DataTable
                         tb.Columns.Add("Month", GetType(Integer))
                         tb.Columns.Add("Rent", GetType(String))
-                        For i As Integer = 0 To 24
-                            tb.Rows.Add(i, DateTime.Now.AddMonths(i).ToShortDateString & " - " & (payable * (i + 1)))
+                        For i As Integer = 1 To 24
+                            If DataGridView2.RowCount >= 1 Then
+                                tb.Rows.Add(i, Convert.ToDateTime(DataGridView2.Item(5, (DataGridView2.RowCount - 1)).Value).AddMonths(i) & " - " & (Convert.ToDouble(DataGridView2.Item(17, DataGridView2.RowCount - 1).Value) + (Convert.ToDouble(DataGridView2.Item(11, 0).Value) * i)).ToString)
+                            Else
+                                tb.Rows.Add(i, DateTime.Now.AddMonths(i).ToShortDateString & " - " & (payable * (i + 1)))
+                            End If
+
+                            '  
                             ' tb.Rows.Add(i, DateTime.Now.AddMonths(i).ToShortDateString & " - " & ((Convert.ToDouble(DataGridView2.Item(11, 0).Value) * i).ToString))
                         Next
                         RentComboBox.DataSource = tb
                         xcon.Close()
                     End If
+
                 End If
             End If
 
@@ -926,7 +981,10 @@ Public Class FormReceipt
 
             Dim destination_abroad As Boolean
             Dim checkedcount = 0
-            '  MsgBox(Label19.Text)
+            '  MsgBox(Label19.Text
+            If TextBox1.Text.Trim() = "" Then
+                TextBox1.Text = "0.00"
+            End If
             payable = Label19.Text
             For X As Integer = 0 To DataGridView2.RowCount - 1
                 destination_abroad = Convert.ToBoolean(DataGridView2.Item(0, X).EditedFormattedValue)
@@ -1022,6 +1080,7 @@ Public Class FormReceipt
             Loop
             ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
             GrpAddCorrect = "C"
+            Label22.Text = "Edit"
             DataGridView2.Enabled = True
             DataGridView1.Enabled = False
             'Datprimaryrs.Recordset.Edit
@@ -1061,6 +1120,10 @@ Public Class FormReceipt
             insertData()
             DataGridView2.Enabled = False
             DataGridView1.Enabled = True
+            rentsuggestion = False
+            If DataGridView1.RowCount >= 1 Then
+                rownum = DataGridView1.RowCount - 1
+            End If
             If GrpAddCorrect = "C" Then
                 cmdUpdate.Enabled = False
                 cmdCancel.Enabled = False
@@ -1068,6 +1131,7 @@ Public Class FormReceipt
                 cmdEdit.Enabled = True
                 cmdDelete.Enabled = True
                 disablefields()
+                DataGridView1.Rows(rownum).Selected = True
             Else
                 cmdUpdate.Enabled = False
                 cmdCancel.Enabled = False
@@ -1075,7 +1139,10 @@ Public Class FormReceipt
                 cmdEdit.Enabled = True
                 cmdDelete.Enabled = True
                 disablefields()
+                rownum = DataGridView1.RowCount - 1
+                DataGridView1.Rows(rownum).Selected = True
             End If
+            Label22.Text = "View"
             GrpAddCorrect = ""
             navigateenable()
             LodaDataToTextBox()
@@ -1171,7 +1238,7 @@ Public Class FormReceipt
                 ' Do nothing here; transaction is not active.
             End Try
         End Try
-        GrpAddCorrect = ""
+        '  GrpAddCorrect = ""  '''dipti lat change
         ShowData()
 
     End Sub
@@ -1278,6 +1345,8 @@ Public Class FormReceipt
     Private Sub cmdCancel_Click(sender As Object, e As EventArgs) Handles cmdCancel.Click
         Try
             GrpAddCorrect = ""
+            rentsuggestion = False
+            Label22.Text = "View"
             ErrorProvider1.Clear()
             DataGridView2.Enabled = False
             DataGridView1.Enabled = True
@@ -1422,8 +1491,8 @@ Public Class FormReceipt
         MyConn = New OleDbConnection(connString)
         'If MyConn.State = ConnectionState.Closed Then
         MyConn.Open()
-        da = New OleDb.OleDbDataAdapter("SELECT [RECEIPT].* from [RECEIPT] where " & indexorder & " Like '%" & TxtSrch.Text & "%' order by [RECEIPT].REC_NO", MyConn)
-        'da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where [GODOWN].GROUP Like '%" & TxtSrch.Text & "%' ORDER BY [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
+        ' da = New OleDb.OleDbDataAdapter("SELECT [RECEIPT].* from [RECEIPT] where " & indexorder & " Like '%" & TxtSrch.Text & "%' order by [RECEIPT].REC_NO", MyConn)
+        da = New OleDb.OleDbDataAdapter("SELECT [RECEIPT].*,[S].[P_CODE] from [RECEIPT] LEFT OUTER JOIN (SELECT [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE] FROM [BILL] GROUP BY [BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[P_CODE]) AS S ON [RECEIPT].[REC_DATE]=[S].[REC_DATE] AND TRIM(STR([RECEIPT].[REC_NO]))=[S].[REC_NO] where " & indexorder & " Like '%" & TxtSrch.Text & "%'  order by [RECEIPT].[REC_DATE],[RECEIPT].REC_NO", MyConn)
         ds = New DataSet
         ds.Clear()
         da.Fill(ds)
@@ -1527,6 +1596,58 @@ Public Class FormReceipt
     Private Sub DateTimePicker1_ValueChanged(sender As Object, e As EventArgs) Handles DateTimePicker1.ValueChanged
         If GrpAddCorrect = "A" Then
             lastdate = DateTimePicker1.Value
+        End If
+    End Sub
+
+    Private Sub TextBox1_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox1.KeyPress
+        If Not IsNumeric(e.KeyChar) And Not e.KeyChar = ChrW(Keys.Back) Then
+            e.Handled = True
+
+        End If
+    End Sub
+
+    Private Sub RentComboBox_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles RentComboBox.SelectionChangeCommitted
+        'Dim vl As Double
+        ''Console.WriteLine(RentComboBox.SelectedText)
+        'If Double.TryParse(RentComboBox.SelectedText.ToString.Substring(12), vl) Then
+        '    TextBox1.Text = CDbl(Val(RentComboBox.SelectedText.ToString.Substring(12)))
+        'End If
+        rentsuggestion = True
+    End Sub
+
+    Private Sub RentComboBox_TextUpdate(sender As Object, e As EventArgs) Handles RentComboBox.TextUpdate
+        'If RentComboBox.FindString(RentComboBox.Text) < 0 Then
+        '    RentComboBox.Text = RentComboBox.Text.Remove(RentComboBox.Text.Length - 1)
+        '    RentComboBox.SelectionStart = RentComboBox.Text.Length
+
+        'End If
+    End Sub
+
+    Private Sub RentComboBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles RentComboBox.SelectedIndexChanged
+
+        If rentsuggestion = True Then
+            DataGridView2.Columns(0).ReadOnly = False
+            For X As Integer = 0 To DataGridView2.RowCount - 1
+                ' Console.WriteLine("grid " & DataGridView2.Item(5, X).Value)
+                If (Format(DataGridView2.Item(5, X).Value, "dd/MM/yyyy") <= Format(RentComboBox.Text.ToString().Substring(0, 10), "dd/MM/yyyy")) Then
+                    Console.WriteLine(Format(DataGridView2.Item(5, X).Value, "dd/MM/yyyy"))
+
+                    If DataGridView2.Item(0, X).Value = False Then
+
+                        DataGridView2.CurrentCell = DataGridView2.Item(0, X)
+                        DataGridView2.BeginEdit(True)
+                        DataGridView2.Item(0, X).Value = True
+                        DataGridView2.RefreshEdit()
+
+                    End If
+                End If
+                ' Console.WriteLine("combo " & RentComboBox.Text.ToString().Substring(0, 10))
+
+            Next
+            TextBox1.Text = RentComboBox.Text.ToString().Substring(12)
+            TextBox1.Focus()
+
+
         End If
     End Sub
 End Class

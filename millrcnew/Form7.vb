@@ -33,6 +33,13 @@
         RichTextBox1.Width = Me.Width - 40
         RichTextBox1.Height = Me.Height - 100
         formloaded = True
+        If FrmInvoicePrn.DataGridView2.CurrentRow.Index = Convert.ToInt32(FrmInvoicePrn.TextBox4.Text) Then
+            Button3.Enabled = False
+        End If
+        If FrmInvoicePrn.DataGridView2.CurrentRow.Index = Convert.ToInt32(FrmInvoicePrn.TextBox3.Text) Then
+            Button1.Enabled = False
+        End If
+
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click

@@ -142,7 +142,18 @@
             convinRS = convstr & "Only"
         End If
     End Function
-
+    Public Function globalHeader(reportHead As String, fl1 As String, fl2 As String)
+        Print(fl1, GetStringToPrint(150, reportHead, "S") & vbNewLine)
+        Print(fl1, GetStringToPrint(24, "Report Date : " & Date.Now, "S") & vbNewLine)
+        Print(fl1, " " & vbNewLine)
+        Print(fl1, " " & vbNewLine)
+        If fl2 > 0 Then
+            Print(fl2, GetStringToPrint(150, reportHead, "S") & vbNewLine)
+            Print(fl2, GetStringToPrint(24, "Report Date : " & Date.Now, "S") & vbNewLine)
+            Print(fl2, " " & vbNewLine)
+            Print(fl2, " " & vbNewLine)
+        End If
+    End Function
 
     Public Function diginwrd(ByVal digsnum As Integer) As String
         Select Case digsnum

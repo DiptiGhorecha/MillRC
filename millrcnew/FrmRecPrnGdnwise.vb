@@ -58,9 +58,9 @@ Public Class FrmRecPrnGdnwise
                 MyConn.Open()
             End If
             If (ComboBox2.Text.Equals("")) Then
-                da = New OleDb.OleDbDataAdapter("SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].[GROUP]='" & grp & "' order by [RECEIPT].REC_NO", MyConn)
+                da = New OleDb.OleDbDataAdapter("SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].[GROUP]='" & grp & "' order by [RECEIPT].REC_date,[RECEIPT].REC_NO", MyConn)
             Else
-                da = New OleDb.OleDbDataAdapter("SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].[GROUP]='" & grp & "' AND [RECEIPT].GODWN_NO='" & gdn & "' order by [RECEIPT].REC_NO", MyConn)
+                da = New OleDb.OleDbDataAdapter("SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].[GROUP]='" & grp & "' AND [RECEIPT].GODWN_NO='" & gdn & "' order by [RECEIPT].REC_date,[RECEIPT].REC_NO", MyConn)
             End If
             ds = New DataSet
             ds.Clear()
@@ -326,24 +326,12 @@ Public Class FrmRecPrnGdnwise
                 Dim agcount As Integer = 0
                 Dim adjusted_amt As Double = 0
                 Dim last_bldate As DateTime
-                '  If chkrs1.Fields(6).Value = True Then
-
-                '  Else
-
                 Dim RS As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=format(#" & Convert.ToDateTime(invdt) & "#,'dd/mm/yyyy'))) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=format(#" & Convert.ToDateTime(invdt) & "#,'dd/mm/yyyy'))) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                 chkrs2.Open("SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=format('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=format('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO", xcon)
 
                 Do While chkrs2.EOF = False
 
                     If chkrs2.Fields(13).Value >= inv And chkrs2.Fields(14).Value <= invdt And chkrs1.Fields(3).Value >= chkrs2.Fields(4).Value Then
-                        'If FIRSTREC Then
-                        '    FROMNO = MonthName(Convert.ToDateTime(chkrs2.Fields(4).Value).Month, False) & "-" & Convert.ToDateTime(chkrs2.Fields(4).Value).Year
-                        '    TONO = FROMNO
-                        '    FIRSTREC = False
-                        'Else
-                        '    TONO = MonthName(Convert.ToDateTime(chkrs2.Fields(4).Value).Month, False) & "-" & Convert.ToDateTime(chkrs2.Fields(4).Value).Year
-                        'End If
-
                         If FIRSTREC Then
                             chkrs6.Open("Select FROM_DATE,TO_DATE FROM BILL_TR WHERE [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND INVOICE_NO='" & chkrs2.Fields(0).Value & "' and  BILL_DATE=format('" & Convert.ToDateTime(chkrs2.Fields(4).Value) & "','dd/mm/yyyy') ", xcon)
                             If chkrs6.EOF = False Then

@@ -260,7 +260,7 @@ Public Class FrmInvoicePrnGdnwise
         Dim myList As New List(Of String)()
 
         Dim FLNAME As String = GetValue(DataGridView2.Item(0, Convert.ToInt32(TextBox3.Text)).Value).Replace("/", "_")   ' 'TextBox1.Text.Substring(0, 4) & "_" & Month(CDate("1 " & TextBox1.Text.Substring(8, 3))) & "_" & TextBox1.Text.Substring(12, TextBox1.Text.Length - 12)
-        Form19.RichTextBox1.LoadFile(Application.StartupPath & "\Invoices\" & FLNAME & ".dat", RichTextBoxStreamType.PlainText)
+        Form19.RichTextBox1.LoadFile(Application.StartupPath & "\Invoices\dat\" & FLNAME & ".dat", RichTextBoxStreamType.PlainText)
         Form19.Show()
         DataGridView2.Rows(Convert.ToInt32(TextBox3.Text)).Selected = True
         DataGridView2.CurrentCell = DataGridView2.Rows(Convert.ToInt32(TextBox3.Text)).Cells(2)

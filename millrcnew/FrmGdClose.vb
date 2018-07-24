@@ -18,6 +18,7 @@ Public Class FrmGdClose
     Dim da As OleDbDataAdapter
     Dim ds As DataSet
     Dim fnum As Integer
+    Dim fnumm As Integer
     Private Sub FrmGdClose_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
@@ -106,9 +107,11 @@ Public Class FrmGdClose
         End If
 
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
+        fnumm = 2
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
         FileOpen(fnum, Application.StartupPath & "\Reports\Gdclosedlist.dat", OpenMode.Output)
+        FileOpen(fnumm, Application.StartupPath & "\Reports\" & TextBox5.Text & ".csv", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
@@ -129,6 +132,10 @@ Public Class FrmGdClose
                 Print(fnum, StrDup(14, " ") & vbNewLine)
                 Print(fnum, GetStringToPrint(7, "Sr. No.", "S") & " " & GetStringToPrint(10, "Godown Type", "S") & " " & GetStringToPrint(10, "Godown Code", "S") & " " & GetStringToPrint(15, "Closing Date", "S") & " " & GetStringToPrint(50, "Tenant Name", "S") & " " & GetStringToPrint(20, "Closed / Suspended", "S") & vbNewLine)
                 Print(fnum, StrDup(120, "=") & vbNewLine)
+                Print(fnumm, GetStringToPrint(107, "Closed / Suspended Godown List From Date : " & DateTimePicker1.Value.ToShortDateString & " to " & DateTimePicker2.Value.ToShortDateString, "S") & vbNewLine)
+                Print(fnumm, StrDup(14, " ") & vbNewLine)
+                Print(fnumm, GetStringToPrint(7, "Sr. No.", "S") & "," & GetStringToPrint(10, "Godown Type", "S") & "," & GetStringToPrint(10, "Godown Code", "S") & "," & GetStringToPrint(15, "Closing Date", "S") & "," & GetStringToPrint(50, "Tenant Name", "S") & "," & GetStringToPrint(20, "Closed / Suspended", "S") & vbNewLine)
+                Print(fnumm, StrDup(120, "=") & vbNewLine)
                 first = False
                 xline = xline + 4
             End If
@@ -140,6 +147,7 @@ Public Class FrmGdClose
                 cld = "Suspended"
             End If
             Print(fnum, GetStringToPrint(7, counter, "S") & " " & GetStringToPrint(10, chkrs1.Fields(0).Value, "S") & " " & GetStringToPrint(10, chkrs1.Fields(2).Value, "S") & " " & GetStringToPrint(15, chkrs1.Fields(3).Value, "S") & " " & GetStringToPrint(50, chkrs1.Fields(7).Value, "S") & " " & GetStringToPrint(20, cld, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(7, counter, "S") & "," & GetStringToPrint(10, chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(10, chkrs1.Fields(2).Value, "S") & "," & GetStringToPrint(15, chkrs1.Fields(3).Value, "S") & "," & GetStringToPrint(50, chkrs1.Fields(7).Value, "S") & "," & GetStringToPrint(20, cld, "S") & vbNewLine)
 
             counter = counter + 1
             If chkrs1.EOF = False Then
@@ -150,6 +158,7 @@ Public Class FrmGdClose
         chkrs1.Close()
         MyConn.Close()
         FileClose(fnum)
+        FileClose(fnumm)
         FrmGdCloseView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Gdclosedlist.dat", RichTextBoxStreamType.PlainText)
         FrmGdCloseView.Show()
         CreatePDF(Application.StartupPath & "\Reports\Gdclosedlist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)

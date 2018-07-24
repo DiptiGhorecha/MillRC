@@ -65,10 +65,15 @@ Public Class FrmInvoiceSummary
         Dim startP As DateTime = New DateTime(Convert.ToInt16(ComboBox4.Text), Convert.ToInt16(DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month), DaysInMonth)
         DaysInMonth = Date.DaysInMonth(ComboBox1.Text, DateTime.ParseExact(ComboBox2.Text, "MMMM", CultureInfo.CurrentCulture).Month)
         Dim endP As DateTime = New DateTime(Convert.ToInt16(ComboBox1.Text), Convert.ToInt16(DateTime.ParseExact(ComboBox2.Text, "MMMM", CultureInfo.CurrentCulture).Month), DaysInMonth)
+
+
         Dim CurrD As DateTime = startP
         '  MsgBox(startP)
         '  MsgBox(endP)
-
+        If startP > endP Then
+            MsgBox("From month-year must be less than To month-year")
+            Exit Sub
+        End If
 
 
         Dim objPRNSetup = New clsPrinterSetup
@@ -88,13 +93,13 @@ Public Class FrmInvoiceSummary
                 xpage = Val("2")
 
                 Dim numRec As Integer = 0
-                FileOpen(fnum, Application.StartupPath & "\Invoicessummary.dat", OpenMode.Output)
-                FileOpen(fnumm, Application.StartupPath & "\" & TextBox5.Text & ".csv", OpenMode.Output)
-                If xcon.State = ConnectionState.Open Then
+        FileOpen(fnum, Application.StartupPath & "\Reports\Invoicessummary.dat", OpenMode.Output)
+        FileOpen(fnumm, Application.StartupPath & "\Reports\" & TextBox5.Text & ".csv", OpenMode.Output)
+        If xcon.State = ConnectionState.Open Then
                 Else
                     xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
                 End If
-
+        Dim minv As Integer = 0
         Dim totnet, tottaxable, totcgst, totsgst, groupnet, grouptaxable, groupcgst, groupsgst, b2btaxable, b2ctaxable, ntaxable As Double
         Dim mtotnet, mtottaxable, mtotcgst, mtotsgst, mgroupnet, mgrouptaxable, mgroupcgst, mgroupsgst, mb2btaxable, mb2ctaxable, mntaxable As Double
         mtotnet = mtottaxable = mtotcgst = mtotsgst = mgroupnet = mgrouptaxable = mgroupcgst = mgroupsgst = mb2btaxable = mb2ctaxable = mntaxable = 0
@@ -112,9 +117,11 @@ Public Class FrmInvoiceSummary
             mb2btaxable = 0
             mb2ctaxable = 0
             mntaxable = 0
+            minv = 0
             If xcount = 0 Then
-                Print(fnum, GetStringToPrint(15, "Month-Year", "S") & GetStringToPrint(30, "        Total Rent Residential", "S") & GetStringToPrint(30, "    Total Rent Non-Residential", "S") & GetStringToPrint(13, "         CGST", "S") & GetStringToPrint(13, "         SGST", "S") & GetStringToPrint(15, "      Net Total", "S") & vbNewLine)
-                Print(fnumm, GetStringToPrint(15, "Month-Year", "S") & "," & GetStringToPrint(30, "        Total Rent Residential", "S") & "," & GetStringToPrint(30, "    Total Rent Non-Residential", "S") & "," & GetStringToPrint(13, "         CGST", "S") & "," & GetStringToPrint(13, "         SGST", "S") & "," & GetStringToPrint(15, "      Net Total", "S") & vbNewLine)
+                globalHeader("Invoice Summary", fnum, fnumm)
+                Print(fnum, GetStringToPrint(15, "Month-Year", "S") & GetStringToPrint(30, "        Total Rent Residential", "S") & GetStringToPrint(30, "    Total Rent Non-Residential", "S") & GetStringToPrint(13, "         CGST", "S") & GetStringToPrint(13, "         SGST", "S") & GetStringToPrint(15, "      Net Total", "S") & GetStringToPrint(25, "   No. of Invoices", "S") & vbNewLine)
+                Print(fnumm, GetStringToPrint(15, "Month-Year", "S") & "," & GetStringToPrint(30, "        Total Rent Residential", "S") & "," & GetStringToPrint(30, "    Total Rent Non-Residential", "S") & "," & GetStringToPrint(13, "         CGST", "S") & "," & GetStringToPrint(13, "         SGST", "S") & "," & GetStringToPrint(15, "      Net Total", "S") & GetStringToPrint(25, "   No. of Invoices", "S") & vbNewLine)
                 Print(fnum, " " & vbNewLine)
                 Print(fnumm, " " & vbNewLine)
                 xcount = xcount + 3
@@ -123,6 +130,7 @@ Public Class FrmInvoiceSummary
 
             chkrs1.Open("SELECT [BILL].*,[PARTY].P_NAME,[party].GST from [BILL] INNER JOIN [PARTY] on [BILL].P_CODE=[PARTY].P_CODE WHERE [BILL].BILL_DATE=#" & CurrD & "# order by [BILL].BILL_DATE,[BILL].GROUP,[BILL].GODWN_NO", xcon)
             Do While chkrs1.EOF = False
+                minv = minv + 1
                 Dim partyGST As String = ""
                 If chkrs1.Fields(11).Value.Equals("997212") Then
                     partyGST = ""
@@ -178,11 +186,12 @@ Public Class FrmInvoiceSummary
 
             Loop
             chkrs1.Close()
-            Print(fnum, GetStringToPrint(15, CurrD.Month & "-" & CurrD.Year, "S") & GetStringToPrint(30, Format(mntaxable, "##########0.00"), "N") & GetStringToPrint(30, Format(mb2btaxable + mb2ctaxable, "##########0.00"), "N") & GetStringToPrint(13, Format(mtotcgst, "######0.00"), "N") & GetStringToPrint(13, Format(mtotsgst, "##########0.00"), "N") & GetStringToPrint(15, Format(mtotnet, "##########0.00"), "N") & vbNewLine)
-            Print(fnumm, GetStringToPrint(15, CurrD.Month & "-" & CurrD.Year, "S") & "," & GetStringToPrint(30, Format(mntaxable, "##########0.00"), "N") & "," & GetStringToPrint(30, Format(mb2btaxable + mb2ctaxable, "##########0.00"), "N") & "," & GetStringToPrint(13, Format(mtotcgst, "######0.00"), "N") & "," & GetStringToPrint(13, Format(mtotsgst, "##########0.00"), "N") & "," & GetStringToPrint(15, Format(mtotnet, "##########0.00"), "N") & vbNewLine)
+            Print(fnum, GetStringToPrint(15, CurrD.Month & "-" & CurrD.Year, "S") & GetStringToPrint(30, Format(mntaxable, "##########0.00"), "N") & GetStringToPrint(30, Format(mb2btaxable + mb2ctaxable, "##########0.00"), "N") & GetStringToPrint(13, Format(mtotcgst, "######0.00"), "N") & GetStringToPrint(13, Format(mtotsgst, "##########0.00"), "N") & GetStringToPrint(15, Format(mtotnet, "##########0.00"), "N") & GetStringToPrint(15, minv, "N") & vbNewLine)
+            Print(fnumm, GetStringToPrint(15, CurrD.Month & "-" & CurrD.Year, "S") & "," & GetStringToPrint(30, Format(mntaxable, "##########0.00"), "N") & "," & GetStringToPrint(30, Format(mb2btaxable + mb2ctaxable, "##########0.00"), "N") & "," & GetStringToPrint(13, Format(mtotcgst, "######0.00"), "N") & "," & GetStringToPrint(13, Format(mtotsgst, "##########0.00"), "N") & "," & GetStringToPrint(15, Format(mtotnet, "##########0.00"), "N") & "," & GetStringToPrint(15, minv, "N") & vbNewLine)
             '  Print(fnumm, GetStringToPrint(35, CurrD.Month & "-" & CurrD.Year, "S") & "," & GetStringToPrint(35, DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView2.Item(15, X).Value, "S") & vbNewLine)
 
             CurrD = CurrD.AddMonths(1)
+            CurrD = New DateTime(CurrD.Year, CurrD.Month, DateTime.DaysInMonth(CurrD.Year, CurrD.Month))
             mtotnet = mtottaxable = mtotcgst = mtotsgst = mgroupnet = mgrouptaxable = mgroupcgst = mgroupsgst = mb2btaxable = mb2ctaxable = mntaxable = 0
         End While
         'If HSNRadio1.Checked = True Then
@@ -213,9 +222,9 @@ Public Class FrmInvoiceSummary
         Print(fnumm, GetStringToPrint(15, "Total -->", "S") & "," & GetStringToPrint(30, Format(ntaxable, "##########0.00"), "N") & "," & GetStringToPrint(30, Format(b2btaxable + b2ctaxable, "##########0.00"), "N") & "," & GetStringToPrint(13, Format(totcgst, "######0.00"), "N") & "," & GetStringToPrint(13, Format(totsgst, "##########0.00"), "N") & "," & GetStringToPrint(15, Format(totnet, "##########0.00"), "N") & vbNewLine)
         FileClose(fnum)
         FileClose(fnumm)
-        Form14.RichTextBox1.LoadFile(Application.StartupPath & "\invoicessummary.dat", RichTextBoxStreamType.PlainText)
+        Form14.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\invoicessummary.dat", RichTextBoxStreamType.PlainText)
         Form14.Show()
-        MsgBox(Application.StartupPath + " \" & TextBox5.Text & ".CSV file is generated")
+        MsgBox(Application.StartupPath + "\Reports\" & TextBox5.Text & ".CSV file is generated")
 
 
     End Sub
@@ -230,7 +239,10 @@ Public Class FrmInvoiceSummary
         Dim CurrD As DateTime = startP
         '  MsgBox(startP)
         '  MsgBox(endP)
-
+        If startP > endP Then
+            MsgBox("From month-year must be less than To month-year")
+            Exit Sub
+        End If
 
 
         Dim objPRNSetup = New clsPrinterSetup
@@ -250,19 +262,20 @@ Public Class FrmInvoiceSummary
         xpage = Val("2")
 
         Dim numRec As Integer = 0
-        FileOpen(fnum, Application.StartupPath & "\Invoicessummary.dat", OpenMode.Output)
-        FileOpen(fnumm, Application.StartupPath & "\" & TextBox5.Text & ".csv", OpenMode.Output)
+        FileOpen(fnum, Application.StartupPath & "\Reports\Invoicessummary.dat", OpenMode.Output)
+        FileOpen(fnumm, Application.StartupPath & "\Reports\" & TextBox5.Text & ".csv", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
-
+        Dim minv As Integer = 0
         Dim totnet, tottaxable, totcgst, totsgst, groupnet, grouptaxable, groupcgst, groupsgst, b2btaxable, b2ctaxable, ntaxable As Double
         Dim mtotnet, mtottaxable, mtotcgst, mtotsgst, mgroupnet, mgrouptaxable, mgroupcgst, mgroupsgst, mb2btaxable, mb2ctaxable, mntaxable As Double
         mtotnet = mtottaxable = mtotcgst = mtotsgst = mgroupnet = mgrouptaxable = mgroupcgst = mgroupsgst = mb2btaxable = mb2ctaxable = mntaxable = 0
         While (CurrD <= endP)
             ' ProcessData(CurrD)
             'Console.WriteLine(CurrD.ToShortDateString)
+            minv = 0
             mtotnet = 0
             mtottaxable = 0
             mtotcgst = 0
@@ -275,8 +288,12 @@ Public Class FrmInvoiceSummary
             mb2ctaxable = 0
             mntaxable = 0
             If xcount = 0 Then
-                Print(fnum, GetStringToPrint(15, "Month-Year", "S") & GetStringToPrint(30, "        Total Rent Residential", "S") & GetStringToPrint(30, "    Total Rent Non-Residential", "S") & GetStringToPrint(13, "         CGST", "S") & GetStringToPrint(13, "         SGST", "S") & GetStringToPrint(15, "      Net Total", "S") & vbNewLine)
-                Print(fnumm, GetStringToPrint(15, "Month-Year", "S") & "," & GetStringToPrint(30, "        Total Rent Residential", "S") & "," & GetStringToPrint(30, "    Total Rent Non-Residential", "S") & "," & GetStringToPrint(13, "         CGST", "S") & "," & GetStringToPrint(13, "         SGST", "S") & "," & GetStringToPrint(15, "      Net Total", "S") & vbNewLine)
+                globalHeader("Invoice Summary", fnum, fnumm)
+                ' Print(fnum, GetStringToPrint(15, "Month-Year", "S") & GetStringToPrint(30, "        Total Rent Residential", "S") & GetStringToPrint(30, "    Total Rent Non-Residential", "S") & GetStringToPrint(13, "         CGST", "S") & GetStringToPrint(13, "         SGST", "S") & GetStringToPrint(15, "      Net Total", "S") & vbNewLine)
+                ' Print(fnumm, GetStringToPrint(15, "Month-Year", "S") & "," & GetStringToPrint(30, "        Total Rent Residential", "S") & "," & GetStringToPrint(30, "    Total Rent Non-Residential", "S") & "," & GetStringToPrint(13, "         CGST", "S") & "," & GetStringToPrint(13, "         SGST", "S") & "," & GetStringToPrint(15, "      Net Total", "S") & vbNewLine)
+                Print(fnum, GetStringToPrint(15, "Month-Year", "S") & GetStringToPrint(30, "        Total Rent Residential", "S") & GetStringToPrint(30, "    Total Rent Non-Residential", "S") & GetStringToPrint(13, "         CGST", "S") & GetStringToPrint(13, "         SGST", "S") & GetStringToPrint(15, "      Net Total", "S") & GetStringToPrint(25, "   No. of Invoices", "S") & vbNewLine)
+                Print(fnumm, GetStringToPrint(15, "Month-Year", "S") & "," & GetStringToPrint(30, "        Total Rent Residential", "S") & "," & GetStringToPrint(30, "    Total Rent Non-Residential", "S") & "," & GetStringToPrint(13, "         CGST", "S") & "," & GetStringToPrint(13, "         SGST", "S") & "," & GetStringToPrint(15, "      Net Total", "S") & GetStringToPrint(25, "   No. of Invoices", "S") & vbNewLine)
+
                 Print(fnum, " " & vbNewLine)
                 Print(fnumm, " " & vbNewLine)
                 xcount = xcount + 3
@@ -285,6 +302,7 @@ Public Class FrmInvoiceSummary
 
             chkrs1.Open("SELECT [BILL].*,[PARTY].P_NAME,[party].GST from [BILL] INNER JOIN [PARTY] on [BILL].P_CODE=[PARTY].P_CODE WHERE [BILL].BILL_DATE=#" & CurrD & "# order by [BILL].BILL_DATE,[BILL].GROUP,[BILL].GODWN_NO", xcon)
             Do While chkrs1.EOF = False
+                minv = minv + 1
                 Dim partyGST As String = ""
                 If chkrs1.Fields(11).Value.Equals("997212") Then
                     partyGST = ""
@@ -342,9 +360,12 @@ Public Class FrmInvoiceSummary
             chkrs1.Close()
             Print(fnum, GetStringToPrint(15, CurrD.Month & "-" & CurrD.Year, "S") & GetStringToPrint(30, Format(mntaxable, "##########0.00"), "N") & GetStringToPrint(30, Format(mb2btaxable + mb2ctaxable, "##########0.00"), "N") & GetStringToPrint(13, Format(mtotcgst, "######0.00"), "N") & GetStringToPrint(13, Format(mtotsgst, "##########0.00"), "N") & GetStringToPrint(15, Format(mtotnet, "##########0.00"), "N") & vbNewLine)
             Print(fnumm, GetStringToPrint(15, CurrD.Month & "-" & CurrD.Year, "S") & "," & GetStringToPrint(30, Format(mntaxable, "##########0.00"), "N") & "," & GetStringToPrint(30, Format(mb2btaxable + mb2ctaxable, "##########0.00"), "N") & "," & GetStringToPrint(13, Format(mtotcgst, "######0.00"), "N") & "," & GetStringToPrint(13, Format(mtotsgst, "##########0.00"), "N") & "," & GetStringToPrint(15, Format(mtotnet, "##########0.00"), "N") & vbNewLine)
+            Print(fnum, GetStringToPrint(15, CurrD.Month & "-" & CurrD.Year, "S") & GetStringToPrint(30, Format(mntaxable, "##########0.00"), "N") & GetStringToPrint(30, Format(mb2btaxable + mb2ctaxable, "##########0.00"), "N") & GetStringToPrint(13, Format(mtotcgst, "######0.00"), "N") & GetStringToPrint(13, Format(mtotsgst, "##########0.00"), "N") & GetStringToPrint(15, Format(mtotnet, "##########0.00"), "N") & GetStringToPrint(15, minv, "N") & vbNewLine)
+            Print(fnumm, GetStringToPrint(15, CurrD.Month & "-" & CurrD.Year, "S") & "," & GetStringToPrint(30, Format(mntaxable, "##########0.00"), "N") & "," & GetStringToPrint(30, Format(mb2btaxable + mb2ctaxable, "##########0.00"), "N") & "," & GetStringToPrint(13, Format(mtotcgst, "######0.00"), "N") & "," & GetStringToPrint(13, Format(mtotsgst, "##########0.00"), "N") & "," & GetStringToPrint(15, Format(mtotnet, "##########0.00"), "N") & "," & GetStringToPrint(15, minv, "N") & vbNewLine)
             '  Print(fnumm, GetStringToPrint(35, CurrD.Month & "-" & CurrD.Year, "S") & "," & GetStringToPrint(35, DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView2.Item(15, X).Value, "S") & vbNewLine)
 
             CurrD = CurrD.AddMonths(1)
+            CurrD = New DateTime(CurrD.Year, CurrD.Month, DateTime.DaysInMonth(CurrD.Year, CurrD.Month))
             mtotnet = mtottaxable = mtotcgst = mtotsgst = mgroupnet = mgrouptaxable = mgroupcgst = mgroupsgst = mb2btaxable = mb2ctaxable = mntaxable = 0
         End While
         'If HSNRadio1.Checked = True Then
@@ -377,8 +398,8 @@ Public Class FrmInvoiceSummary
         FileClose(fnumm)
         Form14.RichTextBox1.LoadFile(Application.StartupPath & "\invoicessummary.dat", RichTextBoxStreamType.PlainText)
         Form14.Show()
-        CreatePDF(Application.StartupPath & "\invoicessummary.dat", Application.StartupPath & "\" & TextBox5.Text)
-        MsgBox(Application.StartupPath + " \" & TextBox5.Text & ".CSV file is generated")
+        CreatePDF(Application.StartupPath & "\Reports\invoicessummary.dat", Application.StartupPath & "\" & TextBox5.Text)
+        MsgBox(Application.StartupPath + "\Reports\" & TextBox5.Text & ".CSV file is generated")
 
         Dim PrintPDFFile As New ProcessStartInfo
         PrintPDFFile.UseShellExecute = True

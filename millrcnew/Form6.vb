@@ -332,25 +332,27 @@ Public Class FrmInvoicePrn
     End Sub
 
     Private Sub DataGridView2_Click(sender As Object, e As EventArgs) Handles DataGridView2.Click
-        Dim i As Integer = DataGridView2.CurrentRow.Index
-        CType(Me.Controls.Find(ctrlname, False)(0), TextBox).Text = GetValue(DataGridView2.Item(0, i).Value)
-        If (TextBox2.Text = "") Then
-            TextBox2.Text = GetValue(DataGridView2.Item(0, i).Value)
-            TextBox4.Text = DataGridView2.CurrentCell.RowIndex
-        End If
-        '  GroupBox5.Visible = False
-        '  DataGridView2.Visible = False
-        ' ' Me.Width = Me.Width - DataGridView2.Width + 15
-        '  Me.Height = Me.Height - 145
-        If ctrlname = "TextBox1" Then
-            TextBox3.Text = DataGridView2.CurrentCell.RowIndex
-            TextBox2.Focus()
-        Else
-            If ctrlname = "TextBox2" Then
+        If DataGridView2.RowCount >= 1 Then
+            Dim i As Integer = DataGridView2.CurrentRow.Index
+            CType(Me.Controls.Find(ctrlname, False)(0), TextBox).Text = GetValue(DataGridView2.Item(0, i).Value)
+            If (TextBox2.Text = "") Then
+                TextBox2.Text = GetValue(DataGridView2.Item(0, i).Value)
                 TextBox4.Text = DataGridView2.CurrentCell.RowIndex
-                Button1.Focus()
+            End If
+            '  GroupBox5.Visible = False
+            '  DataGridView2.Visible = False
+            ' ' Me.Width = Me.Width - DataGridView2.Width + 15
+            '  Me.Height = Me.Height - 145
+            If ctrlname = "TextBox1" Then
+                TextBox3.Text = DataGridView2.CurrentCell.RowIndex
+                TextBox2.Focus()
             Else
-                TextBox1.Focus()
+                If ctrlname = "TextBox2" Then
+                    TextBox4.Text = DataGridView2.CurrentCell.RowIndex
+                    Button1.Focus()
+                Else
+                    TextBox1.Focus()
+                End If
             End If
         End If
     End Sub
