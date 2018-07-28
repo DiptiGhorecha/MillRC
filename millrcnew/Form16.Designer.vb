@@ -253,7 +253,7 @@ Partial Class Form16
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(452, 133)
+        Me.ClientSize = New System.Drawing.Size(883, 504)
         Me.Controls.Add(Me.ComboBox5)
         Me.Controls.Add(Me.ComboBox2)
         Me.Controls.Add(Me.DataGridView1)

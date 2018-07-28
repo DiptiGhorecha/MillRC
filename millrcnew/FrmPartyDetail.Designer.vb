@@ -33,6 +33,8 @@ Partial Class FrmPartyDetail
         Me.TxtSrch = New System.Windows.Forms.TextBox()
         Me.TextBox5 = New System.Windows.Forms.TextBox()
         Me.Label6 = New System.Windows.Forms.Label()
+        Me.DateTimePicker1 = New System.Windows.Forms.DateTimePicker()
+        Me.Label2 = New System.Windows.Forms.Label()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox3.SuspendLayout()
         Me.SuspendLayout()
@@ -61,7 +63,7 @@ Partial Class FrmPartyDetail
         Me.DataGridView1.AllowUserToResizeRows = False
         Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically
-        Me.DataGridView1.Location = New System.Drawing.Point(283, 12)
+        Me.DataGridView1.Location = New System.Drawing.Point(326, 12)
         Me.DataGridView1.Name = "DataGridView1"
         Me.DataGridView1.Size = New System.Drawing.Size(397, 365)
         Me.DataGridView1.TabIndex = 25
@@ -69,7 +71,7 @@ Partial Class FrmPartyDetail
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(160, 104)
+        Me.Button3.Location = New System.Drawing.Point(160, 144)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(50, 22)
         Me.Button3.TabIndex = 28
@@ -78,7 +80,7 @@ Partial Class FrmPartyDetail
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(91, 104)
+        Me.Button2.Location = New System.Drawing.Point(91, 144)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(50, 22)
         Me.Button2.TabIndex = 27
@@ -87,7 +89,7 @@ Partial Class FrmPartyDetail
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(19, 104)
+        Me.Button1.Location = New System.Drawing.Point(19, 144)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(50, 22)
         Me.Button1.TabIndex = 26
@@ -97,7 +99,7 @@ Partial Class FrmPartyDetail
         'GroupBox3
         '
         Me.GroupBox3.Controls.Add(Me.TxtSrch)
-        Me.GroupBox3.Location = New System.Drawing.Point(282, 392)
+        Me.GroupBox3.Location = New System.Drawing.Point(328, 392)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(187, 50)
         Me.GroupBox3.TabIndex = 29
@@ -113,7 +115,7 @@ Partial Class FrmPartyDetail
         '
         'TextBox5
         '
-        Me.TextBox5.Location = New System.Drawing.Point(138, 55)
+        Me.TextBox5.Location = New System.Drawing.Point(138, 95)
         Me.TextBox5.Name = "TextBox5"
         Me.TextBox5.Size = New System.Drawing.Size(132, 20)
         Me.TextBox5.TabIndex = 151
@@ -121,17 +123,35 @@ Partial Class FrmPartyDetail
         '
         'Label6
         '
-        Me.Label6.Location = New System.Drawing.Point(21, 55)
+        Me.Label6.Location = New System.Drawing.Point(21, 95)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(91, 41)
         Me.Label6.TabIndex = 152
         Me.Label6.Text = "Report File Name (Without Extn)"
         '
+        'DateTimePicker1
+        '
+        Me.DateTimePicker1.Location = New System.Drawing.Point(138, 64)
+        Me.DateTimePicker1.Name = "DateTimePicker1"
+        Me.DateTimePicker1.Size = New System.Drawing.Size(177, 20)
+        Me.DateTimePicker1.TabIndex = 156
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(21, 64)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(69, 13)
+        Me.Label2.TabIndex = 155
+        Me.Label2.Text = "As on Date : "
+        '
         'FrmPartyDetail
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(697, 451)
+        Me.ClientSize = New System.Drawing.Size(739, 451)
+        Me.Controls.Add(Me.DateTimePicker1)
+        Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.TextBox5)
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.GroupBox3)
@@ -163,4 +183,6 @@ Partial Class FrmPartyDetail
     Friend WithEvents TxtSrch As TextBox
     Friend WithEvents TextBox5 As TextBox
     Friend WithEvents Label6 As Label
+    Friend WithEvents DateTimePicker1 As DateTimePicker
+    Friend WithEvents Label2 As Label
 End Class

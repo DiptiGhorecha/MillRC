@@ -94,64 +94,67 @@ Partial Class MainMDIForm
         '
         Me.MastersToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GroupToolStripMenuItem, Me.TenantToolStripMenuItem, Me.GodownToolStripMenuItem, Me.RentToolStripMenuItem, Me.GodownCloseToolStripMenuItem, Me.OpeningAdvanceToolStripMenuItem, Me.GodownReopenToolStripMenuItem})
         Me.MastersToolStripMenuItem.Name = "MastersToolStripMenuItem"
+        Me.MastersToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.M), System.Windows.Forms.Keys)
         Me.MastersToolStripMenuItem.Size = New System.Drawing.Size(60, 34)
-        Me.MastersToolStripMenuItem.Text = "Masters"
+        Me.MastersToolStripMenuItem.Text = "&Masters"
         '
         'GroupToolStripMenuItem
         '
         Me.GroupToolStripMenuItem.Name = "GroupToolStripMenuItem"
         Me.GroupToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.G), System.Windows.Forms.Keys)
-        Me.GroupToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
-        Me.GroupToolStripMenuItem.Text = "Godown Type"
+        Me.GroupToolStripMenuItem.Size = New System.Drawing.Size(215, 22)
+        Me.GroupToolStripMenuItem.Text = "&Godown Type"
         Me.GroupToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage
         '
         'TenantToolStripMenuItem
         '
         Me.TenantToolStripMenuItem.Name = "TenantToolStripMenuItem"
         Me.TenantToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.T), System.Windows.Forms.Keys)
-        Me.TenantToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
-        Me.TenantToolStripMenuItem.Text = "Tenant"
+        Me.TenantToolStripMenuItem.Size = New System.Drawing.Size(215, 22)
+        Me.TenantToolStripMenuItem.Text = "&Tenant"
         '
         'GodownToolStripMenuItem
         '
         Me.GodownToolStripMenuItem.Name = "GodownToolStripMenuItem"
         Me.GodownToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.O), System.Windows.Forms.Keys)
-        Me.GodownToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
-        Me.GodownToolStripMenuItem.Text = "Godown"
+        Me.GodownToolStripMenuItem.Size = New System.Drawing.Size(215, 22)
+        Me.GodownToolStripMenuItem.Text = "G&odown"
         '
         'RentToolStripMenuItem
         '
         Me.RentToolStripMenuItem.Name = "RentToolStripMenuItem"
-        Me.RentToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.R), System.Windows.Forms.Keys)
-        Me.RentToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
-        Me.RentToolStripMenuItem.Text = "Transfer of Godown"
+        Me.RentToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.S), System.Windows.Forms.Keys)
+        Me.RentToolStripMenuItem.Size = New System.Drawing.Size(215, 22)
+        Me.RentToolStripMenuItem.Text = "Tran&sfer of Godown"
         '
         'GodownCloseToolStripMenuItem
         '
         Me.GodownCloseToolStripMenuItem.Name = "GodownCloseToolStripMenuItem"
         Me.GodownCloseToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.C), System.Windows.Forms.Keys)
-        Me.GodownCloseToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
-        Me.GodownCloseToolStripMenuItem.Text = "Godown Close"
+        Me.GodownCloseToolStripMenuItem.Size = New System.Drawing.Size(215, 22)
+        Me.GodownCloseToolStripMenuItem.Text = "Godown &Close"
         '
         'OpeningAdvanceToolStripMenuItem
         '
         Me.OpeningAdvanceToolStripMenuItem.Name = "OpeningAdvanceToolStripMenuItem"
-        Me.OpeningAdvanceToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
-        Me.OpeningAdvanceToolStripMenuItem.Text = "Opening Advance"
+        Me.OpeningAdvanceToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.A), System.Windows.Forms.Keys)
+        Me.OpeningAdvanceToolStripMenuItem.Size = New System.Drawing.Size(215, 22)
+        Me.OpeningAdvanceToolStripMenuItem.Text = "Opening &Advance"
         '
         'GodownReopenToolStripMenuItem
         '
         Me.GodownReopenToolStripMenuItem.Name = "GodownReopenToolStripMenuItem"
-        Me.GodownReopenToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
-        Me.GodownReopenToolStripMenuItem.Text = "Godown Reopen"
+        Me.GodownReopenToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.P), System.Windows.Forms.Keys)
+        Me.GodownReopenToolStripMenuItem.Size = New System.Drawing.Size(215, 22)
+        Me.GodownReopenToolStripMenuItem.Text = "Godown Reo&pen"
         '
         'TransactionsToolStripMenuItem
         '
         Me.TransactionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BillToolStripMenuItem, Me.ToolStripMenuItem1, Me.ToolStripMenuItem5, Me.ReceiptToolStripMenuItem})
         Me.TransactionsToolStripMenuItem.Name = "TransactionsToolStripMenuItem"
-        Me.TransactionsToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.E), System.Windows.Forms.Keys)
+        Me.TransactionsToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.N), System.Windows.Forms.Keys)
         Me.TransactionsToolStripMenuItem.Size = New System.Drawing.Size(86, 34)
-        Me.TransactionsToolStripMenuItem.Text = "Transactions"
+        Me.TransactionsToolStripMenuItem.Text = "Transactio&ns"
         '
         'BillToolStripMenuItem
         '
@@ -184,8 +187,9 @@ Partial Class MainMDIForm
         '
         Me.ReportsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.InvoicePrintingToolStripMenuItem, Me.ToolStripMenuItem2, Me.ToolStripMenuItem3, Me.ReceiptPrintingToolStripMenuItem, Me.OutstandingReportToolStripMenuItem, Me.TenantsDetailToolStripMenuItem, Me.GSTSpreadsheetsToolStripMenuItem, Me.ToolStripMenuItem4, Me.OutstandingToolStripMenuItem, Me.SummaryToolStripMenuItem})
         Me.ReportsToolStripMenuItem.Name = "ReportsToolStripMenuItem"
+        Me.ReportsToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.R), System.Windows.Forms.Keys)
         Me.ReportsToolStripMenuItem.Size = New System.Drawing.Size(59, 34)
-        Me.ReportsToolStripMenuItem.Text = "Reports"
+        Me.ReportsToolStripMenuItem.Text = "&Reports"
         '
         'InvoicePrintingToolStripMenuItem
         '
@@ -334,8 +338,9 @@ Partial Class MainMDIForm
         '
         Me.UtilityToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReupdateToolStripMenuItem, Me.RegenerateBillsWithLogoToolStripMenuItem})
         Me.UtilityToolStripMenuItem.Name = "UtilityToolStripMenuItem"
+        Me.UtilityToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.U), System.Windows.Forms.Keys)
         Me.UtilityToolStripMenuItem.Size = New System.Drawing.Size(50, 34)
-        Me.UtilityToolStripMenuItem.Text = "Utility"
+        Me.UtilityToolStripMenuItem.Text = "&Utility"
         '
         'ReupdateToolStripMenuItem
         '

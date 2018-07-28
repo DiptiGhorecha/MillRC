@@ -39,7 +39,7 @@ Public Class FrmOutstanding
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
         If RadioGodown.Checked = True Then
-            'chkrs1.Open("SELECT [godown].*,[PARTY].P_NAME from [godown] INNER JOIN [PARTY] ON [godown].P_CODE=[PARTY].P_CODE WHERE [STATUS]='C' and [godown].[group]='OLD' AND [GODWN_NO]='051' order by [godown].[GROUP],[godown].GODWN_NO,[godown].P_CODE", xcon)
+            'chkrs1.Open("SELECT [godown].*,[PARTY].P_NAME from [godown] INNER JOIN [PARTY] ON [godown].P_CODE=[PARTY].P_CODE WHERE [STATUS]='C' and [godown].[group]='cd' AND [GODWN_NO]='001' order by [godown].[GROUP],[godown].GODWN_NO,[godown].P_CODE", xcon)
             chkrs1.Open("SELECT [godown].*,[PARTY].P_NAME from [godown] INNER JOIN [PARTY] ON [godown].P_CODE=[PARTY].P_CODE WHERE [STATUS]='C' AND [GODOWN].[FROM_D]<=FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') order by [godown].[GROUP],[godown].GODWN_NO,[godown].P_CODE", xcon)
         Else
             chkrs1.Open("SELECT [godown].*,[PARTY].P_NAME from [godown] INNER JOIN [PARTY] ON [godown].P_CODE=[PARTY].P_CODE WHERE [STATUS]='C' order by [PARTY].P_NAME", xcon)
@@ -130,6 +130,7 @@ Public Class FrmOutstanding
             End While
             chkrs22.Close()
             '''''''''''''''''''''''''ADVANCES
+            Dim tr As String = "SELECT [bill].* from [BILL] WHERE [GROUP]='" & grp & "' AND [GODWN_NO]='" & gdn & "' AND [BILL].BILL_DATE > FORMAT('" & fdate & "','DD/MM/YYYY') and [BILL].BILL_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') order by [BILL].[GROUP],[BILL].GODWN_NO,[BILL].BILL_DATE,[BILL].INVOICE_NO"
             chkrs3.Open("SELECT [bill].* from [BILL] WHERE [GROUP]='" & grp & "' AND [GODWN_NO]='" & gdn & "' AND [BILL].BILL_DATE > FORMAT('" & fdate & "','DD/MM/YYYY') and [BILL].BILL_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') order by [BILL].[GROUP],[BILL].GODWN_NO,[BILL].BILL_DATE,[BILL].INVOICE_NO", xcon)
             While Not chkrs3.EOF
                 If chkrs3.Fields(1).Value = grp And chkrs3.Fields(2).Value = gdn And chkrs3.Fields(3).Value = pcd Then
@@ -149,8 +150,8 @@ Public Class FrmOutstanding
 
             End While
             chkrs3.Close()
-            Dim STR As String = "SELECT DISTINCT [receipt].*,[bill].[P_CODE],[BILL].[REC_DATE],[BILL].[REC_NO] from [receipt] INNER JOIN [bill] on [receipt].[rec_no]=int([bill].[rec_no]) and [receipt].[rec_date]=[bill].[rec_date] WHERE [receipt].[GROUP]='" & grp & "' AND [receipt].[GODWN_NO]='" & gdn & "' AND [receipt].REC_DATE>" & fdate & " AND [receipt].REC_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE='" & pcd & "' order by [receipt].[GROUP],[receipt].GODWN_NO,[receipt].REC_DATE,[receipt].REC_NO"
-            chkrs2.Open("SELECT DISTINCT [receipt].*,[bill].[P_CODE],[BILL].[REC_DATE],[BILL].[REC_NO] from [receipt] INNER JOIN [bill] on [receipt].[rec_no]=int([bill].[rec_no]) and [receipt].[rec_date]=[bill].[rec_date] WHERE [receipt].[GROUP]='" & grp & "' AND [receipt].[GODWN_NO]='" & gdn & "' AND [receipt].REC_DATE>" & fdate & " AND [receipt].REC_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE='" & pcd & "' order by [receipt].[GROUP],[receipt].GODWN_NO,[receipt].REC_DATE,[receipt].REC_NO", xcon)
+            Dim STR As String = "SELECT DISTINCT [receipt].*,[bill].[P_CODE],[BILL].[REC_DATE],[BILL].[REC_NO] from [receipt] INNER JOIN [bill] on [receipt].[rec_no]=int([bill].[rec_no]) and [receipt].[rec_date]=[bill].[rec_date] and [receipt].[group]=[godown].[group] and [receipt].[godwn_no]=[godown].[godwn_no] WHERE [receipt].[GROUP]='" & grp & "' AND [receipt].[GODWN_NO]='" & gdn & "' AND [receipt].REC_DATE>" & fdate & " AND [receipt].REC_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE='" & pcd & "' order by [receipt].[GROUP],[receipt].GODWN_NO,[receipt].REC_DATE,[receipt].REC_NO"
+            chkrs2.Open("SELECT DISTINCT [receipt].*,[bill].[P_CODE],[BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[GROUP],[BILL].[GODWN_NO] from [receipt] INNER JOIN [bill] on [receipt].[rec_no]=int([bill].[rec_no]) and [receipt].[rec_date]=[bill].[rec_date] and [receipt].[group]=[bill].[group] and [receipt].[godwn_no]=[bill].[godwn_no] WHERE [receipt].[GROUP]='" & grp & "' AND [receipt].[GODWN_NO]='" & gdn & "' AND [receipt].REC_DATE>" & fdate & " AND [receipt].REC_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE='" & pcd & "' order by [receipt].[GROUP],[receipt].GODWN_NO,[receipt].REC_DATE,[receipt].REC_NO", xcon)
             While Not chkrs2.EOF
                 If (chkrs2.Fields(1).Value = grp And chkrs2.Fields(2).Value = gdn And chkrs2.Fields(14).Value = pcd) Then
                     rnet = rnet + chkrs2.Fields(5).Value
@@ -204,12 +205,17 @@ Public Class FrmOutstanding
 
             End If
 
-            If oDate > poDate And outDate = oDate Then
+            'If oDate > poDate And outDate = oDate Then
+            '    outDate = poDate
+            '    out = out + Convert.ToDouble(outstandAmt)
+
+            'End If
+
+            If outstandAmt > 0 And oDate > poDate Then
                 outDate = poDate
                 out = out + Convert.ToDouble(outstandAmt)
 
             End If
-
 
             '''''''''''''''''''''''''''''''''''''''''due in previou application
 
@@ -500,7 +506,7 @@ Public Class FrmOutstanding
 
             End If
 
-            If oDate > poDate Then
+            If outstandAmt > 0 And oDate > poDate Then
                 outDate = poDate
                 out = out + Convert.ToDouble(outstandAmt)
 

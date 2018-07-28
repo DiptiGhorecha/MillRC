@@ -120,8 +120,8 @@ Public Class FrmTenant
             '  TextBox8.Text = ""
             TextBox9.Text = ""
             TextBox10.Text = ""
-
-            i = DataGridView1.CurrentRow.Index
+            If DataGridView1.RowCount >= 1 Then
+                i = DataGridView1.CurrentRow.Index
             If Not IsDBNull(DataGridView1.Item(0, i).Value) Then
                 TextBox2.Text = DataGridView1.Item(0, i).Value
             End If
@@ -195,7 +195,8 @@ Public Class FrmTenant
             If Not IsDBNull(DataGridView1.Item(19, i).Value) Then
                 TextBox10.Text = DataGridView1.Item(19, i).Value
             End If
-            Label6.Text = "Total : " & DataGridView1.RowCount
+                Label6.Text = "Total : " & DataGridView1.RowCount
+            End If
         Catch ex As Exception
             MessageBox.Show("Error loading data: " & ex.Message)
         End Try
@@ -292,7 +293,6 @@ Public Class FrmTenant
     Private Sub cmdClose_Click(sender As Object, e As EventArgs) Handles cmdClose.Click
         Try
             Me.Close()
-
             Exit Sub
         Catch ex As Exception
             MessageBox.Show("Error Cancel Module: " & ex.Message)
@@ -315,11 +315,9 @@ Public Class FrmTenant
             ShowData()
             LodaDataToTextBox()
             Exit Sub
-
         Catch ex As Exception
             MessageBox.Show("Error Cancel Module: " & ex.Message)
         End Try
-
     End Sub
     Private Sub navigatedisable()
         cmdPrev.Enabled = False
@@ -417,7 +415,6 @@ Public Class FrmTenant
             '  TextBox8.Enabled = True
             TextBox9.Enabled = True
             TextBox10.Enabled = True
-
             RichTextBox1.Enabled = True
             RichTextBox3.Enabled = True
             navigatedisable()
@@ -521,8 +518,6 @@ Public Class FrmTenant
                 errorMsg = "Duplicate tenant code not allowed..."
                 e.Cancel = True
                 TextBox2.Select(0, TextBox2.Text.Length)
-
-                ' Set the ErrorProvider error with the text to display. 
                 Me.ErrorProvider1.SetError(TextBox2, errorMsg)
             End If
             da.Dispose()

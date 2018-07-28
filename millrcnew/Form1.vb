@@ -317,9 +317,6 @@ Public Class MainMDIForm
         End If
     End Sub
 
-    Private Sub ReportsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReportsToolStripMenuItem.Click
-
-    End Sub
 
     Private Sub OpeningAdvanceToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles OpeningAdvanceToolStripMenuItem.Click
         If Application.OpenForms().OfType(Of FrmAdvance).Any Then
@@ -376,4 +373,6 @@ Public Class MainMDIForm
             FrmGSTAdvance.Show()
         End If
     End Sub
+
+
 End Class
