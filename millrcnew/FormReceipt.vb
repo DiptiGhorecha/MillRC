@@ -88,7 +88,7 @@ Public Class FormReceipt
 
     End Sub
     Private Sub FormReceipt_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyCode = Keys.F1 And (Me.ActiveControl.Name = "ComboBox4") Then
+        If e.KeyCode = Keys.F1 And ((Me.ActiveControl.Name = "ComboBox4") Or Me.ActiveControl.Name = "ComboBox3") Then
             'GroupBox2.BringToFront()
             'GroupBox2.Visible = True
             'Label17.Text = "Godown Detail"
@@ -654,7 +654,7 @@ Public Class FormReceipt
             ComboBox4.SelectedIndex = ComboBox4.Items.IndexOf("")
             ComboBox4.Text = ""
             ComboBox3.Enabled = True
-            ComboBox3.SelectedIndex = ComboBox3.Items.IndexOf("")
+            '  ComboBox3.SelectedIndex = ComboBox3.Items.IndexOf("")
             ComboBox3.Text = ""
             Label14.Text = ""
             Label15.Text = ""
@@ -1388,27 +1388,50 @@ Public Class FormReceipt
             MessageBox.Show("Error Cancel Module: " & ex.Message)
         End Try
     End Sub
-    Private Sub ComboBox3_Validating(sender As Object, e As CancelEventArgs) Handles ComboBox3.Validating
-        Dim errorMsg As String = "Please select godown type"
-        If GrpAddCorrect = "A" And bValidatetype = True And ComboBox3.Text.Trim.Equals("") Then
-            ' Cancel the event and select the text to be corrected by the user.
-            e.Cancel = True
-            ComboBox3.Select(0, ComboBox3.Text.Length)
-            ' Set the ErrorProvider error with the text to display. 
-            Me.ErrorProvider1.SetError(ComboBox3, errorMsg)
-        End If
-    End Sub
-    Private Sub ComboBox3_Validated(sender As Object, e As EventArgs) Handles ComboBox3.Validated
-        ErrorProvider1.SetError(ComboBox3, "")
-    End Sub
+    'Private Sub ComboBox3_Validating(sender As Object, e As CancelEventArgs) Handles ComboBox3.Validating
+
+    '    If Application.OpenForms().OfType(Of GodownHelp).Any And ComboBox3.Text.Trim.Equals("") Then
+    '        e.Cancel = True
+    '        bValidatetype = False
+    '        ComboBox4.Select(0, ComboBox4.Text.Length)
+    '    Else
+    '        Dim errorMsg As String = "Please select godown type"
+    '        If GrpAddCorrect = "A" And bValidatetype = True And ComboBox3.Text.Trim.Equals("") Then
+    '            ' Cancel the event and select the text to be corrected by the user.
+    '            e.Cancel = True
+    '            ComboBox3.Select(0, ComboBox3.Text.Length)
+    '            ' Set the ErrorProvider error with the text to display. 
+    '            Me.ErrorProvider1.SetError(ComboBox3, errorMsg)
+    '        End If
+    '    End If
+    'End Sub
+    'Private Sub ComboBox3_Validated(sender As Object, e As EventArgs) Handles ComboBox3.Validated
+    '    If Application.OpenForms().OfType(Of GodownHelp).Any Then
+
+    '    Else
+    '        ErrorProvider1.SetError(ComboBox3, "")
+    '    End If
+    'End Sub
     Private Sub ComboBox4_Validating(sender As Object, e As CancelEventArgs) Handles ComboBox4.Validating
-        Dim errorMsg As String = "Please select godown number"
-        If GrpAddCorrect = "A" And bValidategodown = True And ComboBox4.Text.Trim.Equals("") Then
-            ' Cancel the event and select the text to be corrected by the user.
-            e.Cancel = True
-            ComboBox4.Select(0, ComboBox4.Text.Length)
-            ' Set the ErrorProvider error with the text to display. 
-            Me.ErrorProvider1.SetError(ComboBox4, errorMsg)
+        If Application.OpenForms().OfType(Of GodownHelp).Any Then
+        Else
+
+            If GrpAddCorrect = "A" And bValidatetype = True And ComboBox3.Text.Trim.Equals("") Then
+                ' Cancel the event and select the text to be corrected by the user.
+                e.Cancel = True
+                ComboBox3.Select(0, ComboBox3.Text.Length)
+                ' Set the ErrorProvider error with the text to display. 
+                MsgBox("Please select Godown Type")
+                Exit Sub
+            End If
+            Dim errorMsg As String = "Please select godown number"
+            If GrpAddCorrect = "A" And bValidategodown = True And ComboBox4.Text.Trim.Equals("") Then
+                ' Cancel the event and select the text to be corrected by the user.
+                e.Cancel = True
+                ComboBox4.Select(0, ComboBox4.Text.Length)
+                ' Set the ErrorProvider error with the text to display. 
+                Me.ErrorProvider1.SetError(ComboBox4, errorMsg)
+            End If
         End If
     End Sub
 
@@ -1668,4 +1691,6 @@ Public Class FormReceipt
 
         End If
     End Sub
+
+
 End Class

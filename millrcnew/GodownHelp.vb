@@ -19,7 +19,8 @@ Public Class GodownHelp
             If MyConn.State = ConnectionState.Closed Then
                 MyConn.Open()
             End If
-            da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where [STATUS]='C' AND [GROUP]='" & helpgrpcombo.Text & "' order by [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
+            'da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where [STATUS]='C' AND [GROUP]='" & helpgrpcombo.Text & "' order by [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
+            da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where [STATUS]='C' order by [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
             ds = New DataSet
             ds.Clear()
             da.Fill(ds)
@@ -90,8 +91,11 @@ Public Class GodownHelp
         TxtSrch.Focus()
     End Sub
     Private Sub DataGridView3_DoubleClick(sender As Object, e As EventArgs) Handles DataGridView3.DoubleClick
+        helpgrpcombo.Text = FormReceipt.GetValue(DataGridView3.Item(0, DataGridView3.CurrentRow.Index).Value)
+        helpgrpcombo.SelectedIndex = helpgrpcombo.FindStringExact(helpgrpcombo.Text)
         helpgdncombo.Text = FormReceipt.GetValue(DataGridView3.Item(3, DataGridView3.CurrentRow.Index).Value)
         helpgdncombo.SelectedIndex = helpgdncombo.FindStringExact(helpgdncombo.Text)
+
         Me.Close()
         'FormReceipt.Label14.Text = DataGridView3.Item(38, DataGridView3.CurrentRow.Index).Value
         'If DataGridView3.Item(37, DataGridView3.CurrentRow.Index).Value.Equals("997212") Then
@@ -123,7 +127,7 @@ Public Class GodownHelp
         MyConn = New OleDbConnection(connString)
         'If MyConn.State = ConnectionState.Closed Then
         MyConn.Open()
-        da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where " & indexorder & " Like '%" & TxtSrch.Text & "%' and [STATUS]='C' AND [GROUP]='" & helpgrpcombo.Text & "' ORDER BY [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
+        da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where " & indexorder & " Like '%" & TxtSrch.Text & "%' and [STATUS]='C' ORDER BY [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
         'da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where [GODOWN].GROUP Like '%" & TxtSrch.Text & "%' ORDER BY [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
         ds = New DataSet
         ds.Clear()
