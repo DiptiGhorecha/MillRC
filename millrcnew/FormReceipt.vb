@@ -1303,8 +1303,26 @@ Public Class FormReceipt
                     Else
                         xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
                     End If
+                    Dim iDate As String
+                    Dim fDate As DateTime
+                    Dim oDate As String
+                    Dim foDate As DateTime
+                    If (Month(Convert.ToDateTime(DateTimePicker1.Value.ToString)) >= 4) Then
+                        iDate = "30/04/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                        fDate = Convert.ToDateTime(iDate)
+                        oDate = "31/03/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) + 1))
+                        foDate = Convert.ToDateTime(oDate)
+                    Else
+                        iDate = "30/04/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) - 1))
+                        fDate = Convert.ToDateTime(iDate)
+                        oDate = "31/03/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))
+                        foDate = Convert.ToDateTime(oDate)
+                    End If
+
+
                     '  Dim SRD As String = "SELECT [RECEIPT].* from [RECEIPT] where [GROUP]='" & ComboBox3.Text & "' AND GODWN_NO='" & ComboBox4.Text & "' AND Year([RECEIPT].REC_DATE)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' order by [RECEIPT].REC_NO"
-                    chkrs1.Open("SELECT [RECEIPT].* from [RECEIPT] where Year([RECEIPT].REC_DATE)='" & Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) & "' AND REC_NO=" & Convert.ToInt32(TextBox2.Text) & " order by [RECEIPT].REC_NO", xcon)
+                    Dim strn As String = "Select * FROM BILL where [BILL].bill_date>=Format('" & fDate & "', 'dd/mm/yyyy') and [BILL].bill_date<=Format('" & foDate & "', 'dd/mm/yyyy') order by Year([BILL].bill_date)+[BILL].INVOICE_NO"
+                    chkrs1.Open("SELECT [RECEIPT].* from [RECEIPT] where [receipt].rec_date>=Format('" & fDate & "', 'dd/mm/yyyy') and [receipt].rec_date<=Format('" & foDate & "', 'dd/mm/yyyy') AND REC_NO=" & Convert.ToInt32(TextBox2.Text) & " order by [RECEIPT].REC_NO", xcon)
                     ' chkrs1.MoveLast()
                     Do While chkrs1.EOF = False
                         RECFOUND = True
