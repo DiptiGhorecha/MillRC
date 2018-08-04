@@ -39,11 +39,7 @@ Public Class FrmSpReport
             MMT1 = "0" + MMT.ToString()
         End If
         Dim startPP As Date = New Date(Convert.ToInt16(ComboBox4.Text), MMT1, DaysInMonth)
-
         Dim stdt As String = "SELECT sUM(NET_AMOUNT) AS NET FROM BILL where MONTH(BILL_DATE)='" & DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month & "' AND YEAR(BILL_DATE)='" & ComboBox4.Text & "' AND HSN='997212'"
-
-
-
         Dim objPRNSetup = New clsPrinterSetup
         'set Paper Lines and Left Margin
         prnmaxpagelines = objPRNSetup.LinesPerPage
@@ -70,39 +66,39 @@ Public Class FrmSpReport
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
-        chkrs1.Open("SELECT SUM(BILL_AMOUNT) AS NET FROM BILL where MONTH(BILL_DATE)='" & DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month & "' AND YEAR(BILL_DATE)='" & ComboBox4.Text & "' AND HSN='997212'", xcon)
+        chkrs1.Open("SELECT SUM(BILL_AMOUNT) AS NET,SUM(CGST_AMT) AS CGST,SUM(SGST_AMT) AS SGST,SUM(NET_AMOUNT) AS NTOT FROM BILL where MONTH(BILL_DATE)='" & DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month & "' AND YEAR(BILL_DATE)='" & ComboBox4.Text & "' AND HSN='997212'", xcon)
         Dim HSN As String
         Dim HSNPRINT As Boolean
         Dim totnet, tottaxable, totcgst, totsgst, groupnet, grouptaxable, groupcgst, groupsgst As Double
         Dim atotnet, atottaxable, atotcgst, atotsgst, agroupnet, agrouptaxable, agroupcgst, agroupsgst As Double
         Do While chkrs1.EOF = False
+            If chkrs1.Fields(0).Value.Equals("") Or IsDBNull(chkrs1.Fields(0).Value) Then
 
-            Print(fnum, GetStringToPrint(50, "Total Rent Bills less Residential ", "S") & GetStringToPrint(14, Format(chkrs1.Fields(0).Value, "##########0.00"), "N") & vbNewLine)
+                Print(fnum, GetStringToPrint(50, "Total Rent Bills less Residential ", "S") & GetStringToPrint(14, Format(0, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(0, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(0, "##########0.00"), "N") & " = " & GetStringToPrint(14, Format(0, "##########0.00"), "N") & vbNewLine)
+
+            Else
+
+                Print(fnum, GetStringToPrint(50, "Total Rent Bills less Residential ", "S") & GetStringToPrint(14, Format(chkrs1.Fields(0).Value, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(chkrs1.Fields(1).Value, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(chkrs1.Fields(2).Value, "##########0.00"), "N") & " = " & GetStringToPrint(14, Format(chkrs1.Fields(3).Value, "##########0.00"), "N") & vbNewLine)
+
+            End If
             If (chkrs1.EOF = False) Then
                 chkrs1.MoveNext()
             End If
         Loop
         chkrs1.Close()
-        chkrs1.Open("SELECT sUM(BILL_AMOUNT) AS NET FROM BILL where MONTH(BILL_DATE)='" & DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month & "' AND YEAR(BILL_DATE)='" & ComboBox4.Text & "' AND HSN='997212' AND ADVANCE=TRUE", xcon)
+        chkrs1.Open("SELECT SUM(BILL_AMOUNT) AS NET,SUM(CGST_AMT) AS CGST,SUM(SGST_AMT) AS SGST,SUM(NET_AMOUNT) AS NTOT FROM BILL where MONTH(BILL_DATE)='" & DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month & "' AND YEAR(BILL_DATE)='" & ComboBox4.Text & "' AND HSN='997212' AND ADVANCE=TRUE", xcon)
         Do While chkrs1.EOF = False
-
-            Print(fnum, GetStringToPrint(50, "Adj against Advance less Residential ", "S") & GetStringToPrint(14, Format(chkrs1.Fields(0).Value, "##########0.00"), "N") & vbNewLine)
+            If chkrs1.Fields(0).Value.Equals("") Or IsDBNull(chkrs1.Fields(0).Value) Then
+                Print(fnum, GetStringToPrint(50, "Adj against Advance less Residential ", "S") & GetStringToPrint(14, Format(0, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(0, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(0, "##########0.00"), "N") & " = " & GetStringToPrint(14, Format(0, "##########0.00"), "N") & vbNewLine)
+            Else
+                Print(fnum, GetStringToPrint(50, "Adj against Advance less Residential ", "S") & GetStringToPrint(14, Format(chkrs1.Fields(0).Value, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(chkrs1.Fields(1).Value, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(chkrs1.Fields(2).Value, "##########0.00"), "N") & " = " & GetStringToPrint(14, Format(chkrs1.Fields(3).Value, "##########0.00"), "N") & vbNewLine)
+            End If
             If (chkrs1.EOF = False) Then
                 chkrs1.MoveNext()
             End If
         Loop
         chkrs1.Close()
-        'chkrs1.Open("SELECT *,[GODOWN].* FROM RECEIPT INNER JOIN GODOWN ON [GODOWN].[GROUP]=[RECEIPT].[GROUP] AND [GODOWN].[GODWN_NO]=[RECEIPT].[GODWN_NO] where MONTH(REC_DATE)='" & DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month & "' AND YEAR(REC_DATE)='" & ComboBox4.Text & "' AND [GODOWN].GST='997212' AND ADVANCE=TRUE", xcon)
-        'Do While chkrs1.EOF = False
-        '    chkr2.Open("SELECT *,[GODOWN].* FROM RECEIPT INNER JOIN GODOWN ON [GODOWN].[GROUP]=[RECEIPT].[GROUP] AND [GODOWN].[GODWN_NO]=[RECEIPT].[GODWN_NO] where MONTH(REC_DATE)='" & DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month & "' AND YEAR(REC_DATE)='" & ComboBox4.Text & "' AND [GODOWN].GST='997212' AND ADVANCE=TRUE", xcon)
-        '    Print(fnum, GetStringToPrint(35, "Total Advances less Residential: ", "S") & GetStringToPrint(15, Format(chkrs1.Fields(0).Value, "######0.00"), "N") & GetStringToPrint(15, Format(chkrs1.Fields(1).Value, "######0.00"), "N") & vbNewLine)
-        '    If (chkrs1.EOF = False) Then
-        '        chkrs1.MoveNext()
-        '    End If
-        'Loop
-        'chkrs1.Close()
 
-        'hsnwise
         DaysInMonth = 1  'Date.DaysInMonth(ComboBox4.Text, DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month)
         '  MsgBox(DaysInMonth)
         Dim startP As DateTime = New DateTime(Convert.ToInt16(ComboBox4.Text), Convert.ToInt16(DateTime.ParseExact(ComboBox3.Text, "MMMM", CultureInfo.CurrentCulture).Month), DaysInMonth)
@@ -612,5 +608,9 @@ Public Class FrmSpReport
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         Me.Close()
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+
     End Sub
 End Class

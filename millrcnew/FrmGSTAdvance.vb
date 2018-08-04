@@ -247,6 +247,9 @@ Public Class FrmGSTAdvance
         fnumm = 2 '''''''''Get FreeFile No.'''''''''''
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
+        If (Not System.IO.Directory.Exists(Application.StartupPath & "\Reports")) Then
+            System.IO.Directory.CreateDirectory(Application.StartupPath & "\Reports")
+        End If
         FileOpen(fnum, Application.StartupPath & "\Reports\Recprintgstadvance.dat", OpenMode.Output)
         FileOpen(fnumm, Application.StartupPath & "\Reports\" & TextBox5.Text & ".csv", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
@@ -613,8 +616,8 @@ Public Class FrmGSTAdvance
             ''''''''''''''''''''''''hsnwise
 
         End If
-        Form17.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Recprintgstadvance.dat", RichTextBoxStreamType.PlainText)
-        Form17.Show()
+        FrmGSTAdvView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Recprintgstadvance.dat", RichTextBoxStreamType.PlainText)
+        FrmGSTAdvView.Show()
         CreatePDF(Application.StartupPath & "\Reports\Recprintgstadvance.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
         MsgBox(Application.StartupPath + " \Reports\" & TextBox5.Text & ".CSV file is generated")
     End Sub
@@ -1086,8 +1089,8 @@ Public Class FrmGSTAdvance
             ''''''''''''''''''''''''hsnwise
 
         End If
-        Form17.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Recprintgstadvance.dat", RichTextBoxStreamType.PlainText)
-        Form17.Show()
+        FrmGSTAdvView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Recprintgstadvance.dat", RichTextBoxStreamType.PlainText)
+        FrmGSTAdvView.Show()
         CreatePDF(Application.StartupPath & "\Reports\Recprintgstadvance.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
         Dim PrintPDFFile As New ProcessStartInfo
         PrintPDFFile.UseShellExecute = True

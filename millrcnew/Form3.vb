@@ -30,7 +30,7 @@ Public Class FrmTenant
     Private bValidatepname As Boolean = True
     Private BVALIDATEEMAIL As Boolean = True
     Dim formloaded As Boolean = False
-    Private indexorder As String = "P_CODE"
+    Private indexorder As String = "P_NAME"
     Private Sub FrmTenant_Load(sender As Object, e As EventArgs) Handles Me.Load
         Try
             Me.MdiParent = MainMDIForm

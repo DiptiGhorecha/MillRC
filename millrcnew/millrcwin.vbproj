@@ -329,6 +329,12 @@
     <Compile Include="FrmGSTAdvance.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FrmGSTAdvView.Designer.vb">
+      <DependentUpon>FrmGSTAdvView.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmGSTAdvView.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmGstSales.Designer.vb">
       <DependentUpon>FrmGstSales.vb</DependentUpon>
     </Compile>
@@ -561,6 +567,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FrmGSTAdvance.resx">
       <DependentUpon>FrmGSTAdvance.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmGSTAdvView.resx">
+      <DependentUpon>FrmGSTAdvView.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmGstSales.resx">
       <DependentUpon>FrmGstSales.vb</DependentUpon>

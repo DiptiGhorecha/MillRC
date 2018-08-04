@@ -26,11 +26,12 @@ Partial Class FrmReupdate
         Me.Button4 = New System.Windows.Forms.Button()
         Me.cmdClose = New System.Windows.Forms.Button()
         Me.ChkLogo = New System.Windows.Forms.CheckBox()
+        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
         Me.SuspendLayout()
         '
         'Button4
         '
-        Me.Button4.Location = New System.Drawing.Point(31, 61)
+        Me.Button4.Location = New System.Drawing.Point(31, 91)
         Me.Button4.Name = "Button4"
         Me.Button4.Size = New System.Drawing.Size(75, 23)
         Me.Button4.TabIndex = 159
@@ -39,7 +40,7 @@ Partial Class FrmReupdate
         '
         'cmdClose
         '
-        Me.cmdClose.Location = New System.Drawing.Point(128, 61)
+        Me.cmdClose.Location = New System.Drawing.Point(128, 91)
         Me.cmdClose.Name = "cmdClose"
         Me.cmdClose.Size = New System.Drawing.Size(51, 23)
         Me.cmdClose.TabIndex = 160
@@ -56,11 +57,19 @@ Partial Class FrmReupdate
         Me.ChkLogo.Text = "With Logo"
         Me.ChkLogo.UseVisualStyleBackColor = True
         '
+        'ProgressBar1
+        '
+        Me.ProgressBar1.Location = New System.Drawing.Point(32, 48)
+        Me.ProgressBar1.Name = "ProgressBar1"
+        Me.ProgressBar1.Size = New System.Drawing.Size(273, 28)
+        Me.ProgressBar1.TabIndex = 162
+        '
         'FrmReupdate
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(319, 125)
+        Me.Controls.Add(Me.ProgressBar1)
         Me.Controls.Add(Me.ChkLogo)
         Me.Controls.Add(Me.cmdClose)
         Me.Controls.Add(Me.Button4)
@@ -76,4 +85,5 @@ Partial Class FrmReupdate
     Friend WithEvents Button4 As Button
     Friend WithEvents cmdClose As Button
     Friend WithEvents ChkLogo As CheckBox
+    Friend WithEvents ProgressBar1 As ProgressBar
 End Class

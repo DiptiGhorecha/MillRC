@@ -280,7 +280,7 @@ Partial Class FrmTenant
         Me.GroupBox3.Size = New System.Drawing.Size(187, 50)
         Me.GroupBox3.TabIndex = 18
         Me.GroupBox3.TabStop = False
-        Me.GroupBox3.Text = "Search by tenant code"
+        Me.GroupBox3.Text = "Search by tenant name"
         '
         'TxtSrch
         '

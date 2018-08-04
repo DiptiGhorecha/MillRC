@@ -64,7 +64,7 @@ Partial Class FrmSpReport
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(141, 97)
+        Me.Button3.Location = New System.Drawing.Point(71, 98)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(50, 22)
         Me.Button3.TabIndex = 94
@@ -74,12 +74,13 @@ Partial Class FrmSpReport
         'Button2
         '
         Me.Button2.Enabled = False
-        Me.Button2.Location = New System.Drawing.Point(77, 97)
+        Me.Button2.Location = New System.Drawing.Point(206, 98)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(50, 22)
         Me.Button2.TabIndex = 93
         Me.Button2.Text = "Print"
         Me.Button2.UseVisualStyleBackColor = True
+        Me.Button2.Visible = False
         '
         'Button1
         '

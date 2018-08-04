@@ -83,9 +83,6 @@ Public Class FrmReupdate
             objcmd.ExecuteNonQuery()
             transaction.Commit()
             MyConn.Close()
-
-
-
             If xcon.State = ConnectionState.Open Then
             Else
                 xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
@@ -95,7 +92,6 @@ Public Class FrmReupdate
             Dim RCDT As Date
             Dim RCNO As Integer
             Dim REMAINING As Double = 0
-
             Dim BLDT As Date
             Dim GRP As String
             Dim GDN As String
@@ -113,6 +109,12 @@ Public Class FrmReupdate
             Dim fdate As Date
             Dim radate As Date
             Dim rano As Integer
+            chkrs2.Open("Select Count(invoice_no) As NumberOfInvoice FROM BILL", xcon)
+            ProgressBar1.Minimum = 0
+            ProgressBar1.Maximum = chkrs2.Fields(0).Value
+            chkrs2.Close()
+            ProgressBar1.Value = 0
+            Dim counter As Integer = 0
             chkrs1.Open("SELECT * FROM BILL ORDER BY BILL_DATE,INVOICE_NO", xcon)
             Do While chkrs1.EOF = False
                 BLDT = chkrs1.Fields(4).Value
@@ -449,6 +451,7 @@ Public Class FrmReupdate
                 If chkrs1.EOF = False Then
                     chkrs1.MoveNext()
                 End If
+                ProgressBar1.Value += 1
             Loop
             chkrs1.Close()
             xcon.Close()
