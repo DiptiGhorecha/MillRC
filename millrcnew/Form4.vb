@@ -342,6 +342,9 @@ Public Class FrmGodown
             TextBox8.Text = ""
             TextBox9.Text = ""
             TextBox10.Text = ""
+            TextBox11.Text = ""
+            TextBox12.Text = ""
+            TextBox13.Text = ""
             ComboBox1.Text = ""
             ComboBox2.Text = ""
             ComboBox3.Text = ""
@@ -364,8 +367,17 @@ Public Class FrmGodown
             If Not IsDBNull(DataGridView2.Item(3, i).Value) Then
                 TextBox2.Text = GetValue(DataGridView2.Item(3, i).Value)
             End If
-            If Not IsDBNull(DataGridView2.Item(23, i).Value) Or Not IsDBNull(DataGridView2.Item(24, i).Value) Or Not IsDBNull(DataGridView2.Item(25, i).Value) Or Not IsDBNull(DataGridView2.Item(22, i).Value) Then
-                RichTextBox1.Text = GetValue(DataGridView2.Item(22, i).Value) & vbCrLf & GetValue(DataGridView2.Item(23, i).Value) & vbCrLf & GetValue(DataGridView2.Item(24, i).Value) & vbCrLf & GetValue(DataGridView2.Item(25, i).Value)
+            If Not IsDBNull(DataGridView2.Item(22, i).Value) Then
+                RichTextBox1.Text = DataGridView2.Item(22, i).Value.ToString
+            End If
+            If Not IsDBNull(DataGridView2.Item(23, i).Value) Then
+                TextBox11.Text = DataGridView2.Item(23, i).Value.ToString
+            End If
+            If Not IsDBNull(DataGridView2.Item(24, i).Value) Then
+                TextBox12.Text = DataGridView2.Item(24, i).Value.ToString
+            End If
+            If Not IsDBNull(DataGridView2.Item(25, i).Value) Then
+                TextBox13.Text = DataGridView2.Item(25, i).Value.ToString
             End If
             If Not IsDBNull(DataGridView2.Item(38, i).Value) Then
                 ComboBox2.Text = GetValue(DataGridView2.Item(38, i).Value)
@@ -459,6 +471,10 @@ Public Class FrmGodown
             TextBox7.Enabled = False
             TextBox8.Enabled = False
             TextBox9.Enabled = False
+
+            TextBox13.Enabled = False
+            TextBox11.Enabled = False
+            TextBox12.Enabled = False
             RichTextBox1.Enabled = False
             ComboBox1.Enabled = False
             ComboBox2.Enabled = False
@@ -653,6 +669,14 @@ Public Class FrmGodown
             TextBox8.Enabled = True
             TextBox9.Text = ""
             TextBox9.Enabled = True
+
+            TextBox11.Text = ""
+            TextBox11.Enabled = True
+            TextBox12.Text = ""
+            TextBox12.Enabled = True
+            TextBox13.Text = ""
+            TextBox13.Enabled = True
+
             RichTextBox1.Text = ""
             RichTextBox1.Enabled = True
             ComboBox1.Enabled = True
@@ -703,6 +727,10 @@ Public Class FrmGodown
             TextBox7.Enabled = True
             TextBox8.Enabled = True
             TextBox9.Enabled = True
+
+            TextBox11.Enabled = True
+            TextBox12.Enabled = True
+            TextBox13.Enabled = True
             ComboBox1.Enabled = False
             RichTextBox1.Enabled = True
             ComboBox3.Enabled = True
@@ -770,11 +798,25 @@ Public Class FrmGodown
         objcmd.Connection = MyConn
         objcmd.Transaction = transaction
         objcmd.CommandType = CommandType.Text
-        If GrpAddCorrect = "C" Then
-            save = "UPDATE [GODOWN] SET [GROUP]='" & ComboBox1.SelectedValue.ToString & "',P_CODE='" & TextBox10.Text & "',GODWN_NO='" & TextBox2.Text & "',SURVEY='" & TextBox1.Text & "',CENSES='" & TextBox3.Text & "',STATUS='" & stus & "',FROM_D='" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "',MONTH_FR='" & DateTimePicker2.Value.Month & "',YEAR_FR='" & DateTimePicker2.Value.Year & "',OUTST=" & TextBox9.Text & ",WIDTH='" & TextBox4.Text & "',LENGTH='" & TextBox5.Text & "',SQ='" & TextBox6.Text & "',MY_FLG='" & RichTextBox1.Text & "',REMARK1='',REMARK2='',REMARK3='',GST='" & gsttype & "' WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & TextBox2.Text & "' AND P_CODE='" & ComboBox2.SelectedValue.ToString & "'"  ' sorry about that
+        'If GrpAddCorrect = "C" Then
+        '    save = "UPDATE [GODOWN] SET [GROUP]='" & ComboBox1.SelectedValue.ToString & "',P_CODE='" & TextBox10.Text & "',GODWN_NO='" & TextBox2.Text & "',SURVEY='" & TextBox1.Text & "',CENSES='" & TextBox3.Text & "',STATUS='" & stus & "',FROM_D='" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "',MONTH_FR='" & DateTimePicker2.Value.Month & "',YEAR_FR='" & DateTimePicker2.Value.Year & "',OUTST=" & TextBox9.Text & ",WIDTH='" & TextBox4.Text & "',LENGTH='" & TextBox5.Text & "',SQ='" & TextBox6.Text & "',MY_FLG='" & RichTextBox1.Text & "',REMARK1='',REMARK2='',REMARK3='',GST='" & gsttype & "' WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & TextBox2.Text & "' AND P_CODE='" & ComboBox2.SelectedValue.ToString & "'"  ' sorry about that
+        'Else
+        '    save = "INSERT INTO [GODOWN]([GROUP],P_CODE,GODWN_NO,SURVEY,CENSES,STATUS,FROM_D,MONTH_FR,YEAR_FR,WIDTH,LENGTH,SQ,MY_FLG,GST) VALUES('" & ComboBox1.SelectedValue.ToString & "','" & TextBox10.Text & "','" & TextBox2.Text & "','" & TextBox1.Text & "','" & TextBox3.Text & "','" & stus & "','" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','" & DateTimePicker2.Value.Month & "','" & DateTimePicker2.Value.Year & "','" & TextBox4.Text & "','" & TextBox5.Text & "','" & TextBox6.Text & "','" & RichTextBox1.Text & "','" & gsttype & "')"
+        'End If
+        Dim outst As Double
+        If (TextBox9.Text.Trim = "") Then
+            outst = 0
         Else
-            save = "INSERT INTO [GODOWN]([GROUP],P_CODE,GODWN_NO,SURVEY,CENSES,STATUS,FROM_D,MONTH_FR,YEAR_FR,WIDTH,LENGTH,SQ,MY_FLG,GST) VALUES('" & ComboBox1.SelectedValue.ToString & "','" & TextBox10.Text & "','" & TextBox2.Text & "','" & TextBox1.Text & "','" & TextBox3.Text & "','" & stus & "','" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','" & DateTimePicker2.Value.Month & "','" & DateTimePicker2.Value.Year & "','" & TextBox4.Text & "','" & TextBox5.Text & "','" & TextBox6.Text & "','" & RichTextBox1.Text & "','" & gsttype & "')"
+            outst = Convert.ToDouble(TextBox9.Text)
         End If
+
+
+        If GrpAddCorrect = "C" Then
+            save = "UPDATE [GODOWN] SET [GROUP]='" & ComboBox1.SelectedValue.ToString & "',P_CODE='" & TextBox10.Text & "',GODWN_NO='" & TextBox2.Text & "',SURVEY='" & TextBox1.Text & "',CENSES='" & TextBox3.Text & "',STATUS='" & stus & "',FROM_D='" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "',MONTH_FR='" & DateTimePicker2.Value.Month & "',YEAR_FR='" & DateTimePicker2.Value.Year & "',OUTST=" & outst & ",WIDTH='" & TextBox4.Text & "',LENGTH='" & TextBox5.Text & "',SQ='" & TextBox6.Text & "',MY_FLG='" & RichTextBox1.Text & "',REMARK1='" & TextBox11.Text & "',REMARK2='" & TextBox12.Text & "',REMARK3='" & TextBox13.Text & "',GST='" & gsttype & "' WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & TextBox2.Text & "' AND P_CODE='" & ComboBox2.SelectedValue.ToString & "'"  ' sorry about that
+        Else
+            save = "INSERT INTO [GODOWN]([GROUP],P_CODE,GODWN_NO,SURVEY,CENSES,STATUS,FROM_D,MONTH_FR,YEAR_FR,WIDTH,LENGTH,SQ,MY_FLG,remark1,remark2,remark3,GST) VALUES('" & ComboBox1.SelectedValue.ToString & "','" & TextBox10.Text & "','" & TextBox2.Text & "','" & TextBox1.Text & "','" & TextBox3.Text & "','" & stus & "','" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','" & DateTimePicker2.Value.Month & "','" & DateTimePicker2.Value.Year & "','" & TextBox4.Text & "','" & TextBox5.Text & "','" & TextBox6.Text & "','" & RichTextBox1.Text & "','" & TextBox11.Text & "','" & TextBox12.Text & "','" & TextBox13.Text & "','" & gsttype & "')"
+        End If
+
         objcmd.CommandText = save
         objcmd.ExecuteNonQuery()
         ' doSQL(save)
@@ -1126,6 +1168,10 @@ Public Class FrmGodown
     End Sub
 
     Private Sub DataGridView2_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView2.CellContentClick
+
+    End Sub
+
+    Private Sub TextBox11_TextChanged(sender As Object, e As EventArgs) Handles TextBox11.TextChanged
 
     End Sub
 End Class

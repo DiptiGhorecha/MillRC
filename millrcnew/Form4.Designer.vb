@@ -90,6 +90,9 @@ Partial Class FrmGodown
         Me.cmdAdd = New System.Windows.Forms.Button()
         Me.ErrorProvider1 = New System.Windows.Forms.ErrorProvider(Me.components)
         Me.Label23 = New System.Windows.Forms.Label()
+        Me.TextBox11 = New System.Windows.Forms.TextBox()
+        Me.TextBox12 = New System.Windows.Forms.TextBox()
+        Me.TextBox13 = New System.Windows.Forms.TextBox()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox3, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -585,7 +588,7 @@ Partial Class FrmGodown
         '
         Me.RichTextBox1.Location = New System.Drawing.Point(485, 198)
         Me.RichTextBox1.Name = "RichTextBox1"
-        Me.RichTextBox1.Size = New System.Drawing.Size(377, 123)
+        Me.RichTextBox1.Size = New System.Drawing.Size(377, 40)
         Me.RichTextBox1.TabIndex = 19
         Me.RichTextBox1.Text = ""
         '
@@ -633,7 +636,7 @@ Partial Class FrmGodown
         Me.cmdLast.Location = New System.Drawing.Point(149, 19)
         Me.cmdLast.Name = "cmdLast"
         Me.cmdLast.Size = New System.Drawing.Size(40, 25)
-        Me.cmdLast.TabIndex = 23
+        Me.cmdLast.TabIndex = 26
         Me.cmdLast.Text = ">|"
         Me.cmdLast.TextAlign = System.Drawing.ContentAlignment.TopCenter
         Me.cmdLast.UseVisualStyleBackColor = True
@@ -645,7 +648,7 @@ Partial Class FrmGodown
         Me.cmdNext.Location = New System.Drawing.Point(106, 19)
         Me.cmdNext.Name = "cmdNext"
         Me.cmdNext.Size = New System.Drawing.Size(39, 25)
-        Me.cmdNext.TabIndex = 22
+        Me.cmdNext.TabIndex = 25
         Me.cmdNext.Text = "&>>"
         Me.cmdNext.TextAlign = System.Drawing.ContentAlignment.TopCenter
         Me.cmdNext.UseVisualStyleBackColor = True
@@ -657,7 +660,7 @@ Partial Class FrmGodown
         Me.cmdPrev.Location = New System.Drawing.Point(58, 19)
         Me.cmdPrev.Name = "cmdPrev"
         Me.cmdPrev.Size = New System.Drawing.Size(42, 25)
-        Me.cmdPrev.TabIndex = 21
+        Me.cmdPrev.TabIndex = 24
         Me.cmdPrev.Text = "&<<"
         Me.cmdPrev.TextAlign = System.Drawing.ContentAlignment.TopCenter
         Me.cmdPrev.UseVisualStyleBackColor = True
@@ -669,7 +672,7 @@ Partial Class FrmGodown
         Me.cmdFirst.Location = New System.Drawing.Point(12, 19)
         Me.cmdFirst.Name = "cmdFirst"
         Me.cmdFirst.Size = New System.Drawing.Size(40, 25)
-        Me.cmdFirst.TabIndex = 20
+        Me.cmdFirst.TabIndex = 23
         Me.cmdFirst.Text = "|<"
         Me.cmdFirst.TextAlign = System.Drawing.ContentAlignment.TopCenter
         Me.cmdFirst.UseVisualStyleBackColor = True
@@ -706,7 +709,7 @@ Partial Class FrmGodown
         Me.cmdClose.Location = New System.Drawing.Point(299, 522)
         Me.cmdClose.Name = "cmdClose"
         Me.cmdClose.Size = New System.Drawing.Size(51, 23)
-        Me.cmdClose.TabIndex = 29
+        Me.cmdClose.TabIndex = 32
         Me.cmdClose.Text = "E&xit"
         Me.cmdClose.UseVisualStyleBackColor = True
         '
@@ -715,7 +718,7 @@ Partial Class FrmGodown
         Me.cmdCancel.Location = New System.Drawing.Point(242, 522)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(51, 23)
-        Me.cmdCancel.TabIndex = 28
+        Me.cmdCancel.TabIndex = 31
         Me.cmdCancel.Text = "&Cancel"
         Me.cmdCancel.UseVisualStyleBackColor = True
         '
@@ -724,7 +727,7 @@ Partial Class FrmGodown
         Me.cmdUpdate.Location = New System.Drawing.Point(185, 522)
         Me.cmdUpdate.Name = "cmdUpdate"
         Me.cmdUpdate.Size = New System.Drawing.Size(51, 23)
-        Me.cmdUpdate.TabIndex = 27
+        Me.cmdUpdate.TabIndex = 30
         Me.cmdUpdate.Text = "&Update"
         Me.cmdUpdate.UseVisualStyleBackColor = True
         '
@@ -733,7 +736,7 @@ Partial Class FrmGodown
         Me.cmdDelete.Location = New System.Drawing.Point(129, 522)
         Me.cmdDelete.Name = "cmdDelete"
         Me.cmdDelete.Size = New System.Drawing.Size(51, 23)
-        Me.cmdDelete.TabIndex = 26
+        Me.cmdDelete.TabIndex = 29
         Me.cmdDelete.Text = "&Delete"
         Me.cmdDelete.UseVisualStyleBackColor = True
         '
@@ -742,7 +745,7 @@ Partial Class FrmGodown
         Me.cmdEdit.Location = New System.Drawing.Point(72, 522)
         Me.cmdEdit.Name = "cmdEdit"
         Me.cmdEdit.Size = New System.Drawing.Size(51, 23)
-        Me.cmdEdit.TabIndex = 25
+        Me.cmdEdit.TabIndex = 28
         Me.cmdEdit.Text = "&Edit"
         Me.cmdEdit.UseVisualStyleBackColor = True
         '
@@ -751,7 +754,7 @@ Partial Class FrmGodown
         Me.cmdAdd.Location = New System.Drawing.Point(15, 522)
         Me.cmdAdd.Name = "cmdAdd"
         Me.cmdAdd.Size = New System.Drawing.Size(51, 23)
-        Me.cmdAdd.TabIndex = 24
+        Me.cmdAdd.TabIndex = 27
         Me.cmdAdd.Text = "&Add"
         Me.cmdAdd.UseVisualStyleBackColor = True
         '
@@ -769,11 +772,38 @@ Partial Class FrmGodown
         Me.Label23.TabIndex = 127
         Me.Label23.Text = "View"
         '
+        'TextBox11
+        '
+        Me.TextBox11.Location = New System.Drawing.Point(485, 247)
+        Me.TextBox11.MaxLength = 10
+        Me.TextBox11.Name = "TextBox11"
+        Me.TextBox11.Size = New System.Drawing.Size(377, 20)
+        Me.TextBox11.TabIndex = 20
+        '
+        'TextBox12
+        '
+        Me.TextBox12.Location = New System.Drawing.Point(485, 275)
+        Me.TextBox12.MaxLength = 10
+        Me.TextBox12.Name = "TextBox12"
+        Me.TextBox12.Size = New System.Drawing.Size(377, 20)
+        Me.TextBox12.TabIndex = 21
+        '
+        'TextBox13
+        '
+        Me.TextBox13.Location = New System.Drawing.Point(485, 301)
+        Me.TextBox13.MaxLength = 10
+        Me.TextBox13.Name = "TextBox13"
+        Me.TextBox13.Size = New System.Drawing.Size(377, 20)
+        Me.TextBox13.TabIndex = 22
+        '
         'FrmGodown
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(881, 555)
+        Me.Controls.Add(Me.TextBox13)
+        Me.Controls.Add(Me.TextBox12)
+        Me.Controls.Add(Me.TextBox11)
         Me.Controls.Add(Me.Label23)
         Me.Controls.Add(Me.Label21)
         Me.Controls.Add(Me.cmdClose)
@@ -892,4 +922,7 @@ Partial Class FrmGodown
     Friend WithEvents RadioButton3 As RadioButton
     Friend WithEvents TextBox10 As TextBox
     Friend WithEvents Label23 As Label
+    Friend WithEvents TextBox13 As TextBox
+    Friend WithEvents TextBox12 As TextBox
+    Friend WithEvents TextBox11 As TextBox
 End Class

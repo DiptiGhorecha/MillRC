@@ -112,6 +112,11 @@ Public Class FrmSpReport
         Dim first As Boolean = True
         Dim totamt As Double = 0
         Dim totadv As Double = 0
+        Dim totadvbasic As Double = 0
+        Dim totadvcst As Double = 0
+        Dim totadvgst As Double = 0
+
+
         Do While chkrs11.EOF = False
             HSN = chkrs11.Fields(0).Value
             HSNPRINT = True
@@ -387,6 +392,9 @@ Public Class FrmSpReport
                     totadv = totadv + advanceamtprint
                     gtotamt = gtotamt + chkrs1.Fields(5).Value
                     gtotadv = gtotadv + advanceamtprint
+                    totadvbasic = totadvbasic + Math.Round((advanceamtprint * 100 / 118), 2, MidpointRounding.AwayFromZero)
+                    totadvgst = totadvgst + Math.Round((advanceamtprint - (advanceamtprint * 100 / 118)) / 2, 2, MidpointRounding.AwayFromZero)
+                    totadvcst = totadvcst + Math.Round((advanceamtprint - (advanceamtprint * 100 / 118)) / 2, 2, MidpointRounding.AwayFromZero)
                     '        If CheckBox1.Checked Then
                     '            If chkrs1.Fields(6).Value = True Then
                     '                Print(fnum, GetStringToPrint(17, chkrs1.Fields(3).Value, "S") & GetStringToPrint(17, "GST-" + chkrs1.Fields(4).Value.ToString, "S") & GetStringToPrint(13, Format(chkrs1.Fields(5).Value, "######0.00"), "N") & GetStringToPrint(13, Format(advanceamtprint, "######0.00"), "N") & GetStringToPrint(12, "  " & chkrs1.Fields(7).Value, "S") & GetStringToPrint(7, chkrs1.Fields(1).Value, "S") & GetStringToPrint(13, chkrs1.Fields(2).Value, "S") & GetStringToPrint(50, pname, "S") & GetStringToPrint(33, IIf(IsDBNull(chkrs1.Fields(12).Value), "", chkrs1.Fields(12).Value), "S") & vbNewLine)
@@ -444,7 +452,13 @@ Public Class FrmSpReport
         Loop
         'Print(fnum, StrDup(180, " ") & vbNewLine)
         '  Print(fnum, StrDup(180, "-") & vbNewLine)
-        Print(fnum, GetStringToPrint(50, "Total Advances less Residential (Net)", "S") & GetStringToPrint(14, Format(totadv, "##########0.00"), "N") & vbNewLine)
+
+        Print(fnum, GetStringToPrint(50, "Total Advances less Residential (Net) ", "S") & GetStringToPrint(14, Format(totadvbasic, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(totadvcst, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(totadvgst, "##########0.00"), "N") & " = " & GetStringToPrint(14, Format(totadv, "##########0.00"), "N") & vbNewLine)
+
+
+
+
+        '''   Print(fnum, GetStringToPrint(50, "Total Advances less Residential (Net)", "S") & GetStringToPrint(14, Format(totadv, "##########0.00"), "N") & vbNewLine)
         ' Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(7, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(50, "", "S") & GetStringToPrint(33, "", "S") & vbNewLine)
         chkrs11.Close()
 
@@ -457,6 +471,8 @@ Public Class FrmSpReport
 
         groupnet = 0
         grouptaxable = 0
+        Dim groupcst As Double = 0
+        Dim groupgst As Double = 0
         Dim taxrate As Double = 18.0
         For X As Integer = 0 To DataGridView1.RowCount - 1
             '   MsgBox(DataGridView1.Item(18, X).Value)
@@ -464,12 +480,14 @@ Public Class FrmSpReport
 
             groupnet = groupnet + DataGridView1.Item(7, X).Value
             grouptaxable = grouptaxable + DataGridView1.Item(4, X).Value
+            groupcst = groupcst + (DataGridView1.Item(6, X).Value / 2)
+            groupgst = groupgst + (DataGridView1.Item(6, X).Value / 2)
         Next
 
 
         ' Print(fnum, StrDup(185, "-") & vbNewLine)
-        Print(fnum, GetStringToPrint(50, "Total Warehouse ", "S") & GetStringToPrint(14, Format(grouptaxable, "##########0.00"), "N") & vbNewLine)
-
+        'Print(fnum, GetStringToPrint(50, "Total Warehouse ", "S") & GetStringToPrint(14, Format(grouptaxable, "##########0.00"), "N") & vbNewLine)
+        Print(fnum, GetStringToPrint(50, "Total Warehouse ", "S") & GetStringToPrint(14, Format(grouptaxable, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(groupcst, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(groupgst, "##########0.00"), "N") & " = " & GetStringToPrint(14, Format(groupnet, "##########0.00"), "N") & vbNewLine)
 
         'tb = getdbasetable("select BILLWR.*,ACCMST.* from BILLWR INNER JOIN ACCMST ON ACCMST.PARTY_COD=BILLWR.PARTY_COD WHERE BILLWR.BILL_DATE BETWEEN FORMAT('" & startP & "','DD/MM/YYYY') AND FORMAT('" & endP & "','DD/MM/YYYY') AND ACCMST.GST_NO<>'' order by BILLWR.BILL_DATE;")
         tb = getdbasetable("select BILL.*,ACCMST.* from BILL INNER JOIN ACCMST ON ACCMST.PARTY_COD=BILL.PARTY_COD WHERE BILL.BILL_DATE BETWEEN FORMAT('" & startP & "','DD/MM/YYYY') AND FORMAT('" & endP & "','DD/MM/YYYY') order by BILL.BILL_DATE;")     '(ACCMST.GST_NO<>'' OR ACCMST.GST_NO='Null') ;")
@@ -478,20 +496,16 @@ Public Class FrmSpReport
 
         groupnet = 0
         grouptaxable = 0
+        groupcst = 0
+        groupgst = 0
         taxrate = 18.0
         For X As Integer = 0 To DataGridView1.RowCount - 1
-            '   MsgBox(DataGridView1.Item(18, X).Value)
-            ' Print(fnum, GetStringToPrint(16, DataGridView1.Item(18, X).Value, "S") & GetStringToPrint(35, "WV-" & DataGridView1.Item(2, X).Value, "S") & GetStringToPrint(13, DataGridView1.Item(3, X).Value, "S") & GetStringToPrint(10, Format(DataGridView1.Item(27, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(taxrate, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView1.Item(19, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & GetStringToPrint(55, DataGridView1.Item(32, X).Value, "S") & vbNewLine)
-            ' Print(fnumm, GetStringToPrint(16, DataGridView1.Item(18, X).Value, "S") & "," & GetStringToPrint(35, "WV-" & DataGridView1.Item(2, X).Value, "S") & "," & GetStringToPrint(13, DataGridView1.Item(3, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView1.Item(27, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(taxrate, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView1.Item(19, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView1.Item(32, X).Value, "S") & vbNewLine)
             groupnet = groupnet + DataGridView1.Item(27, X).Value
             grouptaxable = grouptaxable + DataGridView1.Item(19, X).Value
+            groupcst = groupcst + (DataGridView1.Item(30, X).Value)
+            groupgst = groupgst + (DataGridView1.Item(29, X).Value)
         Next
-        'Print(fnumm, " " & vbNewLine)
-        ' Print(fnumm, " " & vbNewLine)
-        '  Print(fnum, StrDup(185, "-") & vbNewLine)
-        Print(fnum, GetStringToPrint(50, "Total Warehouse rent (Gandalal) ", "S") & GetStringToPrint(14, Format(grouptaxable, "##########0.00"), "N") & vbNewLine)
-
-
+        Print(fnum, GetStringToPrint(50, "Total Warehouse rent (Gandalal) ", "S") & GetStringToPrint(14, Format(grouptaxable, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(groupcst, "##########0.00"), "N") & " + " & GetStringToPrint(14, Format(groupgst, "##########0.00"), "N") & " = " & GetStringToPrint(14, Format(groupnet, "##########0.00"), "N") & vbNewLine)
         xcon.Close()
 
         FileClose(fnum)

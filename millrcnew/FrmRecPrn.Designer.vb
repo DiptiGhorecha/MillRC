@@ -44,6 +44,7 @@ Partial Class FrmRecPrn
         Me.TextBox6 = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.PrintDialog1 = New System.Windows.Forms.PrintDialog()
+        Me.ChkLogo = New System.Windows.Forms.CheckBox()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox5.SuspendLayout()
         Me.SuspendLayout()
@@ -84,28 +85,28 @@ Partial Class FrmRecPrn
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(167, 210)
+        Me.Button3.Location = New System.Drawing.Point(167, 236)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(50, 22)
-        Me.Button3.TabIndex = 8
+        Me.Button3.TabIndex = 9
         Me.Button3.Text = "Cancel"
         Me.Button3.UseVisualStyleBackColor = True
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(98, 210)
+        Me.Button2.Location = New System.Drawing.Point(98, 236)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(50, 22)
-        Me.Button2.TabIndex = 7
+        Me.Button2.TabIndex = 8
         Me.Button2.Text = "Print"
         Me.Button2.UseVisualStyleBackColor = True
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(26, 210)
+        Me.Button1.Location = New System.Drawing.Point(26, 236)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(50, 22)
-        Me.Button1.TabIndex = 6
+        Me.Button1.TabIndex = 7
         Me.Button1.Text = "View"
         Me.Button1.UseVisualStyleBackColor = True
         '
@@ -196,15 +197,15 @@ Partial Class FrmRecPrn
         '
         'TextBox5
         '
-        Me.TextBox5.Location = New System.Drawing.Point(140, 163)
+        Me.TextBox5.Location = New System.Drawing.Point(140, 189)
         Me.TextBox5.Name = "TextBox5"
         Me.TextBox5.Size = New System.Drawing.Size(132, 20)
-        Me.TextBox5.TabIndex = 5
+        Me.TextBox5.TabIndex = 6
         Me.TextBox5.Text = "Receipt"
         '
         'Label6
         '
-        Me.Label6.Location = New System.Drawing.Point(23, 163)
+        Me.Label6.Location = New System.Drawing.Point(23, 189)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(91, 41)
         Me.Label6.TabIndex = 133
@@ -231,11 +232,22 @@ Partial Class FrmRecPrn
         '
         Me.PrintDialog1.UseEXDialog = True
         '
+        'ChkLogo
+        '
+        Me.ChkLogo.AutoSize = True
+        Me.ChkLogo.Location = New System.Drawing.Point(26, 161)
+        Me.ChkLogo.Name = "ChkLogo"
+        Me.ChkLogo.Size = New System.Drawing.Size(75, 17)
+        Me.ChkLogo.TabIndex = 5
+        Me.ChkLogo.Text = "With Logo"
+        Me.ChkLogo.UseVisualStyleBackColor = True
+        '
         'FrmRecPrn
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(726, 414)
+        Me.Controls.Add(Me.ChkLogo)
         Me.Controls.Add(Me.TextBox6)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.TextBox5)
@@ -289,4 +301,5 @@ Partial Class FrmRecPrn
     Friend WithEvents TextBox6 As TextBox
     Friend WithEvents Label2 As Label
     Friend WithEvents PrintDialog1 As PrintDialog
+    Friend WithEvents ChkLogo As CheckBox
 End Class

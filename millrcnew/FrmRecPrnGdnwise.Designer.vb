@@ -36,6 +36,7 @@ Partial Class FrmRecPrnGdnwise
         Me.Label4 = New System.Windows.Forms.Label()
         Me.TextBox5 = New System.Windows.Forms.TextBox()
         Me.Label6 = New System.Windows.Forms.Label()
+        Me.ChkLogo = New System.Windows.Forms.CheckBox()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -93,7 +94,7 @@ Partial Class FrmRecPrnGdnwise
         Me.DataGridView1.AllowUserToResizeRows = False
         Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically
-        Me.DataGridView1.Location = New System.Drawing.Point(12, 95)
+        Me.DataGridView1.Location = New System.Drawing.Point(12, 122)
         Me.DataGridView1.Name = "DataGridView1"
         Me.DataGridView1.Size = New System.Drawing.Size(832, 261)
         Me.DataGridView1.TabIndex = 125
@@ -101,7 +102,7 @@ Partial Class FrmRecPrnGdnwise
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(153, 377)
+        Me.Button3.Location = New System.Drawing.Point(153, 398)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(50, 22)
         Me.Button3.TabIndex = 7
@@ -110,7 +111,7 @@ Partial Class FrmRecPrnGdnwise
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(84, 377)
+        Me.Button2.Location = New System.Drawing.Point(84, 398)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(50, 22)
         Me.Button2.TabIndex = 6
@@ -119,7 +120,7 @@ Partial Class FrmRecPrnGdnwise
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(12, 377)
+        Me.Button1.Location = New System.Drawing.Point(12, 398)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(50, 22)
         Me.Button1.TabIndex = 5
@@ -146,25 +147,36 @@ Partial Class FrmRecPrnGdnwise
         '
         'TextBox5
         '
-        Me.TextBox5.Location = New System.Drawing.Point(111, 63)
+        Me.TextBox5.Location = New System.Drawing.Point(111, 86)
         Me.TextBox5.Name = "TextBox5"
         Me.TextBox5.Size = New System.Drawing.Size(121, 20)
-        Me.TextBox5.TabIndex = 4
+        Me.TextBox5.TabIndex = 5
         Me.TextBox5.Text = "Receipt"
         '
         'Label6
         '
-        Me.Label6.Location = New System.Drawing.Point(14, 63)
+        Me.Label6.Location = New System.Drawing.Point(14, 86)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(91, 29)
         Me.Label6.TabIndex = 137
         Me.Label6.Text = "Report File Name (Without Extn)"
         '
+        'ChkLogo
+        '
+        Me.ChkLogo.AutoSize = True
+        Me.ChkLogo.Location = New System.Drawing.Point(20, 61)
+        Me.ChkLogo.Name = "ChkLogo"
+        Me.ChkLogo.Size = New System.Drawing.Size(75, 17)
+        Me.ChkLogo.TabIndex = 4
+        Me.ChkLogo.Text = "With Logo"
+        Me.ChkLogo.UseVisualStyleBackColor = True
+        '
         'FrmRecPrnGdnwise
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(856, 413)
+        Me.ClientSize = New System.Drawing.Size(856, 437)
+        Me.Controls.Add(Me.ChkLogo)
         Me.Controls.Add(Me.TextBox6)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.TextBox5)
@@ -201,4 +213,5 @@ Partial Class FrmRecPrnGdnwise
     Friend WithEvents Label4 As Label
     Friend WithEvents TextBox5 As TextBox
     Friend WithEvents Label6 As Label
+    Friend WithEvents ChkLogo As CheckBox
 End Class

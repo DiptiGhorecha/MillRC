@@ -1641,10 +1641,28 @@ Public Class FormReceipt
     End Sub
 
     Private Sub TextBox1_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox1.KeyPress
-        If Not IsNumeric(e.KeyChar) And Not e.KeyChar = ChrW(Keys.Back) Then
-            e.Handled = True
+        'If Not IsNumeric(e.KeyChar) And Not e.KeyChar = ChrW(Keys.Back) Then
+        '    e.Handled = True
 
+        'End If
+
+        Dim BACKSPACE As Int16 = 8
+        Dim DECIMAL_POINT As Int16 = 46
+        Dim ZERO As Int16 = 48
+        Dim NINE As Int16 = 57
+        Dim NOT_FOUND As Int16 = -1
+
+        Dim keyvalue As Int16 = Convert.ToInt16(e.KeyChar)    '''' // Not really necessary to cast to int
+
+        If ((keyvalue = BACKSPACE) Or ((keyvalue >= ZERO) And (keyvalue <= NINE))) Then
+            Return
         End If
+
+        If ((keyvalue = DECIMAL_POINT) And (TextBox1.Text.IndexOf(".") = NOT_FOUND)) Then
+            Return
+        End If
+
+        e.Handled = True
     End Sub
 
     Private Sub RentComboBox_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles RentComboBox.SelectionChangeCommitted

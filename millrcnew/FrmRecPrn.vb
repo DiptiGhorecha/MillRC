@@ -161,9 +161,9 @@ Public Class FrmRecPrn
         Do While chkrs1.EOF = False
             If chkrs1.Fields(4).Value >= strrec And chkrs1.Fields(4).Value <= edrec Then
                 For xX As Integer = 1 To Convert.ToInt16(TextBox6.Text.Trim)
-                    Print(fnum, GetStringToPrint(6, " ", "S") & GetStringToPrint(50, "THE MOTILAL HIRABHAI ESTATE & WAREHOUSE LIMITED", "S") & vbNewLine)
-                    Print(fnum, GetStringToPrint(14, " ", "S") & GetStringToPrint(60, "OUTSIDE PREM DARWAJA, AHMEDABAD - 380 002, Gujarat, INDIA.", "S") & vbNewLine)
-                    Print(fnum, GetStringToPrint(17, " ", "S") & GetStringToPrint(50, "Ph. :(079)22161537 E-mail: contact@mhwarehouse.com", "S") & vbNewLine)
+                    '  Print(fnum, GetStringToPrint(6, " ", "S") & GetStringToPrint(50, "THE MOTILAL HIRABHAI ESTATE & WAREHOUSE LIMITED", "S") & vbNewLine)
+                    '  Print(fnum, GetStringToPrint(14, " ", "S") & GetStringToPrint(60, "OUTSIDE PREM DARWAJA, AHMEDABAD - 380 002, Gujarat, INDIA.", "S") & vbNewLine)
+                    '  Print(fnum, GetStringToPrint(17, " ", "S") & GetStringToPrint(50, "Ph. :(079)22161537 E-mail: contact@mhwarehouse.com", "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(17, "Receipt No.: GST-", "S") & GetStringToPrint(5, Trim(chkrs1.Fields(4).Value), "S") & GetStringToPrint(41, " ", "S") & GetStringToPrint(7, "Date : ", "S") & GetStringToPrint(10, Trim(chkrs1.Fields(3).Value), "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
@@ -189,6 +189,7 @@ Public Class FrmRecPrn
                     Dim gst_amt As Double = 0
                     Dim net As Double
                     Dim rnd As Integer
+                    Dim myflag As Boolean = False
                     If chkrs4.EOF = False Then
                         If IsDBNull(chkrs4.Fields(5).Value) Then
                         Else
@@ -198,6 +199,10 @@ Public Class FrmRecPrn
                         Else
                             survey = chkrs4.Fields(4).Value
                         End If
+                        If Not IsDBNull(chkrs4.Fields(22).Value) Then
+                            myflag = True
+                        End If
+
                         pname = chkrs4.Fields(38).Value
                         pcode1 = chkrs4.Fields(1).Value
                         chkrs2.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs1.Fields(1).Value & "' and GODWN_NO='" & chkrs1.Fields(2).Value & "' and P_CODE ='" & chkrs4.Fields(1).Value & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
@@ -535,7 +540,12 @@ Public Class FrmRecPrn
                     Print(fnum, GetStringToPrint(60, " ", "S") & StrDup(1, "|") & StrDup(7, " ") & StrDup(1, "|") & vbNewLine)
                     Print(fnum, GetStringToPrint(61, " ", "S") & StrDup(7, "-") & vbNewLine)
                     xline = xline + 5
-                    Print(fnum, GetStringToPrint(54, " ", "S") & GetStringToPrint(20, "Authorised Signatory", "S") & vbNewLine)
+                    If myflag Then
+                        Print(fnum, GetStringToPrint(54, " ", "S") & GetStringToPrint(21, "Authorised Signatory*", "S") & vbNewLine)
+                    Else
+                        Print(fnum, GetStringToPrint(54, " ", "S") & GetStringToPrint(20, "Authorised Signatory", "S") & vbNewLine)
+                    End If
+
                     xline = xline + 1
                     'MsgBox(xline)
                     For X As Integer = xline + 1 To 29
@@ -563,7 +573,7 @@ Public Class FrmRecPrn
         Try
             Dim line As String
             Dim readFile As System.IO.TextReader = New StreamReader(strReportFilePath)
-            Dim yPoint As Integer = 60
+            Dim yPoint As Integer = 75
 
             Dim pdf As PdfDocument = New PdfDocument
             pdf.Info.Title = "Text File to PDF"
@@ -586,7 +596,7 @@ Public Class FrmRecPrn
                 If line Is Nothing Then
                     Exit While
                 Else
-                    If counter > 60 Then
+                    If counter > 54 Then
                         counter = 1
                         pdfPage = pdf.AddPage()
                         graph = XGraphics.FromPdfPage(pdfPage)
@@ -596,17 +606,33 @@ Public Class FrmRecPrn
 
                         pdfPage.Width = 595    ' 842
                         pdfPage.Height = 842
-                        yPoint = 60
+                        yPoint = 75
                     End If
-                    If counter = 1 Or counter = 31 Then
-                        font = New XFont("COURIER NEW", 14, XFontStyle.Bold)
+                    Dim image As XImage = image.FromFile(Application.StartupPath & "\logo.png")
+                    If counter = 1 Then
+                        '     font = New XFont("COURIER NEW", 14, XFontStyle.Bold)
+                        ' If ChkLogo.Checked Then
+                        If ChkLogo.Checked Then
+                            graph.DrawImage(image, 0, 0, image.Width, image.Height)
+                        End If
+                        yPoint = image.Height - 10
+                        ' If
                     Else
-                        font = New XFont("COURIER NEW", 10, XFontStyle.Regular)
+                        If counter = 28 Then
+                            '     font = New XFont("COURIER NEW", 14, XFontStyle.Bold)
+                            ' If ChkLogo.Checked Then
+                            If ChkLogo.Checked Then
+                                graph.DrawImage(image, 0, yPoint, image.Width, image.Height)
+                            End If
+                            yPoint = yPoint + image.Height - 10
+                        Else
+                            font = New XFont("COURIER NEW", 10, XFontStyle.Regular)
+                        End If
                     End If
                     graph.DrawString(line, font, XBrushes.Black,
                     New XRect(30, yPoint, pdfPage.Width.Point, pdfPage.Height.Point), XStringFormats.TopLeft)
-                    yPoint = yPoint + 12
-                End If
+                        yPoint = yPoint + 12
+                    End If
             End While
             Dim pdfFilename As String = invoice_no & ".pdf"
             pdf.Save(pdfFilename)
@@ -661,9 +687,9 @@ Public Class FrmRecPrn
         Do While chkrs1.EOF = False
             If chkrs1.Fields(4).Value >= strrec And chkrs1.Fields(4).Value <= edrec Then
                 For xX As Integer = 1 To Convert.ToInt16(TextBox6.Text.Trim)
-                    Print(fnum, GetStringToPrint(6, " ", "S") & GetStringToPrint(50, "THE MOTILAL HIRABHAI ESTATE & WAREHOUSE LIMITED", "S") & vbNewLine)
-                    Print(fnum, GetStringToPrint(14, " ", "S") & GetStringToPrint(60, "OUTSIDE PREM DARWAJA, AHMEDABAD - 380 002, Gujarat, INDIA.", "S") & vbNewLine)
-                    Print(fnum, GetStringToPrint(17, " ", "S") & GetStringToPrint(50, "Ph. :(079)22161537 E-mail: contact@mhwarehouse.com", "S") & vbNewLine)
+                    '   Print(fnum, GetStringToPrint(6, " ", "S") & GetStringToPrint(50, "THE MOTILAL HIRABHAI ESTATE & WAREHOUSE LIMITED", "S") & vbNewLine)
+                    '  Print(fnum, GetStringToPrint(14, " ", "S") & GetStringToPrint(60, "OUTSIDE PREM DARWAJA, AHMEDABAD - 380 002, Gujarat, INDIA.", "S") & vbNewLine)
+                    '  Print(fnum, GetStringToPrint(17, " ", "S") & GetStringToPrint(50, "Ph. :(079)22161537 E-mail: contact@mhwarehouse.com", "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(17, "Receipt No.: GST-", "S") & GetStringToPrint(5, Trim(chkrs1.Fields(4).Value), "S") & GetStringToPrint(41, " ", "S") & GetStringToPrint(7, "Date : ", "S") & GetStringToPrint(10, Trim(chkrs1.Fields(3).Value), "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
@@ -689,6 +715,7 @@ Public Class FrmRecPrn
                     Dim gst_amt As Double = 0
                     Dim net As Double
                     Dim rnd As Integer
+                    Dim myflag As Boolean = False
                     If chkrs4.EOF = False Then
                         If IsDBNull(chkrs4.Fields(5).Value) Then
                         Else
@@ -697,6 +724,9 @@ Public Class FrmRecPrn
                         If IsDBNull(chkrs4.Fields(4).Value) Then
                         Else
                             survey = chkrs4.Fields(4).Value
+                        End If
+                        If Not IsDBNull(chkrs4.Fields(22).Value) Then
+                            myflag = True
                         End If
                         pname = chkrs4.Fields(38).Value
                         pcode1 = chkrs4.Fields(1).Value
@@ -1049,7 +1079,11 @@ Public Class FrmRecPrn
                     Print(fnum, GetStringToPrint(60, " ", "S") & StrDup(1, "|") & StrDup(7, " ") & StrDup(1, "|") & vbNewLine)
                     Print(fnum, GetStringToPrint(61, " ", "S") & StrDup(7, "-") & vbNewLine)
                     xline = xline + 5
-                    Print(fnum, GetStringToPrint(54, " ", "S") & GetStringToPrint(20, "Authorised Signatory", "S") & vbNewLine)
+                    If myflag Then
+                        Print(fnum, GetStringToPrint(54, " ", "S") & GetStringToPrint(21, "Authorised Signatory*", "S") & vbNewLine)
+                    Else
+                        Print(fnum, GetStringToPrint(54, " ", "S") & GetStringToPrint(20, "Authorised Signatory", "S") & vbNewLine)
+                    End If
                     xline = xline + 1
                     'MsgBox(xline)
                     For X As Integer = xline + 1 To 29

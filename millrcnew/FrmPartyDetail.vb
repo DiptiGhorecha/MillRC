@@ -798,11 +798,11 @@ Public Class FrmPartyDetail
                         Print(fnumm, GetStringToPrint(17, "Total-->", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & "," & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & "," & GetStringToPrint(12, "  ", "S") & "," & GetStringToPrint(7, "", "S") & "," & GetStringToPrint(13, "", "S") & "," & GetStringToPrint(50, "", "S") & "," & GetStringToPrint(33, "", "S") & vbNewLine)
                     End If
                     chkrs11.Close()
-                        recntAMT = totamt
-                        ''''''''''''''''''''payment details
-                    Else
-                        ''''''''''''''''checking in godown transfer table
-                        chkrs4.Open("SELECT [GDTRANS].*,[PARTY].P_NAME FROM GDTRANS INNER JOIN PARTY ON [PARTY].P_CODE=[GDTRANS].NP_CODE WHERE [GROUP]='" & chkrs2.Fields(0).Value & "' and GODWN_NO='" & chkrs2.Fields(3).Value & "' and OP_CODE ='" & TextBox1.Text & "' order by  [GROUP],[GODWN_NO],OP_CODE DESC", xcon)
+                    recntAMT = totamt
+                    ''''''''''''''''''''payment details
+                Else
+                    ''''''''''''''''checking in godown transfer table
+                    chkrs4.Open("SELECT [GDTRANS].*,[PARTY].P_NAME FROM GDTRANS INNER JOIN PARTY ON [PARTY].P_CODE=[GDTRANS].NP_CODE WHERE [GROUP]='" & chkrs2.Fields(0).Value & "' and GODWN_NO='" & chkrs2.Fields(3).Value & "' and OP_CODE ='" & TextBox1.Text & "' order by  [GROUP],[GODWN_NO],OP_CODE DESC", xcon)
                     If chkrs4.BOF = False Then
                         chkrs4.MoveFirst()
                     End If
@@ -1525,6 +1525,10 @@ Public Class FrmPartyDetail
 
 
             End If
+            Dim otst As Double = 0
+            Dim prvdt As String = ""
+            otst = chkrs2.Fields(21).Value
+            prvdt = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Convert.ToInt16(chkrs2.Fields(14).Value)).ToString() + " - " + chkrs2.Fields(15).Value.ToString()
             If chkrs2.BOF = False Then
                 chkrs2.MoveNext()
             End If
@@ -1532,6 +1536,10 @@ Public Class FrmPartyDetail
             ' Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(7, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(50, "", "S") & GetStringToPrint(33, "", "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "  ", "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "  ", "S") & vbNewLine)
+            If (otst > 0) Then
+                Print(fnum, GetStringToPrint(42, "Previous Outstanding Detail as on Date : ", "S") & GetStringToPrint(15, Format(otst, "########0.00"), "N") & GetStringToPrint(30, " from " & prvdt, "S") & vbNewLine)
+                Print(fnumm, GetStringToPrint(42, "Previous Outstanding Detail as on Date : ", "S") & GetStringToPrint(15, Format(otst, "########0.00"), "N") & GetStringToPrint(30, " from " & prvdt, "S") & vbNewLine)
+            End If
             Print(fnum, GetStringToPrint(42, "Outstanding Detail as on Date : " + DateTimePicker1.Value.ToShortDateString, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(42, "Outstanding Detail as on Date : " + DateTimePicker1.Value.ToShortDateString, "S") & vbNewLine)
             Print(fnum, GetStringToPrint(42, "===============================================  ", "S") & vbNewLine)
