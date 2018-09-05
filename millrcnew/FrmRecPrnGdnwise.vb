@@ -620,7 +620,7 @@ Public Class FrmRecPrnGdnwise
         Try
             Dim line As String
             Dim readFile As System.IO.TextReader = New StreamReader(strReportFilePath)
-            Dim yPoint As Integer = 60
+            Dim yPoint As Integer = 77
 
             Dim pdf As PdfDocument = New PdfDocument
             pdf.Info.Title = "Text File to PDF"
@@ -653,7 +653,7 @@ Public Class FrmRecPrnGdnwise
 
                         pdfPage.Width = 595    ' 842
                         pdfPage.Height = 842
-                        yPoint = 60
+                        yPoint = 77
                     End If
                     Dim image As XImage = image.FromFile(Application.StartupPath & "\logo.png")
                     If counter = 1 Then
@@ -662,16 +662,16 @@ Public Class FrmRecPrnGdnwise
                         If ChkLogo.Checked Then
                             graph.DrawImage(image, 0, 0, image.Width, image.Height)
                         End If
-                        yPoint = image.Height - 10
-                            ' If
-                        Else
+                        yPoint = image.Height + 10
+                        ' If
+                    Else
                             If counter = 28 Then
                             '     font = New XFont("COURIER NEW", 14, XFontStyle.Bold)
                             ' If ChkLogo.Checked Then
                             If ChkLogo.Checked Then
                                 graph.DrawImage(image, 0, yPoint, image.Width, image.Height)
                             End If
-                            yPoint = yPoint + image.Height - 10
+                            yPoint = yPoint + image.Height + 10
                         Else
                                 font = New XFont("COURIER NEW", 10, XFontStyle.Regular)
                         End If

@@ -1177,19 +1177,21 @@ Public Class FormReceipt
             objcmd.CommandType = CommandType.Text
             If GrpAddCorrect = "C" Then
                 '''''REVERSE UPDATE
-                Dim a As String = "delete * from [RECEIPT] where REC_NO=" & Convert.ToInt32(TextBox2.Text) & " AND year(REC_DATE)='" & Convert.ToDateTime(DateTimePicker1.Value.ToString).Year & "'"
+                Dim a As String = "delete * from [RECEIPT] where REC_NO=" & Convert.ToInt32(TextBox2.Text) & " And REC_DATE =format('" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','dd/mm/yyyy')"
+
+                ''''''''''''''''#" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "#"
                 For i = 0 To DataGridView2.RowCount - 1
 
                     save = "UPDATE [BILL] SET REC_NO=Null, REC_DATE=Null WHERE INVOICE_NO='" & DataGridView2.Item(1, i).Value & "' AND BILL_DATE=#" & Convert.ToDateTime(DataGridView2.Item(5, i).Value) & "#" ' sorry about that
                     objcmd.CommandText = save
                     objcmd.ExecuteNonQuery()
 
-                    objcmd.CommandText = "delete * from [RECIPTBILL] where REC_NO=" & Convert.ToInt32(TextBox2.Text) & " AND INVOICE_NO ='" & DataGridView2.Item(1, i).Value & "'"
+                    objcmd.CommandText = "delete * from [RECIPTBILL] where REC_NO=" & Convert.ToInt32(TextBox2.Text) & " AND INVOICE_NO ='" & DataGridView2.Item(1, i).Value & "' And REC_DATE =format('" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','dd/mm/yyyy')"      '''''''''''#" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "#"
                     objcmd.ExecuteNonQuery()
                     ' objcmd.Dispose()
                 Next
 
-                objcmd.CommandText = "delete * from [RECEIPT] where REC_NO=" & Convert.ToInt32(TextBox2.Text) & " AND year(REC_DATE)='" & Convert.ToDateTime(DateTimePicker1.Value.ToString).Year & "'"
+                objcmd.CommandText = "delete * from [RECEIPT] where REC_NO=" & Convert.ToInt32(TextBox2.Text) & " And REC_DATE =format('" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','dd/mm/yyyy')"          ''''''''''#" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "#"
                 objcmd.ExecuteNonQuery()
 
                 For i = 0 To DataGridView2.RowCount - 1

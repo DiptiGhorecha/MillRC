@@ -573,7 +573,7 @@ Public Class FrmRecPrn
         Try
             Dim line As String
             Dim readFile As System.IO.TextReader = New StreamReader(strReportFilePath)
-            Dim yPoint As Integer = 75
+            Dim yPoint As Integer = 77   '''75
 
             Dim pdf As PdfDocument = New PdfDocument
             pdf.Info.Title = "Text File to PDF"
@@ -606,7 +606,7 @@ Public Class FrmRecPrn
 
                         pdfPage.Width = 595    ' 842
                         pdfPage.Height = 842
-                        yPoint = 75
+                        yPoint = 77    '''''75
                     End If
                     Dim image As XImage = image.FromFile(Application.StartupPath & "\logo.png")
                     If counter = 1 Then
@@ -615,7 +615,7 @@ Public Class FrmRecPrn
                         If ChkLogo.Checked Then
                             graph.DrawImage(image, 0, 0, image.Width, image.Height)
                         End If
-                        yPoint = image.Height - 10
+                        yPoint = image.Height + 10        '''''- 10
                         ' If
                     Else
                         If counter = 28 Then
@@ -624,15 +624,15 @@ Public Class FrmRecPrn
                             If ChkLogo.Checked Then
                                 graph.DrawImage(image, 0, yPoint, image.Width, image.Height)
                             End If
-                            yPoint = yPoint + image.Height - 10
+                            yPoint = yPoint + image.Height + 10    ''' -10
                         Else
                             font = New XFont("COURIER NEW", 10, XFontStyle.Regular)
                         End If
                     End If
                     graph.DrawString(line, font, XBrushes.Black,
                     New XRect(30, yPoint, pdfPage.Width.Point, pdfPage.Height.Point), XStringFormats.TopLeft)
-                        yPoint = yPoint + 12
-                    End If
+                    yPoint = yPoint + 12
+                End If
             End While
             Dim pdfFilename As String = invoice_no & ".pdf"
             pdf.Save(pdfFilename)
@@ -1102,11 +1102,11 @@ Public Class FrmRecPrn
         chkrs1.Close()
         xcon.Close()
         FileClose(fnum)
-        Me.PrintDialog1.PrintToFile = False
-        If Me.PrintDialog1.ShowDialog() = DialogResult.OK Then
-            'Form15.PrintDocument1.PrinterSettings = Form7.PrintDialog1.PrinterSettings
-            'Form7.PrintDocument1.Print()
-        End If
+        'Me.PrintDialog1.PrintToFile = False
+        'If Me.PrintDialog1.ShowDialog() = DialogResult.OK Then
+        '    'Form15.PrintDocument1.PrinterSettings = Form7.PrintDialog1.PrinterSettings
+        '    'Form7.PrintDocument1.Print()
+        'End If
         Form15.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Recprint.dat", RichTextBoxStreamType.PlainText)
         CreatePDF(Application.StartupPath & "\Reports\Recprint.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
         Form15.Show()
