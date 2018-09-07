@@ -1604,14 +1604,14 @@ Public Class FormReceipt
                     objcmd.Connection = MyConn
                     objcmd.Transaction = transaction
                     objcmd.CommandType = CommandType.Text
-                    objcmd.CommandText = "delete from [RECEIPT] where year(REC_DATE)='" & Convert.ToDateTime(DateTimePicker1.Value.ToString).Year & "' AND REC_NO=" & Convert.ToInt32(TextBox2.Text)
+                    objcmd.CommandText = "delete from [RECEIPT] where REC_DATE =format('" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','dd/mm/yyyy') AND REC_NO=" & Convert.ToInt32(TextBox2.Text)
                     objcmd.ExecuteNonQuery()
                     '  MsgBox("Data deleted successfully from GODOWN table in database", vbInformation)
 
-                    objcmd.CommandText = "DELETE FROM [RECIPTBILL] WHERE year(REC_DATE)='" & Convert.ToDateTime(DateTimePicker1.Value.ToString).Year & "' AND REC_NO=" & Convert.ToInt32(TextBox2.Text)
+                    objcmd.CommandText = "DELETE FROM [RECIPTBILL] WHERE REC_DATE =format('" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','dd/mm/yyyy') AND REC_NO=" & Convert.ToInt32(TextBox2.Text)
                     objcmd.ExecuteNonQuery()
                     '  MsgBox("Data deleted successfully from GODOWN table In database", vbInformation)
-                    objcmd.CommandText = "UPDATE [BILL] Set REC_NO=Null, REC_DATE =Null WHERE REC_NO='" & Convert.ToInt32(TextBox2.Text) & "' AND year(REC_DATE)='" & Convert.ToDateTime(DateTimePicker1.Value.ToString).Year & "'"
+                    objcmd.CommandText = "UPDATE [BILL] Set REC_NO=Null, REC_DATE =Null WHERE REC_NO='" & Convert.ToInt32(TextBox2.Text) & "' AND REC_DATE =format('" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','dd/mm/yyyy')"
                     objcmd.ExecuteNonQuery()
                     ShowData()
                     rownum = 0

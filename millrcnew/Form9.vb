@@ -246,7 +246,8 @@ Public Class FrmInvSummary
             HSN = chkrs1.Fields(0).Value
             HSNPRINT = True
             For X As Integer = strbill To edbill
-                If xcount = 0 Then
+                If X < DataGridView2.RowCount Then
+                    If xcount = 0 Then
                     globalHeader(title, fnum, fnumm)
                     Print(fnum, GetStringToPrint(16, "GSTIN/UIN Of", "S") & GetStringToPrint(35, "Invoice Number", "S") & GetStringToPrint(13, "Invoice Date", "S") & GetStringToPrint(10, " Invoice", "S") & GetStringToPrint(12, " Place Of", "S") & GetStringToPrint(7, "Reverse", "S") & GetStringToPrint(12, " Invoice", "S") & GetStringToPrint(10, "E-Commerce GSTIN", "S") & GetStringToPrint(7, "Rate", "N") & GetStringToPrint(15, " Taxable Value", "S") & GetStringToPrint(15, "Cess Amount", "S") & GetStringToPrint(55, "Tenant Name", "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(16, "recipient", "S") & GetStringToPrint(35, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(10, " Value", "S") & GetStringToPrint(12, " Supply", "S") & GetStringToPrint(7, "Charge", "S") & GetStringToPrint(12, " Type ", "S") & GetStringToPrint(10, "GSTIN", "S") & GetStringToPrint(7, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(15, " ", "S") & vbNewLine)
@@ -257,38 +258,18 @@ Public Class FrmInvSummary
 
                     xcount = xcount + 1
                 End If
-                If HSNRadio1.Checked = True Then
-                    If DataGridView2.Item(11, X).Value = HSN Then
-                        partyGST = ""
-                        If IsDBNull(DataGridView2.Item(17, X).Value) Or DataGridView2.Item(17, X).Value Is Nothing Then
+                    If HSNRadio1.Checked = True Then
+                        If DataGridView2.Item(11, X).Value = HSN Then
                             partyGST = ""
-                        Else
-                            partyGST = DataGridView2.Item(17, X).Value
-                        End If
-                        If B2BRadio1.Checked = True Then
-                            If partyGST.Trim <> "" Then
-                                If HSNRadio1.Checked = True And HSNPRINT = True Then
-                                    Print(fnum, GetStringToPrint(35, "HSN Number : " & chkrs1.Fields(0).Value, "S") & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
-                                    Print(fnumm, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
-                                    HSNPRINT = False
-                                    xcount = xcount + 1
-                                End If
-                                If DataGridView2.Item(15, X).Value = True Then
-                                Else
-                                    Print(fnum, GetStringToPrint(16, partyGST, "S") & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
-                                    Print(fnumm, GetStringToPrint(16, partyGST, "S") & "," & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
-                                    totnet = totnet + DataGridView2.Item(10, X).Value
-                                    groupnet = groupnet + DataGridView2.Item(10, X).Value
-                                    tottaxable = tottaxable + DataGridView2.Item(5, X).Value
-                                    grouptaxable = grouptaxable + DataGridView2.Item(5, X).Value
-                                    xcount = xcount + 1
-                                End If
+                            If IsDBNull(DataGridView2.Item(17, X).Value) Or DataGridView2.Item(17, X).Value Is Nothing Then
+                                partyGST = ""
+                            Else
+                                partyGST = DataGridView2.Item(17, X).Value
                             End If
-                        Else
-                            If B2BRadio2.Checked = True Then
-                                If partyGST.Trim.Equals("") Then
+                            If B2BRadio1.Checked = True Then
+                                If partyGST.Trim <> "" Then
                                     If HSNRadio1.Checked = True And HSNPRINT = True Then
-                                        Print(fnum, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
+                                        Print(fnum, GetStringToPrint(35, "HSN Number : " & chkrs1.Fields(0).Value, "S") & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
                                         Print(fnumm, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
                                         HSNPRINT = False
                                         xcount = xcount + 1
@@ -304,53 +285,58 @@ Public Class FrmInvSummary
                                         xcount = xcount + 1
                                     End If
                                 End If
-
                             Else
-                                If HSNRadio1.Checked = True And HSNPRINT = True Then
-                                    Print(fnum, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
-                                    Print(fnumm, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
-                                    HSNPRINT = False
-                                End If
-                                If DataGridView2.Item(15, X).Value = True Then
+                                If B2BRadio2.Checked = True Then
+                                    If partyGST.Trim.Equals("") Then
+                                        If HSNRadio1.Checked = True And HSNPRINT = True Then
+                                            Print(fnum, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
+                                            Print(fnumm, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
+                                            HSNPRINT = False
+                                            xcount = xcount + 1
+                                        End If
+                                        If DataGridView2.Item(15, X).Value = True Then
+                                        Else
+                                            Print(fnum, GetStringToPrint(16, partyGST, "S") & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
+                                            Print(fnumm, GetStringToPrint(16, partyGST, "S") & "," & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
+                                            totnet = totnet + DataGridView2.Item(10, X).Value
+                                            groupnet = groupnet + DataGridView2.Item(10, X).Value
+                                            tottaxable = tottaxable + DataGridView2.Item(5, X).Value
+                                            grouptaxable = grouptaxable + DataGridView2.Item(5, X).Value
+                                            xcount = xcount + 1
+                                        End If
+                                    End If
+
                                 Else
-                                    Print(fnum, GetStringToPrint(16, partyGST, "S") & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
-                                    Print(fnumm, GetStringToPrint(16, partyGST, "S") & "," & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
-                                    totnet = totnet + DataGridView2.Item(10, X).Value
-                                    groupnet = groupnet + DataGridView2.Item(10, X).Value
-                                    tottaxable = tottaxable + DataGridView2.Item(5, X).Value
-                                    grouptaxable = grouptaxable + DataGridView2.Item(5, X).Value
-                                    xcount = xcount + 1
+                                    If HSNRadio1.Checked = True And HSNPRINT = True Then
+                                        Print(fnum, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
+                                        Print(fnumm, GetStringToPrint(35, "HSN Number :" & chkrs1.Fields(0).Value, "S") & "," & GetStringToPrint(75, chkrs1.Fields(1).Value, "S") & vbNewLine)
+                                        HSNPRINT = False
+                                    End If
+                                    If DataGridView2.Item(15, X).Value = True Then
+                                    Else
+                                        Print(fnum, GetStringToPrint(16, partyGST, "S") & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
+                                        Print(fnumm, GetStringToPrint(16, partyGST, "S") & "," & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
+                                        totnet = totnet + DataGridView2.Item(10, X).Value
+                                        groupnet = groupnet + DataGridView2.Item(10, X).Value
+                                        tottaxable = tottaxable + DataGridView2.Item(5, X).Value
+                                        grouptaxable = grouptaxable + DataGridView2.Item(5, X).Value
+                                        xcount = xcount + 1
+                                    End If
                                 End If
+                                ' xcount = xcount + 1
                             End If
-                            ' xcount = xcount + 1
+
                         End If
+                    Else
 
-                    End If
-                Else
-
-                    partyGST = ""
-                    If IsDBNull(DataGridView2.Item(17, X).Value) Or DataGridView2.Item(17, X).Value Is Nothing Then
                         partyGST = ""
-                    Else
-                        partyGST = DataGridView2.Item(17, X).Value
-                    End If
-                    If B2BRadio1.Checked = True Then
-                        If partyGST.Trim <> "" Then
-                            If DataGridView2.Item(15, X).Value = True Then
-                            Else
-                                Print(fnum, GetStringToPrint(16, partyGST, "S") & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(16, partyGST, "S") & "," & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
-                                totnet = totnet + DataGridView2.Item(10, X).Value
-                                groupnet = groupnet + DataGridView2.Item(10, X).Value
-                                tottaxable = tottaxable + DataGridView2.Item(5, X).Value
-                                grouptaxable = grouptaxable + DataGridView2.Item(5, X).Value
-                                xcount = xcount + 1
-                            End If
-
+                        If IsDBNull(DataGridView2.Item(17, X).Value) Or DataGridView2.Item(17, X).Value Is Nothing Then
+                            partyGST = ""
+                        Else
+                            partyGST = DataGridView2.Item(17, X).Value
                         End If
-                    Else
-                        If B2BRadio2.Checked = True Then
-                            If partyGST.Trim.Equals("") Then
+                        If B2BRadio1.Checked = True Then
+                            If partyGST.Trim <> "" Then
                                 If DataGridView2.Item(15, X).Value = True Then
                                 Else
                                     Print(fnum, GetStringToPrint(16, partyGST, "S") & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
@@ -361,24 +347,41 @@ Public Class FrmInvSummary
                                     grouptaxable = grouptaxable + DataGridView2.Item(5, X).Value
                                     xcount = xcount + 1
                                 End If
+
                             End If
                         Else
-                            If DataGridView2.Item(15, X).Value = True Then
+                            If B2BRadio2.Checked = True Then
+                                If partyGST.Trim.Equals("") Then
+                                    If DataGridView2.Item(15, X).Value = True Then
+                                    Else
+                                        Print(fnum, GetStringToPrint(16, partyGST, "S") & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
+                                        Print(fnumm, GetStringToPrint(16, partyGST, "S") & "," & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
+                                        totnet = totnet + DataGridView2.Item(10, X).Value
+                                        groupnet = groupnet + DataGridView2.Item(10, X).Value
+                                        tottaxable = tottaxable + DataGridView2.Item(5, X).Value
+                                        grouptaxable = grouptaxable + DataGridView2.Item(5, X).Value
+                                        xcount = xcount + 1
+                                    End If
+                                End If
                             Else
-                                Print(fnum, GetStringToPrint(16, partyGST, "S") & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(16, partyGST, "S") & "," & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
-                                totnet = totnet + DataGridView2.Item(10, X).Value
-                                groupnet = groupnet + DataGridView2.Item(10, X).Value
-                                tottaxable = tottaxable + DataGridView2.Item(5, X).Value
-                                grouptaxable = grouptaxable + DataGridView2.Item(5, X).Value
-                                xcount = xcount + 1
+                                If DataGridView2.Item(15, X).Value = True Then
+                                Else
+                                    Print(fnum, GetStringToPrint(16, partyGST, "S") & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & GetStringToPrint(12, " 24-Gujarat", "S") & GetStringToPrint(7, "   N   ", "S") & GetStringToPrint(12, " Regular", "S") & GetStringToPrint(10, "         ", "S") & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & GetStringToPrint(15, " ", "S") & " " & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(16, partyGST, "S") & "," & GetStringToPrint(35, "GO-" & DataGridView2.Item(0, X).Value, "S") & "," & GetStringToPrint(13, DataGridView2.Item(4, X).Value, "S") & "," & GetStringToPrint(10, Format(DataGridView2.Item(10, X).Value, "######0.00"), "N") & "," & GetStringToPrint(12, " 24-Gujarat", "S") & "," & GetStringToPrint(7, "   N   ", "S") & "," & GetStringToPrint(12, " Regular", "S") & "," & GetStringToPrint(10, "         ", "S") & "," & GetStringToPrint(7, Format(DataGridView2.Item(6, X).Value + DataGridView2.Item(8, X).Value, "###0.00"), "N") & "," & GetStringToPrint(14, Format(DataGridView2.Item(5, X).Value, "##########0.00"), "N") & "," & GetStringToPrint(15, " ", "S") & "," & GetStringToPrint(55, DataGridView2.Item(16, X).Value, "S") & vbNewLine)
+                                    totnet = totnet + DataGridView2.Item(10, X).Value
+                                    groupnet = groupnet + DataGridView2.Item(10, X).Value
+                                    tottaxable = tottaxable + DataGridView2.Item(5, X).Value
+                                    grouptaxable = grouptaxable + DataGridView2.Item(5, X).Value
+                                    xcount = xcount + 1
+                                End If
                             End If
+
                         End If
 
+
                     End If
-
-
                 End If
+
             Next
             If HSNRadio1.Checked = True Then
                 If chkrs1.EOF = False Then
@@ -494,7 +497,8 @@ Public Class FrmInvSummary
             HSN = chkrs1.Fields(0).Value
             HSNPRINT = True
             For X As Integer = strbill To edbill
-                If xcount = 0 Then
+                If X < DataGridView2.RowCount Then
+                    If xcount = 0 Then
                     globalHeader(title, fnum, fnumm)
                     Print(fnum, GetStringToPrint(16, "GSTIN/UIN of", "S") & GetStringToPrint(12, "Invoice No", "S") & GetStringToPrint(13, "Invoice Date", "S") & GetStringToPrint(10, " Invoice", "S") & GetStringToPrint(12, " Place of", "S") & GetStringToPrint(7, "Reverse", "S") & GetStringToPrint(12, " Invoice", "S") & GetStringToPrint(10, "E-Commerce GSTIN", "S") & GetStringToPrint(7, "Rate", "N") & GetStringToPrint(15, " Taxable Value", "S") & GetStringToPrint(15, "Cess Amount", "S") & GetStringToPrint(55, "Tenant Name", "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(16, "recipient", "S") & GetStringToPrint(12, " ", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(10, " Value", "S") & GetStringToPrint(12, " Supply", "S") & GetStringToPrint(7, "Charge", "S") & GetStringToPrint(12, " Type ", "S") & GetStringToPrint(10, "GSTIN", "S") & GetStringToPrint(7, " ", "S") & GetStringToPrint(15, " ", "S") & GetStringToPrint(15, " ", "S") & vbNewLine)
@@ -631,8 +635,9 @@ Public Class FrmInvSummary
                     '  xcount = xcount + 1
 
                 End If
-                If xcount >= 40 Then
-                    xcount = 0
+                    If xcount >= 40 Then
+                        xcount = 0
+                    End If
                 End If
             Next
             If HSNRadio1.Checked = True Then

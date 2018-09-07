@@ -254,6 +254,7 @@ Public Class FrmRecPrnGdnwise
                 Dim net As Double
                 Dim rnd As Integer
                 Dim myflag As Boolean = False
+                Dim amtt As Double = 0
                 If chkrs4.EOF = False Then
                     If IsDBNull(chkrs4.Fields(5).Value) Then
                     Else
@@ -269,7 +270,7 @@ Public Class FrmRecPrnGdnwise
                     pname = chkrs4.Fields(38).Value
                     pcode1 = chkrs4.Fields(1).Value
                     chkrs2.Open("SELECT * FROM RENT WHERE [GROUP]='" & ComboBox1.Text & "' and GODWN_NO='" & ComboBox2.Text & "' and P_CODE ='" & chkrs4.Fields(1).Value & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
-                    Dim amtt As Double = 0
+                    '''    Dim amtt As Double = 0
                     If chkrs2.EOF = False Then
                         chkrs2.MoveFirst()
                         amtt = chkrs2.Fields(4).Value
@@ -566,6 +567,54 @@ Public Class FrmRecPrnGdnwise
                 End If
                 chkrs2.Close()
 
+                ''''''''''''''''''''''''''''''''''''''''''''last change
+
+                chkrs2.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs1.Fields(1).Value & "' and GODWN_NO='" & chkrs1.Fields(2).Value & "' and P_CODE ='" & pcode1 & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
+                ''   Dim amtt As Double = 0
+                amtt = 0
+                If chkrs2.EOF = False Then
+                    chkrs2.MoveFirst()
+                    amtt = chkrs2.Fields(4).Value
+                    If IsDBNull(chkrs2.Fields(5).Value) Then
+                    Else
+                        amtt = amtt + chkrs2.Fields(5).Value
+                    End If
+                End If
+                chkrs2.Close()
+                chkrs3.Open("SELECT * FROM GST WHERE [HSN_NO]='" & hsnm & "'", xcon)
+
+                If chkrs3.EOF = False Then
+                    If IsDBNull(chkrs3.Fields(2).Value) Then
+                        CGST_RATE = 0
+                    Else
+                        CGST_RATE = chkrs3.Fields(2).Value
+                    End If
+                    If IsDBNull(chkrs3.Fields(3).Value) Then
+                        SGST_RATE = 0
+                    Else
+                        SGST_RATE = chkrs3.Fields(3).Value
+                    End If
+                End If
+                gst = CGST_RATE + SGST_RATE
+                chkrs3.Close()
+                gst_amt = gst * amtt / 100
+                rnd = gst_amt - Math.Round(gst_amt)
+                If rnd >= 50 Then
+                    gst_amt = Math.Round(gst_amt) + 1
+                Else
+                    gst_amt = Math.Round(gst_amt)
+                End If
+
+                net = amtt + gst_amt
+                CGST_TAXAMT = gst_amt / 2
+
+
+                'CGST_TAXAMT = amt * CGST_RATE / 100
+                CGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
+                'SGST_TAXAMT = amt * SGST_RATE / 100
+                SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
+
+                ''''''''''''''''''''''''''''''''''''''''''''last change
 
 
                 '''''''''''''''''rent detail
@@ -784,6 +833,7 @@ Public Class FrmRecPrnGdnwise
                 Dim net As Double
                 Dim rnd As Integer
                 Dim myflag As Boolean = False
+                Dim amtt As Double = 0
                 If chkrs4.EOF = False Then
                     If IsDBNull(chkrs4.Fields(5).Value) Then
                     Else
@@ -799,7 +849,7 @@ Public Class FrmRecPrnGdnwise
                     pname = chkrs4.Fields(38).Value
                     pcode1 = chkrs4.Fields(1).Value
                     chkrs2.Open("SELECT * FROM RENT WHERE [GROUP]='" & ComboBox1.Text & "' and GODWN_NO='" & ComboBox2.Text & "' and P_CODE ='" & chkrs4.Fields(1).Value & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
-                    Dim amtt As Double = 0
+                    ''     Dim amtt As Double = 0
                     If chkrs2.EOF = False Then
                         chkrs2.MoveFirst()
                         amtt = chkrs2.Fields(4).Value
@@ -1104,6 +1154,54 @@ Public Class FrmRecPrnGdnwise
                 End If
                 chkrs2.Close()
 
+                ''''''''''''''''''''''''''''''''''''''''''''last change
+
+                chkrs2.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs1.Fields(1).Value & "' and GODWN_NO='" & chkrs1.Fields(2).Value & "' and P_CODE ='" & pcode1 & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
+                ''   Dim amtt As Double = 0
+                amtt = 0
+                If chkrs2.EOF = False Then
+                    chkrs2.MoveFirst()
+                    amtt = chkrs2.Fields(4).Value
+                    If IsDBNull(chkrs2.Fields(5).Value) Then
+                    Else
+                        amtt = amtt + chkrs2.Fields(5).Value
+                    End If
+                End If
+                chkrs2.Close()
+                chkrs3.Open("SELECT * FROM GST WHERE [HSN_NO]='" & hsnm & "'", xcon)
+
+                If chkrs3.EOF = False Then
+                    If IsDBNull(chkrs3.Fields(2).Value) Then
+                        CGST_RATE = 0
+                    Else
+                        CGST_RATE = chkrs3.Fields(2).Value
+                    End If
+                    If IsDBNull(chkrs3.Fields(3).Value) Then
+                        SGST_RATE = 0
+                    Else
+                        SGST_RATE = chkrs3.Fields(3).Value
+                    End If
+                End If
+                gst = CGST_RATE + SGST_RATE
+                chkrs3.Close()
+                gst_amt = gst * amtt / 100
+                rnd = gst_amt - Math.Round(gst_amt)
+                If rnd >= 50 Then
+                    gst_amt = Math.Round(gst_amt) + 1
+                Else
+                    gst_amt = Math.Round(gst_amt)
+                End If
+
+                net = amtt + gst_amt
+                CGST_TAXAMT = gst_amt / 2
+
+
+                'CGST_TAXAMT = amt * CGST_RATE / 100
+                CGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
+                'SGST_TAXAMT = amt * SGST_RATE / 100
+                SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
+
+                ''''''''''''''''''''''''''''''''''''''''''''last change
 
 
                 '''''''''''''''''rent detail
