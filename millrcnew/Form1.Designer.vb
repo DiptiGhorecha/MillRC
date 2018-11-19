@@ -70,6 +70,7 @@ Partial Class MainMDIForm
         Me.PictureBox2 = New System.Windows.Forms.PictureBox()
         Me.PictureBox3 = New System.Windows.Forms.PictureBox()
         Me.PictureBox4 = New System.Windows.Forms.PictureBox()
+        Me.GodownDetailToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -185,7 +186,7 @@ Partial Class MainMDIForm
         '
         'ReportsToolStripMenuItem
         '
-        Me.ReportsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.InvoicePrintingToolStripMenuItem, Me.ToolStripMenuItem2, Me.ToolStripMenuItem3, Me.ReceiptPrintingToolStripMenuItem, Me.OutstandingReportToolStripMenuItem, Me.TenantsDetailToolStripMenuItem, Me.GSTSpreadsheetsToolStripMenuItem, Me.ToolStripMenuItem4, Me.OutstandingToolStripMenuItem, Me.SummaryToolStripMenuItem})
+        Me.ReportsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.InvoicePrintingToolStripMenuItem, Me.ToolStripMenuItem2, Me.ToolStripMenuItem3, Me.ReceiptPrintingToolStripMenuItem, Me.OutstandingReportToolStripMenuItem, Me.TenantsDetailToolStripMenuItem, Me.GSTSpreadsheetsToolStripMenuItem, Me.ToolStripMenuItem4, Me.OutstandingToolStripMenuItem, Me.SummaryToolStripMenuItem, Me.GodownDetailToolStripMenuItem})
         Me.ReportsToolStripMenuItem.Name = "ReportsToolStripMenuItem"
         Me.ReportsToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.R), System.Windows.Forms.Keys)
         Me.ReportsToolStripMenuItem.Size = New System.Drawing.Size(59, 34)
@@ -417,6 +418,12 @@ Partial Class MainMDIForm
         Me.PictureBox4.TabIndex = 9
         Me.PictureBox4.TabStop = False
         '
+        'GodownDetailToolStripMenuItem
+        '
+        Me.GodownDetailToolStripMenuItem.Name = "GodownDetailToolStripMenuItem"
+        Me.GodownDetailToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
+        Me.GodownDetailToolStripMenuItem.Text = "Godown Detail"
+        '
         'MainMDIForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -497,4 +504,5 @@ Partial Class MainMDIForm
     Friend WithEvents GSTSpreadsheetsToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents GSTSalesToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents GSTAdvancesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents GodownDetailToolStripMenuItem As ToolStripMenuItem
 End Class

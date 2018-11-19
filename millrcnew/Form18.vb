@@ -653,41 +653,41 @@ Public Class FrmInvMultiple
         End If
     End Sub
     Private Sub ComboBox4_Validating(sender As Object, e As CancelEventArgs) Handles ComboBox4.Validating
-        Dim errorMsg As String = "Please Select godown Number"
-        If bValidategodown = True Then
-            If ComboBox4.Text.Trim.Equals("") Then
-                ' Cancel the event and select the text to be corrected by the user.
-                e.Cancel = True
-                ComboBox4.Select(0, ComboBox4.Text.Length)
-                ' Set the ErrorProvider error with the text to display. 
-                Me.ErrorProvider1.SetError(ComboBox4, errorMsg)
-            Else
-                MyConn = New OleDbConnection(connString)
-                If MyConn.State = ConnectionState.Closed Then
-                    MyConn.Open()
-                End If
-                dag = New OleDb.OleDbDataAdapter("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE from [BILL] where [GROUP]='" & Trim(ComboBox3.SelectedValue.ToString) & "' AND [GODWN_NO]='" & Trim(ComboBox4.SelectedValue.ToString) & "'", MyConn)
-                dsg = New DataSet
-                dsg.Clear()
-                dag.Fill(dsg, "BILL")
+        'Dim errorMsg As String = "Please Select godown Number"
+        'If bValidategodown = True Then
+        '    If ComboBox4.Text.Trim.Equals("") Then
+        '        ' Cancel the event and select the text to be corrected by the user.
+        '        e.Cancel = True
+        '        ComboBox4.Select(0, ComboBox4.Text.Length)
+        '        ' Set the ErrorProvider error with the text to display. 
+        '        Me.ErrorProvider1.SetError(ComboBox4, errorMsg)
+        '    Else
+        '        MyConn = New OleDbConnection(connString)
+        '        If MyConn.State = ConnectionState.Closed Then
+        '            MyConn.Open()
+        '        End If
+        '        dag = New OleDb.OleDbDataAdapter("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE from [BILL] where [GROUP]='" & Trim(ComboBox3.SelectedValue.ToString) & "' AND [GODWN_NO]='" & Trim(ComboBox4.SelectedValue.ToString) & "'", MyConn)
+        '        dsg = New DataSet
+        '        dsg.Clear()
+        '        dag.Fill(dsg, "BILL")
 
-                If dsg.Tables(0).Rows.Count > 0 And GrpAddCorrect <> "C" Then
-                    errorMsg = "Invoice is already generated..."
-                    e.Cancel = True
-                    ComboBox4.Select(0, ComboBox4.Text.Length)
-                    ' Set the ErrorProvider error with the text to display. 
-                    Me.ErrorProvider1.SetError(ComboBox4, errorMsg)
-                End If
-                dag.Dispose()
-                dsg.Dispose()
-                MyConn.Close() ' close connection
-            End If
-        End If
+        '        If dsg.Tables(0).Rows.Count > 0 And GrpAddCorrect <> "C" Then
+        '            errorMsg = "Invoice is already generated..."
+        '            e.Cancel = True
+        '            ComboBox4.Select(0, ComboBox4.Text.Length)
+        '            ' Set the ErrorProvider error with the text to display. 
+        '            Me.ErrorProvider1.SetError(ComboBox4, errorMsg)
+        '        End If
+        '        dag.Dispose()
+        '        dsg.Dispose()
+        '        MyConn.Close() ' close connection
+        '    End If
+        'End If
 
     End Sub
 
     Private Sub ComboBox4_Validated(sender As Object, e As EventArgs) Handles ComboBox4.Validated
-        ErrorProvider1.SetError(ComboBox4, "")
+        ''   ErrorProvider1.SetError(ComboBox4, "")
     End Sub
     Private Sub TextBox2_Validating(sender As Object, e As CancelEventArgs) Handles TextBox2.Validating
 
@@ -1709,4 +1709,6 @@ Public Class FrmInvMultiple
     Private Sub cmdDelete_Click(sender As Object, e As EventArgs) Handles cmdDelete.Click
 
     End Sub
+
+
 End Class

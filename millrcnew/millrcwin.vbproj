@@ -287,6 +287,12 @@
     <Compile Include="FrmGdCloseView.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FrmGdnDtlView.Designer.vb">
+      <DependentUpon>FrmGdnDtlView.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmGdnDtlView.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmGdTrans.Designer.vb">
       <DependentUpon>FrmGdTrans.vb</DependentUpon>
     </Compile>
@@ -321,6 +327,12 @@
       <DependentUpon>FrmGodownReopen.vb</DependentUpon>
     </Compile>
     <Compile Include="FrmGodownReopen.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmGodwnDtl.Designer.vb">
+      <DependentUpon>FrmGodwnDtl.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmGodwnDtl.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FrmGSTAdvance.Designer.vb">
@@ -547,6 +559,9 @@
     <EmbeddedResource Include="FrmGdCloseView.resx">
       <DependentUpon>FrmGdCloseView.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FrmGdnDtlView.resx">
+      <DependentUpon>FrmGdnDtlView.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FrmGdTrans.resx">
       <DependentUpon>FrmGdTrans.vb</DependentUpon>
     </EmbeddedResource>
@@ -564,6 +579,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FrmGodownReopen.resx">
       <DependentUpon>FrmGodownReopen.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmGodwnDtl.resx">
+      <DependentUpon>FrmGodwnDtl.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmGSTAdvance.resx">
       <DependentUpon>FrmGSTAdvance.vb</DependentUpon>

@@ -601,9 +601,12 @@ Public Class FrmInvSingle
                 Me.ErrorProvider1.SetError(ComboBox4, errorMsg)
             Else
                 MyConn = New OleDbConnection(connString)
-            If MyConn.State = ConnectionState.Closed Then
-                MyConn.Open()
-            End If
+                If MyConn.State = ConnectionState.Closed Then
+                    MyConn.Open()
+                End If
+
+                Dim str As String = "SELECT [BILL].INVOICE_NO, [BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE from [BILL] where [GROUP]='" & Trim(ComboBox3.SelectedValue.ToString) & "' AND [GODWN_NO]='" & Trim(ComboBox4.SelectedValue.ToString) & "' AND BILL_DATE=FORMAT('" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','DD/MM/YYYY')"
+
                 dag = New OleDb.OleDbDataAdapter("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE from [BILL] where [GROUP]='" & Trim(ComboBox3.SelectedValue.ToString) & "' AND [GODWN_NO]='" & Trim(ComboBox4.SelectedValue.ToString) & "' AND BILL_DATE=FORMAT('" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','DD/MM/YYYY')", MyConn)
                 dsg = New DataSet
             dsg.Clear()

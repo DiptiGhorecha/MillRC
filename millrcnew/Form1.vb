@@ -374,5 +374,11 @@ Public Class MainMDIForm
         End If
     End Sub
 
-
+    Private Sub GodownDetailToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GodownDetailToolStripMenuItem.Click
+        If Application.OpenForms().OfType(Of FrmGodwnDtl).Any Then
+            FrmGodwnDtl.BringToFront()
+        Else
+            FrmGodwnDtl.Show()
+        End If
+    End Sub
 End Class

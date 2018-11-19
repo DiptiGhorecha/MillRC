@@ -51,6 +51,8 @@ Partial Class Form11
         Me.B2BRadio1 = New System.Windows.Forms.RadioButton()
         Me.TextBox5 = New System.Windows.Forms.TextBox()
         Me.Label6 = New System.Windows.Forms.Label()
+        Me.PrintDocument1 = New System.Drawing.Printing.PrintDocument()
+        Me.Button4 = New System.Windows.Forms.Button()
         Me.GroupBox5.SuspendLayout()
         CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
@@ -153,16 +155,16 @@ Partial Class Form11
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(143, 311)
+        Me.Button3.Location = New System.Drawing.Point(232, 311)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(50, 22)
-        Me.Button3.TabIndex = 12
+        Me.Button3.TabIndex = 13
         Me.Button3.Text = "Cancel"
         Me.Button3.UseVisualStyleBackColor = True
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(79, 311)
+        Me.Button2.Location = New System.Drawing.Point(82, 311)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(50, 22)
         Me.Button2.TabIndex = 11
@@ -320,11 +322,21 @@ Partial Class Form11
         Me.Label6.TabIndex = 82
         Me.Label6.Text = "Report File Name (Without Extn)"
         '
+        'Button4
+        '
+        Me.Button4.Location = New System.Drawing.Point(147, 311)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(70, 22)
+        Me.Button4.TabIndex = 12
+        Me.Button4.Text = "Excel Print"
+        Me.Button4.UseVisualStyleBackColor = True
+        '
         'Form11
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(628, 548)
+        Me.Controls.Add(Me.Button4)
         Me.Controls.Add(Me.TextBox5)
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.HSNRadio2)
@@ -391,4 +403,6 @@ Partial Class Form11
     Friend WithEvents B2BRadio2 As RadioButton
     Friend WithEvents TextBox5 As TextBox
     Friend WithEvents Label6 As Label
+    Friend WithEvents PrintDocument1 As Printing.PrintDocument
+    Friend WithEvents Button4 As Button
 End Class
