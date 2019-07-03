@@ -1281,7 +1281,7 @@ Public Class Form11
 
             Dim pages As Integer = docRenderer.FormattedDocument.PageCount
             Dim i As Integer
-            For i = 1 To 2      ''pages
+            For i = 1 To pages
 
                 page = pdf.AddPage()
 

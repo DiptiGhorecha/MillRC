@@ -1,8 +1,12 @@
-﻿Public Class Form17
+﻿''' <summary>
+''' report view form - receipt checklist
+''' In this module we are displaying .dat file in reachtextbox
+''' </summary>
+Public Class Form17
     Dim formloaded As Boolean = False
     Private checkPrint As Integer
     Private Sub Form17_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.MdiParent = MainMDIForm
+        '''''set position,size of form and richtextbox        Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
         Me.Left = 0
         Me.Width = Parent.Width - 8
@@ -13,6 +17,7 @@
     End Sub
 
     Private Sub Form17_Move(sender As Object, e As EventArgs) Handles Me.Move
+        ''''keep the position of form fix
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height

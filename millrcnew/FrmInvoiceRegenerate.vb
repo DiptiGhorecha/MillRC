@@ -5,6 +5,10 @@ Imports System.IO
 Imports PdfSharp.Drawing
 Imports PdfSharp.Pdf
 Imports PdfSharp.Pdf.IO
+''' <summary>
+''' tables used - bill
+''' this module was created to place logo on all invoice pdf files. Now logo checkbox is place on invoice generate module, so we can hide/remove this module.
+''' </summary>
 Public Class FrmInvoiceRegenerate
     Dim chkrs1 As New ADODB.Recordset
     Dim chkrs2 As New ADODB.Recordset
@@ -76,7 +80,6 @@ Public Class FrmInvoiceRegenerate
                 CreatePDF(strReportFilePath, INVNO)
                 ProgressBar1.Value += 1
 
-                ''''''''''''''''''''''''''''''''invoice reprint end
                 If chkrs1.EOF = False Then
                     chkrs1.MoveNext()
                 End If
@@ -114,20 +117,16 @@ Public Class FrmInvoiceRegenerate
                 If line Is Nothing Then
                     Exit While
                 Else
-
-                    ' yPoint = yPoint + 1
                     graph.DrawString(line, font, XBrushes.Black,
                      New XRect(50, yPoint, pdfPage.Width.Point, pdfPage.Height.Point), XStringFormats.TopLeft)
                     yPoint = yPoint + 12
                 End If
             End While
-            ' Dim pdfFilename As String = Application.StartupPath & "\Invoices\pdf\" & DateTimePicker1.Value.Year.ToString & "\" & MonthName(DateTimePicker1.Value.Month) & "\" & invoice_no & ".pdf"
             Dim pdfFilename As String = pdfpath & "\" & invoice_no & ".pdf"
             pdf.Save(pdfFilename)
             readFile.Close()
             readFile.Dispose()
             readFile = Nothing
-            ' Process.Start(pdfFilename)
             pdf.Close()
             pdf.Dispose()
         Catch ex As Exception
@@ -136,6 +135,7 @@ Public Class FrmInvoiceRegenerate
     End Function
 
     Private Sub FrmInvoiceRegenerate_Load(sender As Object, e As EventArgs) Handles Me.Load
+        '''''''set position of the form
         Try
             Me.MdiParent = MainMDIForm
             Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
@@ -149,6 +149,7 @@ Public Class FrmInvoiceRegenerate
     End Sub
 
     Private Sub FrmInvoiceRegenerate_Move(sender As Object, e As EventArgs) Handles Me.Move
+        ''''don't allow user to move the form
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height
@@ -160,7 +161,7 @@ Public Class FrmInvoiceRegenerate
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         Try
-            Me.Close()
+            Me.Close()    ''''close form
             Exit Sub
         Catch ex As Exception
             MessageBox.Show("Error Cancel Module: " & ex.Message)

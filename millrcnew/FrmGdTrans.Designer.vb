@@ -102,11 +102,13 @@ Partial Class FrmGdTrans
         '
         'DateTimePicker1
         '
+        Me.DateTimePicker1.CustomFormat = "DD/MM/YYYY"
         Me.DateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
         Me.DateTimePicker1.Location = New System.Drawing.Point(126, 14)
         Me.DateTimePicker1.Name = "DateTimePicker1"
         Me.DateTimePicker1.Size = New System.Drawing.Size(132, 20)
         Me.DateTimePicker1.TabIndex = 148
+        Me.DateTimePicker1.Value = New Date(2019, 6, 17, 15, 31, 47, 0)
         '
         'DateTimePicker2
         '

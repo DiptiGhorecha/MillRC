@@ -5,6 +5,11 @@ Imports System.IO
 Imports PdfSharp.Drawing
 Imports PdfSharp.Pdf
 Imports PdfSharp.Pdf.IO
+''' <summary>
+''' tables used - godown,party,bill,gst,rent,group,gdtrans,clgdwn,advances
+''' this is form to accept inputs from user to view/printoutstanding for a godown 
+''' Form23.vb is used to hold report view 
+''' </summary>
 Public Class FrmOutstanding
     Dim chkrs As New ADODB.Recordset
     Dim chkrs11 As New ADODB.Recordset
@@ -28,8 +33,9 @@ Public Class FrmOutstanding
     Dim fnum As Integer
     Dim fnumm As Integer
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
-        fnumm = 2 '''''''''Get FreeFile No.'''''''''''
+        ''''''report view
+        fnum = FreeFile() '''''''''Get FreeFile No. for .dat file'''''''''''
+        fnumm = 2 '''''''''Get FreeFile No for .csv file.'''''''''''
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
         FileOpen(fnum, Application.StartupPath & "\Reports\outstand.dat", OpenMode.Output)
@@ -38,8 +44,8 @@ Public Class FrmOutstanding
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
+        '''''''set order of report as per radio button selection. godownwise / tenant wise
         If RadioGodown.Checked = True Then
-            'chkrs1.Open("SELECT [godown].*,[PARTY].P_NAME from [godown] INNER JOIN [PARTY] ON [godown].P_CODE=[PARTY].P_CODE WHERE [STATUS]='C' and [godown].[group]='cd' AND [GODWN_NO]='001' order by [godown].[GROUP],[godown].GODWN_NO,[godown].P_CODE", xcon)
             chkrs1.Open("SELECT [godown].*,[PARTY].P_NAME from [godown] INNER JOIN [PARTY] ON [godown].P_CODE=[PARTY].P_CODE WHERE [STATUS]='C' AND [GODOWN].[FROM_D]<=FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') order by [godown].[GROUP],[godown].GODWN_NO,[godown].P_CODE", xcon)
         Else
             chkrs1.Open("SELECT [godown].*,[PARTY].P_NAME from [godown] INNER JOIN [PARTY] ON [godown].P_CODE=[PARTY].P_CODE WHERE [STATUS]='C' order by [PARTY].P_NAME", xcon)
@@ -76,7 +82,7 @@ Public Class FrmOutstanding
                 Else
                     globalHeader("Outstanding Report - Tenantwise" & DateTimePicker1.Value.ToShortDateString, fnum, fnumm)
                 End If
-
+                ''''''report headers
                 Print(fnum, GetStringToPrint(17, "Godown Type", "S") & GetStringToPrint(17, "Godown Number", "S") & GetStringToPrint(50, "Tenant Name", "S") & GetStringToPrint(13, "Rent", "N") & GetStringToPrint(13, "Pe Rent", "N") & GetStringToPrint(13, "GST Amt", "N") & GetStringToPrint(13, "Outstanding", "N") & GetStringToPrint(20, "   From Month-Year", "S") & GetStringToPrint(13, " Advance", "S") & vbNewLine)
                 Print(fnumm, GetStringToPrint(17, "Godown Type", "S") & "," & GetStringToPrint(17, "Godown Number", "S") & "," & GetStringToPrint(50, "Tenant Name", "S") & "," & GetStringToPrint(13, "Rent", "N") & "," & GetStringToPrint(13, "Pe Rent", "N") & "," & GetStringToPrint(13, "GST Amt", "N") & "," & GetStringToPrint(13, "Outstanding", "N") & "," & GetStringToPrint(20, "   From Month-Year", "S") & "," & GetStringToPrint(13, " Advance", "S") & vbNewLine)
                 Print(fnum, StrDup(165, "-") & vbNewLine)
@@ -107,17 +113,18 @@ Public Class FrmOutstanding
                     gst_amt = Math.Round(gst_amt)
                 End If
             End If
-            monthamt = ramt + pramt + gst_amt
+            monthamt = ramt + pramt + gst_amt    '''''''monthly payable by godown
             Dim adv As String = ""
             If chkrs1.EOF = True Then
                 Exit Do
             End If
-            '''''''''''''''''''''''''ADVANCES
+            '''''''''''''''''''''''''ADVANCES start
             Dim hasAdv As Boolean = False
             chkrs22.Open("SELECT [ADVANCES].* from [ADVANCES] WHERE [GROUP]='" & grp & "' AND [GODWN_NO]='" & gdn & "' AND [ADVANCES].P_CODE='" & pcd & "' order by [advances].[GROUP],[advances].GODWN_NO", xcon)
             While Not chkrs22.EOF
                 If (chkrs22.Fields(0).Value = grp And chkrs22.Fields(1).Value = gdn And chkrs22.Fields(2).Value = pcd) Then
                     fdate = chkrs22.Fields(3).Value
+                    oDate = fdate
                     lastBillGen = fdate
                     hasAdv = True
                 End If
@@ -129,32 +136,25 @@ Public Class FrmOutstanding
                 End If
             End While
             chkrs22.Close()
-            '''''''''''''''''''''''''ADVANCES
-            Dim tr As String = "SELECT [bill].* from [BILL] WHERE [GROUP]='" & grp & "' AND [GODWN_NO]='" & gdn & "' AND [BILL].BILL_DATE > FORMAT('" & fdate & "','DD/MM/YYYY') and [BILL].BILL_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') order by [BILL].[GROUP],[BILL].GODWN_NO,[BILL].BILL_DATE,[BILL].INVOICE_NO"
-            chkrs3.Open("SELECT [bill].* from [BILL] WHERE [GROUP]='" & grp & "' AND [GODWN_NO]='" & gdn & "' AND [BILL].BILL_DATE > FORMAT('" & fdate & "','DD/MM/YYYY') and [BILL].BILL_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') order by [BILL].[GROUP],[BILL].GODWN_NO,[BILL].BILL_DATE,[BILL].INVOICE_NO", xcon)
-            While Not chkrs3.EOF
-                If chkrs3.Fields(1).Value = grp And chkrs3.Fields(2).Value = gdn And chkrs3.Fields(3).Value = pcd Then
-                    pgross = pgross + chkrs3.Fields(5).Value
-                    pcgst = pcgst + chkrs3.Fields(7).Value
-                    psgst = psgst + chkrs3.Fields(9).Value
-                    pnet = pnet + chkrs3.Fields(10).Value
-                    '   lastBillGen = chkrs3.Fields(4).Value
+            '''''''''''''''''''''''''ADVANCES end
+            Dim startP As DateTime = oDate
+            If fdate >= oDate Then
+                startP = fdate
+            Else
+                startP = oDate
+            End If
+            Dim endP As DateTime = Convert.ToDateTime(DateTimePicker1.Value)
+            Dim CurrD As DateTime = startP
 
-                End If
-                If chkrs3.EOF = False Then
-                    chkrs3.MoveNext()
-                End If
-                If chkrs3.EOF = True Then
-                        Exit While
-                    End If
-
+            While (CurrD <= endP)           '''''''calculate total payable as on date 
+                pnet = pnet + monthamt
+                CurrD = CurrD.AddMonths(1)
             End While
-            chkrs3.Close()
             Dim STR As String = "SELECT DISTINCT [receipt].*,[bill].[P_CODE],[BILL].[REC_DATE],[BILL].[REC_NO] from [receipt] INNER JOIN [bill] on [receipt].[rec_no]=int([bill].[rec_no]) and [receipt].[rec_date]=[bill].[rec_date] and [receipt].[group]=[godown].[group] and [receipt].[godwn_no]=[godown].[godwn_no] WHERE [receipt].[GROUP]='" & grp & "' AND [receipt].[GODWN_NO]='" & gdn & "' AND [receipt].REC_DATE>" & fdate & " AND [receipt].REC_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE='" & pcd & "' order by [receipt].[GROUP],[receipt].GODWN_NO,[receipt].REC_DATE,[receipt].REC_NO"
             chkrs2.Open("SELECT DISTINCT [receipt].*,[bill].[P_CODE],[BILL].[REC_DATE],[BILL].[REC_NO],[BILL].[GROUP],[BILL].[GODWN_NO] from [receipt] INNER JOIN [bill] on [receipt].[rec_no]=int([bill].[rec_no]) and [receipt].[rec_date]=[bill].[rec_date] and [receipt].[group]=[bill].[group] and [receipt].[godwn_no]=[bill].[godwn_no] WHERE [receipt].[GROUP]='" & grp & "' AND [receipt].[GODWN_NO]='" & gdn & "' AND [receipt].REC_DATE>" & fdate & " AND [receipt].REC_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE='" & pcd & "' order by [receipt].[GROUP],[receipt].GODWN_NO,[receipt].REC_DATE,[receipt].REC_NO", xcon)
             While Not chkrs2.EOF
                 If (chkrs2.Fields(1).Value = grp And chkrs2.Fields(2).Value = gdn And chkrs2.Fields(14).Value = pcd) Then
-                    rnet = rnet + chkrs2.Fields(5).Value
+                    rnet = rnet + chkrs2.Fields(5).Value     '''''calculate tottal receipt as on date
                 End If
                 If chkrs2.EOF = False Then
                     chkrs2.MoveNext()
@@ -163,7 +163,7 @@ Public Class FrmOutstanding
                     Exit While
                 End If
             End While
-            out = pnet - rnet
+            out = pnet - rnet   '''''''calculate outstanding as on date
             If out < 0 Then
                 adv = "Advance"
                 out = out * -1
@@ -174,19 +174,14 @@ Public Class FrmOutstanding
             chkrs2.Close()
             Dim monthCount As Integer = 0
             If monthamt > 0 Then
-                monthCount = rnet / monthamt
-                ' monthCount = monthCount - 1
+                monthCount = rnet / monthamt      '''''''calculate advance /due for how many months
             End If
-            '   If adv.Equals("") Then
-            '  outDate = lastBillGen.AddMonths(-1 * monthCount)
-            '  Else
             outDate = lastBillGen.AddMonths(monthCount)
-            '  End If
             If hasAdv Then
                 outDate = outDate.AddMonths(1)
             End If
             Dim daysinmonth As Integer = 0
-            ''''''''''''''''''''''''''''''''''''''''''due in previou application
+            ''''''''''''''''''''''''''''''''''''''''''due in previou dosbase software 
             If chkrs1.Fields(14).Value.ToString = "1" Or chkrs1.Fields(14).Value.ToString = "3" Or chkrs1.Fields(14).Value.ToString = "5" Or chkrs1.Fields(14).Value.ToString = "7" Or chkrs1.Fields(14).Value.ToString = "8" Or chkrs1.Fields(14).Value.ToString = "10" Or chkrs1.Fields(14).Value.ToString = "12" Then
                 daysinmonth = 31
             End If
@@ -202,22 +197,14 @@ Public Class FrmOutstanding
             If IsDBNull(chkrs1.Fields(21).Value) Then
             Else
                 outstandAmt = chkrs1.Fields(21).Value
-
             End If
-
-            'If oDate > poDate And outDate = oDate Then
-            '    outDate = poDate
-            '    out = out + Convert.ToDouble(outstandAmt)
-
-            'End If
-
             If outstandAmt > 0 And oDate > poDate Then
                 outDate = poDate
                 out = out + Convert.ToDouble(outstandAmt)
 
             End If
 
-            '''''''''''''''''''''''''''''''''''''''''due in previou application
+            '''''''''''''''''''''''''''''''''''''''''due in previou  dosbase software 
 
             If CheckBox1.Checked = True Then
                 If out > 0 Then
@@ -225,12 +212,12 @@ Public Class FrmOutstanding
                     Print(fnumm, GetStringToPrint(17, grp, "S") & "," & GetStringToPrint(17, gdn, "S") & "," & GetStringToPrint(50, pnm, "S") & "," & GetStringToPrint(13, Format(ramt, "0.00"), "N") & "," & GetStringToPrint(13, Format(pramt, "0.00"), "N") & "," & GetStringToPrint(13, Format(gst_amt, "0.00"), "N") & "," & GetStringToPrint(13, Format(out, "0.00"), "N") & "," & GetStringToPrint(20, "   " & outDate.Month.ToString & "-" & outDate.Year.ToString, "S") & "," & GetStringToPrint(13, " " & adv, "S") & vbNewLine)
                 End If
             Else
-                    Print(fnum, GetStringToPrint(17, grp, "S") & GetStringToPrint(17, gdn, "S") & GetStringToPrint(50, pnm, "S") & GetStringToPrint(13, Format(ramt, "0.00"), "N") & GetStringToPrint(13, Format(pramt, "0.00"), "N") & GetStringToPrint(13, Format(gst_amt, "0.00"), "N") & GetStringToPrint(13, Format(out, "0.00"), "N") & GetStringToPrint(20, "   " & outDate.Month.ToString & "-" & outDate.Year.ToString, "S") & GetStringToPrint(13, " " & adv, "S") & vbNewLine)
+                Print(fnum, GetStringToPrint(17, grp, "S") & GetStringToPrint(17, gdn, "S") & GetStringToPrint(50, pnm, "S") & GetStringToPrint(13, Format(ramt, "0.00"), "N") & GetStringToPrint(13, Format(pramt, "0.00"), "N") & GetStringToPrint(13, Format(gst_amt, "0.00"), "N") & GetStringToPrint(13, Format(out, "0.00"), "N") & GetStringToPrint(20, "   " & outDate.Month.ToString & "-" & outDate.Year.ToString, "S") & GetStringToPrint(13, " " & adv, "S") & vbNewLine)
                 Print(fnumm, GetStringToPrint(17, grp, "S") & "," & GetStringToPrint(17, gdn, "S") & "," & GetStringToPrint(50, pnm, "S") & "," & GetStringToPrint(13, Format(ramt, "0.00"), "N") & "," & GetStringToPrint(13, Format(pramt, "0.00"), "N") & "," & GetStringToPrint(13, Format(gst_amt, "0.00"), "N") & "," & GetStringToPrint(13, Format(out, "0.00"), "N") & "," & GetStringToPrint(20, "   " & outDate.Month.ToString & "-" & outDate.Year.ToString, "S") & "," & GetStringToPrint(13, " " & adv, "S") & vbNewLine)
             End If
             If chkrs1.EOF = False Then
-                    chkrs1.MoveNext()
-                End If
+                chkrs1.MoveNext()
+            End If
         Loop
         Print(fnum, StrDup(165, "-") & vbNewLine)
         Print(fnumm, StrDup(165, "-") & vbNewLine)
@@ -242,12 +229,14 @@ Public Class FrmOutstanding
         xcon.Close()
         FileClose(fnum)
         FileClose(fnumm)
+        '''''load created .dat file in view form
         Form23.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\outstand.dat", RichTextBoxStreamType.PlainText)
 
-        Form23.Show()
-        CreatePDF(Application.StartupPath & "\Reports\outstand.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
+        Form23.Show()   ''''show report
+        CreatePDF(Application.StartupPath & "\Reports\outstand.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)    '''''create pdf using .dat file
     End Sub
     Private Function CreatePDF(strReportFilePath As String, invoice_no As String)
+        ''''''''''create pdf file from .dat file
         Try
             Dim line As String
             Dim readFile As System.IO.TextReader = New StreamReader(strReportFilePath)
@@ -257,14 +246,10 @@ Public Class FrmOutstanding
             pdf.Info.Title = "Text File to PDF"
 
             Dim pdfPage As PdfPage = pdf.AddPage
-
-            ' pdfPage.Orientation = PdfSharp.PageOrientation.Landscape
             pdfPage.TrimMargins.Left = 15
 
             pdfPage.Width = 842
             pdfPage.Height = 595
-
-            '  pdf.Pages.RemoveAt(0)
             Dim graph As XGraphics = XGraphics.FromPdfPage(pdfPage)
             Dim font As XFont = New XFont("COURIER NEW", 7, XFontStyle.Regular)
 
@@ -289,11 +274,6 @@ Public Class FrmOutstanding
                         pdfPage.Height = 595
                         yPoint = 60
                     End If
-                    'If counter = 1 Or counter = 31 Then
-                    '    font = New XFont("COURIER NEW", 14, XFontStyle.Bold)
-                    'Else
-                    '    font = New XFont("COURIER NEW", 10, XFontStyle.Regular)
-                    'End If
                     graph.DrawString(line, font, XBrushes.Black,
                     New XRect(30, yPoint, pdfPage.Width.Point, pdfPage.Height.Point), XStringFormats.TopLeft)
                     yPoint = yPoint + 12
@@ -303,7 +283,6 @@ Public Class FrmOutstanding
             pdf.Save(pdfFilename)
             readFile.Close()
             readFile = Nothing
-            ' Process.Start(pdfFilename)
             pdf.Close()
 
         Catch ex As Exception
@@ -312,6 +291,7 @@ Public Class FrmOutstanding
     End Function
 
     Private Sub FrmOutstanding_Load(sender As Object, e As EventArgs) Handles Me.Load
+        ''''''''set position of he form
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
         Me.Left = 0
@@ -321,6 +301,7 @@ Public Class FrmOutstanding
     End Sub
 
     Private Sub FrmOutstanding_Move(sender As Object, e As EventArgs) Handles Me.Move
+        ''''''keep position of the form fix
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height
@@ -331,16 +312,18 @@ Public Class FrmOutstanding
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        ''''''''''''''report print - logic same as button1_click
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
+        fnumm = 2 '''''''''Get FreeFile No.'''''''''''
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
         FileOpen(fnum, Application.StartupPath & "\Reports\outstand.dat", OpenMode.Output)
+        FileOpen(fnumm, Application.StartupPath & "\Reports\" & TextBox5.Text & ".csv", OpenMode.Output)
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
         If RadioGodown.Checked = True Then
-            'chkrs1.Open("SELECT [godown].*,[PARTY].P_NAME from [godown] INNER JOIN [PARTY] ON [godown].P_CODE=[PARTY].P_CODE WHERE [STATUS]='C' and [godown].[group]='CHALI' AND [GODWN_NO]='174' order by [godown].[GROUP],[godown].GODWN_NO,[godown].P_CODE", xcon)
             chkrs1.Open("SELECT [godown].*,[PARTY].P_NAME from [godown] INNER JOIN [PARTY] ON [godown].P_CODE=[PARTY].P_CODE WHERE [STATUS]='C' AND [GODOWN].[FROM_D]<=FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') order by [godown].[GROUP],[godown].GODWN_NO,[godown].P_CODE", xcon)
         Else
             chkrs1.Open("SELECT [godown].*,[PARTY].P_NAME from [godown] INNER JOIN [PARTY] ON [godown].P_CODE=[PARTY].P_CODE WHERE [STATUS]='C' order by [PARTY].P_NAME", xcon)
@@ -431,25 +414,20 @@ Public Class FrmOutstanding
             End While
             chkrs22.Close()
             '''''''''''''''''''''''''ADVANCES
-            chkrs3.Open("SELECT [bill].* from [BILL] WHERE [GROUP]='" & grp & "' AND [GODWN_NO]='" & gdn & "' AND [BILL].BILL_DATE > FORMAT('" & fdate & "','DD/MM/YYYY') and [BILL].BILL_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') order by [BILL].[GROUP],[BILL].GODWN_NO,[BILL].BILL_DATE,[BILL].INVOICE_NO", xcon)
-            While Not chkrs3.EOF
-                If chkrs3.Fields(1).Value = grp And chkrs3.Fields(2).Value = gdn And chkrs3.Fields(3).Value = pcd Then
-                    pgross = pgross + chkrs3.Fields(5).Value
-                    pcgst = pcgst + chkrs3.Fields(7).Value
-                    psgst = psgst + chkrs3.Fields(9).Value
-                    pnet = pnet + chkrs3.Fields(10).Value
-                    '   lastBillGen = chkrs3.Fields(4).Value
+            Dim startP As DateTime = oDate
+            If fdate >= oDate Then
+                startP = fdate
+            Else
+                startP = oDate
+            End If
+            Dim endP As DateTime = Convert.ToDateTime(DateTimePicker1.Value)
+            Dim CurrD As DateTime = startP
 
-                End If
-                If chkrs3.EOF = False Then
-                    chkrs3.MoveNext()
-                End If
-                If chkrs3.EOF = True Then
-                    Exit While
-                End If
-
+            While (CurrD <= endP)
+                pnet = pnet + monthamt
+                CurrD = CurrD.AddMonths(1)
             End While
-            chkrs3.Close()
+
             Dim STR As String = "SELECT DISTINCT [receipt].*,[bill].[P_CODE],[BILL].[REC_DATE],[BILL].[REC_NO] from [receipt] INNER JOIN [bill] on [receipt].[rec_no]=int([bill].[rec_no]) and [receipt].[rec_date]=[bill].[rec_date] WHERE [receipt].[GROUP]='" & grp & "' AND [receipt].[GODWN_NO]='" & gdn & "' AND [receipt].REC_DATE>" & fdate & " AND [receipt].REC_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE='" & pcd & "' order by [receipt].[GROUP],[receipt].GODWN_NO,[receipt].REC_DATE,[receipt].REC_NO"
             chkrs2.Open("SELECT DISTINCT [receipt].*,[bill].[P_CODE],[BILL].[REC_DATE],[BILL].[REC_NO] from [receipt] INNER JOIN [bill] on [receipt].[rec_no]=int([bill].[rec_no]) and [receipt].[rec_date]=[bill].[rec_date] WHERE [receipt].[GROUP]='" & grp & "' AND [receipt].[GODWN_NO]='" & gdn & "' AND [receipt].REC_DATE>" & fdate & " AND [receipt].REC_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE='" & pcd & "' order by [receipt].[GROUP],[receipt].GODWN_NO,[receipt].REC_DATE,[receipt].REC_NO", xcon)
             While Not chkrs2.EOF
@@ -475,13 +453,8 @@ Public Class FrmOutstanding
             Dim monthCount As Integer = 0
             If monthamt > 0 Then
                 monthCount = rnet / monthamt
-                ' monthCount = monthCount - 1
             End If
-            '   If adv.Equals("") Then
-            '  outDate = lastBillGen.AddMonths(-1 * monthCount)
-            '  Else
             outDate = lastBillGen.AddMonths(monthCount)
-            '  End If
             If hasAdv Then
                 outDate = outDate.AddMonths(1)
             End If
@@ -555,7 +528,7 @@ Public Class FrmOutstanding
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         Try
-            Me.Close()
+            Me.Close()  '''''close form
             Exit Sub
         Catch ex As Exception
             MessageBox.Show("Error Cancel Module: " & ex.Message)

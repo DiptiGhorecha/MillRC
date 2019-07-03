@@ -5,6 +5,11 @@ Imports System.Text.RegularExpressions
 Imports PdfSharp.Drawing
 Imports PdfSharp.Pdf
 Imports PdfSharp.Pdf.IO
+''' <summary>
+''' tables used - party
+''' this is form to accept inputs from user to view/print tenant master
+''' FrmTenantListView.vb is used to hold report view 
+''' </summary>
 Public Class FrmTenantList
     Dim chkrs As New ADODB.Recordset
     Dim chkrs1 As New ADODB.Recordset
@@ -27,37 +32,32 @@ Public Class FrmTenantList
     Dim fnumm As Integer
 
     Private Sub FrmTenantList_Load(sender As Object, e As EventArgs) Handles Me.Load
+        ''''''set position of form
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
         Me.Left = 0
         Me.KeyPreview = True
-        'fillpartycombo(ComboBox1)
-        'fillpartycombo(ComboBox2)
-        ShowData()
+        ShowData()   ''''''show tenant data in tenant datagrid using party table
         If DataGridView1.RowCount >= 1 Then
         End If
-        ' TextBox6.Text = "1"
-        ' TextBox1.Enabled = False
-        ' TextBox2.Enabled = False
-        TextBox1.Text = ""
-        TextBox2.Text = ""
+        TextBox1.Text = ""     '''''from tenant code
+        TextBox2.Text = ""     '''' to tenant code
         ComboBox1.SelectedIndex = ComboBox1.Items.IndexOf("")
         ComboBox1.Text = ""
         ComboBox2.SelectedIndex = ComboBox2.Items.IndexOf("")
         ComboBox2.Text = ""
         formloaded = True
+        ''''set 1st row of tenant data grid current row on form load
         If DataGridView1.RowCount > 1 Then
             TextBox1.Text = DataGridView1.Item(0, 0).Value
             TextBox2.Text = DataGridView1.Item(0, DataGridView1.RowCount - 1).Value
         End If
     End Sub
     Private Sub ShowData()
-        '  konek() 'open our connection
+        ''''''show tenant details in tenant datagrid using party table
         Try
             MyConn = New OleDbConnection(connString)
-            'If MyConn.State = ConnectionState.Closed Then
             MyConn.Open()
-            ' End If
             da = New OleDb.OleDbDataAdapter("SELECT * from [PARTY] order by " & indexorder, MyConn)
             ds = New DataSet
             ds.Clear()
@@ -91,40 +91,16 @@ Public Class FrmTenantList
             MessageBox.Show(ex.Message)
         End Try
     End Sub
-    Public Function fillpartycombo(cmbo As ComboBox)
-        Try
-            MyConn = New OleDbConnection(connString)
-            If MyConn.State = ConnectionState.Closed Then
-                MyConn.Open()
-            End If
-            da = New OleDb.OleDbDataAdapter("SELECT * from [PARTY] Order by [PARTY].P_NAME", MyConn)
-            ds = New DataSet
-            ds.Clear()
-            da.Fill(ds, "PARTY")
-            cmbo.DataSource = ds.Tables("PARTY")
-            cmbo.DisplayMember = "P_NAME"
-            cmbo.ValueMember = "P_CODE"
-            da.Dispose()
-            ds.Dispose()
-            MyConn.Close() ' close connection
-
-        Catch ex As Exception
-            MessageBox.Show("Party combo fill :" & ex.Message)
-        End Try
-    End Function
     Function GetValue(Value As Object) As String
         If Value IsNot Nothing Then Return Value.ToString() Else Return ""
     End Function
     Private Sub DataGridView1_Click(sender As Object, e As EventArgs) Handles DataGridView1.Click
+        ''''assign value of p_code from current datagrid row to textbox1 or textbox2 (text box having focus) when user click datagrid
         Dim i As Integer = DataGridView1.CurrentRow.Index
         CType(Me.Controls.Find(ctrlname, False)(0), TextBox).Text = GetValue(DataGridView1.Item(0, i).Value)
         If (TextBox2.Text = "") Then
             TextBox2.Text = GetValue(DataGridView1.Item(0, i).Value)
         End If
-        '  GroupBox5.Visible = False
-        '  DataGridView2.Visible = False
-        ' ' Me.Width = Me.Width - DataGridView2.Width + 15
-        '  Me.Height = Me.Height - 145
         If ctrlname = "TextBox1" Then
             TextBox2.Focus()
         Else
@@ -138,6 +114,7 @@ Public Class FrmTenantList
 
 
     Private Sub DataGridView1_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGridView1.ColumnHeaderMouseClick
+        ''''''''set index order for searching and search textbox label accoarding to datagrid column user clicked 
         If e.ColumnIndex = 0 Then
             indexorder = "P_CODE"
             GroupBox3.Text = "Search by tenant code"
@@ -151,10 +128,9 @@ Public Class FrmTenantList
 
     End Sub
     Private Sub TxtSrch_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtSrch.KeyUp
+        '''''''''search tenant datagrid for the text user type in search text box
         MyConn = New OleDbConnection(connString)
-        'If MyConn.State = ConnectionState.Closed Then
         MyConn.Open()
-        ' End If
         da = New OleDb.OleDbDataAdapter("SELECT * FROM [PARTY] where " & indexorder & " Like '%" & TxtSrch.Text & "%' ORDER BY " & indexorder, MyConn)
         ds = New DataSet
         ds.Clear()
@@ -166,6 +142,7 @@ Public Class FrmTenantList
 
     End Sub
     Private Sub DataGridView1_ColumnHeaderMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGridView1.ColumnHeaderMouseDoubleClick
+        ''''''''set index order for searching and search textbox label accoarding to datagrid column user double clicked 
         If e.ColumnIndex = 0 Then
             indexorder = "P_CODE"
             GroupBox3.Text = "Search by tenant code"
@@ -202,6 +179,7 @@ Public Class FrmTenantList
     End Sub
 
     Private Sub FrmTenantList_Move(sender As Object, e As EventArgs) Handles Me.Move
+        '''''keep position of the form fix
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height
@@ -210,21 +188,8 @@ Public Class FrmTenantList
             If (Top < 87) Then Top = 87
         End If
     End Sub
-    Private Sub ComboBox1_TextUpdate(sender As Object, e As EventArgs) Handles ComboBox1.TextUpdate
-        If ComboBox1.FindString(ComboBox1.Text) < 0 Then
-            ComboBox1.Text = ComboBox1.Text.Remove(ComboBox1.Text.Length - 1)
-            ComboBox1.SelectionStart = ComboBox1.Text.Length
-        End If
-    End Sub
-
-    Private Sub ComboBox2_TextUpdate(sender As Object, e As EventArgs) Handles ComboBox2.TextUpdate
-        If ComboBox2.FindString(ComboBox2.Text) < 0 Then
-            ComboBox2.Text = ComboBox2.Text.Remove(ComboBox2.Text.Length - 1)
-            ComboBox2.SelectionStart = ComboBox2.Text.Length
-        End If
-    End Sub
-
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        '''''''report view
         If (TextBox1.Text = "") Then
             MsgBox("Please enter From Tenant")
             TextBox1.Focus()
@@ -236,15 +201,15 @@ Public Class FrmTenantList
             Exit Sub
         End If
 
-        Dim strrec As String = TextBox1.Text
-        Dim edrec As String = TextBox2.Text
+        Dim strrec As String = TextBox1.Text    ''''''from tenant code
+        Dim edrec As String = TextBox2.Text     ''''''to tenant code
 
         If edrec < strrec Then
             MsgBox("From Tenant must be less than To Tenant")
             Exit Sub
         End If
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
-        fnumm = 2
+        fnumm = 2    '''''for .csv file'''''''
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
         FileOpen(fnum, Application.StartupPath & "\Reports\Tenantmasterlist.dat", OpenMode.Output)
@@ -263,7 +228,7 @@ Public Class FrmTenantList
         Dim ADDPHONE, ADD1, ADD2, ADD3, ACT, HPHONE, HADD1, HADD2, HADD3, HCT, CPERSON, EMAIL, GST, REMARK As String
         Do While chkrs1.EOF = False
 
-
+            '''''report header for new page
             If first Then
                 globalHeader("Tenant Master List", fnum, fnumm)
                 Print(fnum, GetStringToPrint(7, "Sr. No.", "S") & " " & GetStringToPrint(12, "Tenant Code", "S") & " " & GetStringToPrint(55, "Tenant Name", "S") & " " & GetStringToPrint(25, "Office Phone No", "S") & " " & GetStringToPrint(25, "Resi. Phone Number", "S") & " " & GetStringToPrint(55, "Contact Person", "S") & " " & GetStringToPrint(30, "Email_ID", "S") & " " & GetStringToPrint(15, "GST", "S") & vbNewLine)
@@ -334,11 +299,11 @@ Public Class FrmTenantList
                     ADD2 = addArr(1)
                 End If
                 If addArr.Length > 2 Then
-                        ADD3 = addArr(2)
-                    End If
+                    ADD3 = addArr(2)
                 End If
+            End If
 
-                If IsDBNull(chkrs1.Fields(11).Value) Then    'House Address & Phone No
+            If IsDBNull(chkrs1.Fields(11).Value) Then    'House Address & Phone No
                 HPHONE = ""
             Else
                 HPHONE = chkrs1.Fields(11).Value
@@ -346,7 +311,7 @@ Public Class FrmTenantList
             If IsDBNull(chkrs1.Fields(6).Value) Then
                 HADD1 = ""
             Else
-                HADD1 = chkrs1.Fields(6).Value     '.Replace(vbCr, "").Replace(vbLf, "") ' chkrs1.Fields(6).Value
+                HADD1 = chkrs1.Fields(6).Value
 
             End If
             If IsDBNull(chkrs1.Fields(7).Value) Then
@@ -378,27 +343,6 @@ Public Class FrmTenantList
 
 
             Print(fnum, GetStringToPrint(7, counter, "S") & " " & GetStringToPrint(12, chkrs1.Fields(0).Value, "S") & " " & GetStringToPrint(55, chkrs1.Fields(1).Value, "S") & " " & GetStringToPrint(25, ADDPHONE, "S") & " " & GetStringToPrint(25, HPHONE, "S") & " " & GetStringToPrint(55, CPERSON, "S") & " " & GetStringToPrint(30, EMAIL, "S") & " " & GetStringToPrint(15, GST, "S") & vbNewLine)
-            'If (ADD2.Equals("")) Then
-            '    If (ADD3.Equals("")) Then
-            '        Print(fnum, GetStringToPrint(10, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(55, "", "S") & GetStringToPrint(75, ACT, "S"))
-            '    Else
-            '        Print(fnum, GetStringToPrint(10, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(55, "", "S") & GetStringToPrint(75, ADD3, "S"))
-            '    End If
-            'Else
-            '    Print(fnum, GetStringToPrint(10, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(55, "", "S") & GetStringToPrint(75, ADD2, "S"))
-            'End If
-
-            'If (HADD2.Equals("")) Then
-            '    If (HADD3.Equals("")) Then
-            '        Print(fnum, GetStringToPrint(75, HCT, "S"))
-            '    Else
-            '        Print(fnum, GetStringToPrint(75, HADD3, "S"))
-            '    End If
-            'Else
-            '    Print(fnum, GetStringToPrint(10, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(55, "", "S") & GetStringToPrint(75, ADD2, "S"))
-            'End If
-            ' Print(fnum, " " & vbNewLine)
-
             counter = counter + 1
             If chkrs1.EOF = False Then
                 chkrs1.MoveNext()
@@ -409,16 +353,18 @@ Public Class FrmTenantList
         MyConn.Close()
         FileClose(fnum)
         FileClose(fnumm)
+        '''''''display created .dat file in rich textbox of report view form
         FrmTenantListView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Tenantmasterlist.dat", RichTextBoxStreamType.PlainText)
-        FrmTenantListView.Show()
-        CreatePDF(Application.StartupPath & "\Reports\Tenantmasterlist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
+        FrmTenantListView.Show()   ''''show report view
+        CreatePDF(Application.StartupPath & "\Reports\Tenantmasterlist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)   '''''create pdf file using .dat file
 
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        Me.Close()
+        Me.Close()    '''''close form
     End Sub
     Private Function CreatePDF(strReportFilePath As String, invoice_no As String)
+        ''''''''create pdf file from .dat file
         Try
             Dim line As String
             Dim readFile As System.IO.TextReader = New StreamReader(strReportFilePath)
@@ -472,6 +418,7 @@ Public Class FrmTenantList
     End Function
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        ''''''report printing
         If (TextBox1.Text = "") Then
             MsgBox("Please enter From Tenant")
             TextBox1.Focus()
@@ -583,7 +530,7 @@ Public Class FrmTenantList
                 End If
             End If
 
-            If IsDBNull(chkrs1.Fields(11).Value) Then    'House Address & Phone No
+            If IsDBNull(chkrs1.Fields(11).Value) Then
                 HPHONE = ""
             Else
                 HPHONE = chkrs1.Fields(11).Value
@@ -591,7 +538,7 @@ Public Class FrmTenantList
             If IsDBNull(chkrs1.Fields(6).Value) Then
                 HADD1 = ""
             Else
-                HADD1 = chkrs1.Fields(6).Value     '.Replace(vbCr, "").Replace(vbLf, "") ' chkrs1.Fields(6).Value
+                HADD1 = chkrs1.Fields(6).Value
 
             End If
             If IsDBNull(chkrs1.Fields(7).Value) Then
@@ -623,26 +570,6 @@ Public Class FrmTenantList
 
 
             Print(fnum, GetStringToPrint(7, counter, "S") & " " & GetStringToPrint(12, chkrs1.Fields(0).Value, "S") & " " & GetStringToPrint(55, chkrs1.Fields(1).Value, "S") & " " & GetStringToPrint(25, ADDPHONE, "S") & " " & GetStringToPrint(25, HPHONE, "S") & " " & GetStringToPrint(55, CPERSON, "S") & " " & GetStringToPrint(30, EMAIL, "S") & " " & GetStringToPrint(15, GST, "S") & vbNewLine)
-            'If (ADD2.Equals("")) Then
-            '    If (ADD3.Equals("")) Then
-            '        Print(fnum, GetStringToPrint(10, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(55, "", "S") & GetStringToPrint(75, ACT, "S"))
-            '    Else
-            '        Print(fnum, GetStringToPrint(10, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(55, "", "S") & GetStringToPrint(75, ADD3, "S"))
-            '    End If
-            'Else
-            '    Print(fnum, GetStringToPrint(10, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(55, "", "S") & GetStringToPrint(75, ADD2, "S"))
-            'End If
-
-            'If (HADD2.Equals("")) Then
-            '    If (HADD3.Equals("")) Then
-            '        Print(fnum, GetStringToPrint(75, HCT, "S"))
-            '    Else
-            '        Print(fnum, GetStringToPrint(75, HADD3, "S"))
-            '    End If
-            'Else
-            '    Print(fnum, GetStringToPrint(10, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(55, "", "S") & GetStringToPrint(75, ADD2, "S"))
-            'End If
-            ' Print(fnum, " " & vbNewLine)
             xline = xline + 1
             counter = counter + 1
             If chkrs1.EOF = False Then
@@ -662,7 +589,6 @@ Public Class FrmTenantList
 
         PrintPDFFile.Verb = "print"
         PrintPDFFile.WindowStyle = ProcessWindowStyle.Normal
-        '.Hidden
         PrintPDFFile.FileName = Application.StartupPath & "\Reports\" & TextBox5.Text & ".pdf"
         Process.Start(PrintPDFFile)
     End Sub

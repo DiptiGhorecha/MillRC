@@ -5,6 +5,12 @@ Imports System.Runtime.InteropServices
 Imports System.Security.Cryptography
 Imports System.Text
 Imports System.Data.OleDb
+''' <summary>
+''' Tables used gdtrans,godown,party,rent
+''' When user select any group+godown number, check if any due not pending for that party.
+''' Allow godown to transfer only after clearing all dues. After godown transfer, old tenant's record in godown table will updated with status='D' and
+''' new record for new tenant will inserted in godown table with status='C'
+''' </summary>
 Public Class FrmGodownTransfer
     Dim chkrs As New ADODB.Recordset
     Dim chkrs1 As New ADODB.Recordset
@@ -35,7 +41,7 @@ Public Class FrmGodownTransfer
     Dim tables As DataTableCollection
     Dim source1 As New BindingSource
     Dim strReportFilePath As String
-    Dim GrpAddCorrect As String
+    Dim GrpAddCorrect As String                  ''''''variable used to store crud status - C for Edit, A for Add & '' for View
     Dim blnTranStart As Boolean
     Dim oldName As String
     Dim ok As Boolean
@@ -45,13 +51,14 @@ Public Class FrmGodownTransfer
     Private bValidateHSN As Boolean = True
     Private bValidaterent As Boolean = True
     Private bValidatenewtenant As Boolean = True
-    Private indexorder As String = "GODWN_NO"
+    Private indexorder As String = "GODWN_NO"     ''''variable to store sorting order field for datagrid
     Private frmload As Boolean = True
     Private tabrec As Integer = 0
     Private colnum As Integer = 0
     Private rownum As Integer = 0
-    Dim formloaded As Boolean = False
+    Dim formloaded As Boolean = False    ''' variable used to store form load event status
     Private Sub FrmGodownTransfer_Move(sender As Object, e As EventArgs) Handles Me.Move
+        '''''keep the location of the form fix
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height
@@ -63,35 +70,38 @@ Public Class FrmGodownTransfer
 
     Private Sub FrmGodownTransfer_Load(sender As Object, e As EventArgs) Handles Me.Load
         Try
+
+            '''''''Setting form position top left corner of mdi
             Me.MdiParent = MainMDIForm
             Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
             Me.Left = 0
             Me.MaximizeBox = False
+            '''''''enabled/disabled form components
             cmdAdd.Enabled = True
             cmdClose.Enabled = True
             cmdUpdate.Enabled = False
             cmdCancel.Enabled = False
-            textdisable()
+            textdisable()    '''disable text boxes
             GrpAddCorrect = ""
-            fillgroupcombo()
-            fillgodowncombo()
-            fillpartycombo()
-            fillpartycombo1()
-            fillgstcombo()
-            ShowData()
-            LodaDataToTextBox()
+            fillgroupcombo() ''''''fill godown group code drop down
+            fillgodowncombo() '''''fill godown code drop down
+            fillpartycombo()  '''''fill old party code drop down
+            fillpartycombo1() '''''fill new party code drop down
+            fillgstcombo()    '''''Fill gst drop down
+            ShowData()  ''''''fill data and show into datagrid from table gdtrans
+            LodaDataToTextBox()   ''''load data to text box for the row selected from datagrid view
             formloaded = True
         Catch ex As Exception
             MessageBox.Show("Error opening file-sr: " & ex.Message)
         End Try
     End Sub
     Private Sub ShowData()
-        '  konek() 'open our connection
+        ''''''''''''''''''show specific field from gdtrans table into datagrid view
         Try
             MyConn = New OleDbConnection(connString)
-            'If MyConn.State = ConnectionState.Closed Then
             MyConn.Open()
-            ' End If
+
+            '''''''tables used gdtrans and party
             da = New OleDb.OleDbDataAdapter("SELECT [GDTRANS].*,P2.P_NAME AS PNAME1,P1.P_NAME AS PNAME2 from (([GDTRANS] INNER JOIN [PARTY] AS P2 on [GDTRANS].OP_CODE=P2.P_CODE) INNER JOIN [PARTY] AS P1 ON [GDTRANS].NP_CODE=P1.P_CODE) order by DATE", MyConn)
             ds = New DataSet
             ds.Clear()
@@ -101,9 +111,7 @@ Public Class FrmGodownTransfer
             da.Dispose()
             ds.Dispose()
             MyConn.Close() ' close connection
-            'For i As Integer = 0 To DataGridView2.Columns.Count - 1
-            '    DataGridView2.Columns(i).Visible = False
-            'Next
+            ''''''''show only specific columns of gdtrans table in data grid view
             DataGridView2.Columns(1).Visible = False
             DataGridView2.Columns(2).Visible = False
             DataGridView2.Columns(3).Visible = False
@@ -129,15 +137,13 @@ Public Class FrmGodownTransfer
             DataGridView2.Columns(6).HeaderText = "Transfer Date"
             DataGridView2.Columns(7).HeaderText = "Old Tenant"
             DataGridView2.Columns(8).HeaderText = "New Tenant"
-
-            'DataGridView2.Rows(1).Selected = True
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
     End Sub
     Private Sub cmdClose_Click(sender As Object, e As EventArgs) Handles cmdClose.Click
         Try
-            Me.Close()
+            Me.Close()     '''close godown transfer form
 
             Exit Sub
         Catch ex As Exception
@@ -146,6 +152,9 @@ Public Class FrmGodownTransfer
     End Sub
 
     Private Sub cmdCancel_Click(sender As Object, e As EventArgs) Handles cmdCancel.Click
+        '''''''''event associated with cancel button
+        ''''made entry area, update button and cancel button disabled 
+        ''''made grid view, navigation buttons , add button enabled so user can again select data from grid or using navigation buttons
         Try
             GrpAddCorrect = ""
             ErrorProvider1.Clear()
@@ -168,9 +177,10 @@ Public Class FrmGodownTransfer
 
     End Sub
     Private Sub LodaDataToTextBox()
+        '''''''''load data from currently selected datagrid view - gdtrans table used to bind data with grid
         Try
             Dim i As Integer
-            '  TextBox1.Text = ""
+            ''''''''clear all text boxes and reset all combo boxes
             TextBox2.Text = ""
             TextBox3.Text = ""
             TextBox4.Text = ""
@@ -191,6 +201,7 @@ Public Class FrmGodownTransfer
             DataGridView2.Rows(rownum).Selected = True
             DataGridView2.FirstDisplayedScrollingRowIndex = rownum
             DataGridView2.CurrentCell = DataGridView2.Rows(rownum).Cells(0)
+            ''''''''on load keep pointer at 1st row of datagrid and consider 1st row as current row
             If frmload = True Then
                 i = 0
                 frmload = False
@@ -200,30 +211,29 @@ Public Class FrmGodownTransfer
 
             If Not IsDBNull(DataGridView2.Item(0, i).Value) Then
                 ComboBox1.Text = GetValue(DataGridView2.Item(0, i).Value)
-                ComboBox1.SelectedIndex = ComboBox1.FindStringExact(ComboBox1.Text)
+                ComboBox1.SelectedIndex = ComboBox1.FindStringExact(ComboBox1.Text)    ''''''Godown group (GROUP - gdtrans table)
             End If
             If Not IsDBNull(DataGridView2.Item(7, i).Value) Then
-                ComboBox2.Text = GetValue(DataGridView2.Item(7, i).Value)
-                ' ComboBox2.SelectedIndex = ComboBox2.FindStringExact(ComboBox2.Text)
+                ComboBox2.Text = GetValue(DataGridView2.Item(7, i).Value)              ''''''old tenat name - (P_NAME - from PARTY table)
             End If
             If Not IsDBNull(DataGridView2.Item(8, i).Value) Then
-                ComboBox3.Text = GetValue(DataGridView2.Item(8, i).Value)
+                ComboBox3.Text = GetValue(DataGridView2.Item(8, i).Value)              ''''''new tenant name - (P_NAME - from PARTY table)
             End If
 
             If Not IsDBNull(DataGridView2.Item(1, i).Value) Then
-                ComboBox5.Text = GetValue(DataGridView2.Item(1, i).Value)
+                ComboBox5.Text = GetValue(DataGridView2.Item(1, i).Value)              ''''''godown number - (GODWN_NO - from GDTRANS table) 
             End If
             If Not IsDBNull(DataGridView2.Item(2, i).Value) Then
-                TextBox2.Text = GetValue(DataGridView2.Item(2, i).Value)
+                TextBox2.Text = GetValue(DataGridView2.Item(2, i).Value)               ''''''Old tenant code - (OP_CODE - from GDTRANS table) 
             End If
             If Not IsDBNull(DataGridView2.Item(5, i).Value) Then
-                TextBox3.Text = GetValue(DataGridView2.Item(5, i).Value)
+                TextBox3.Text = GetValue(DataGridView2.Item(5, i).Value)               ''''''tenant name - (NP_NAME - from GDTRANS table) 
             End If
             If Not IsDBNull(DataGridView2.Item(6, i).Value) Then
-                DateTimePicker1.Value = GetValue(DataGridView2.Item(6, i).Value)
+                DateTimePicker1.Value = GetValue(DataGridView2.Item(6, i).Value)         ''''''transfer date - (DATE - from GDTRANS table) 
             End If
             If Not IsDBNull(DataGridView2.Item(4, i).Value) Then
-                TextBox3.Text = GetValue(DataGridView2.Item(4, i).Value)
+                TextBox3.Text = GetValue(DataGridView2.Item(4, i).Value)                  ''''''new tenant code - (NP_CODE - from GDTRANS table) 
             End If
 
 
@@ -231,26 +241,25 @@ Public Class FrmGodownTransfer
             Else
                 xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
             End If
-            'chkrs.Open("SELECT * FROM GODOWN where [GROUP]='" & DataGridView2.Item(0, i).Value & "' AND [GODWN_NO]='" & DataGridView2.Item(1, i).Value & "' AND [STATUS]='C' order by [GROUP]+GODWN_NO ", xcon)
+            ''''''''''''''''taking godown details from godown table
             chkrs.Open("SELECT * FROM GODOWN where [GROUP]='" & DataGridView2.Item(0, i).Value & "' AND [GODWN_NO]='" & DataGridView2.Item(1, i).Value & "' order by [GROUP]+GODWN_NO ", xcon)
             Do While chkrs.EOF = False
                 If Not IsDBNull(chkrs.Fields(4).Value) Then
-                    TextBox4.Text = GetValue(chkrs.Fields(4).Value)
+                    TextBox4.Text = GetValue(chkrs.Fields(4).Value)   '''''survey number - survey in godown table
                 End If
                 If Not IsDBNull(chkrs.Fields(5).Value) Then
-                    TextBox5.Text = GetValue(chkrs.Fields(5).Value)
+                    TextBox5.Text = GetValue(chkrs.Fields(5).Value)   '''''census number - censes in godown table
                 End If
                 If Not IsDBNull(chkrs.Fields(18).Value) Then
-                    TextBox6.Text = GetValue(chkrs.Fields(18).Value)
+                    TextBox6.Text = GetValue(chkrs.Fields(18).Value)   ''''godown width - width in godown table
                 End If
                 If Not IsDBNull(chkrs.Fields(19).Value) Then
-                    TextBox7.Text = GetValue(chkrs.Fields(19).Value)
+                    TextBox7.Text = GetValue(chkrs.Fields(19).Value)    '''''godown length - length in godown table
                 End If
-                If Not IsDBNull(chkrs.Fields(20).Value) Then
+                If Not IsDBNull(chkrs.Fields(20).Value) Then            '''''godown size in square feet - sq in godown table
                     TextBox8.Text = GetValue(chkrs.Fields(20).Value)
                 End If
-                If Not IsDBNull(chkrs.Fields(37).Value) Then
-                    ' ComboBox4.Text = GetValue(chkrs.Fields(37).Value)
+                If Not IsDBNull(chkrs.Fields(37).Value) Then             '''''GST description as per gst code - GST in godown table
                     If GetValue(chkrs.Fields(37).Value) = "997212" Then
                         ComboBox4.Text = "Rental Or Leasing Services Involving Own Or Leased Non-residential Property"
                     Else
@@ -274,19 +283,18 @@ Public Class FrmGodownTransfer
     End Sub
 
     Private Sub cmdAdd_Click(sender As Object, e As EventArgs) Handles cmdAdd.Click
+        '''''''''event associated with Add button
+        ''''made entry area, update button and cancel button enabled
+        ''''made grid view, navigation buttons , add button, search text box disabled so user can not again select data from grid or using navigation buttons
         Try
-            GrpAddCorrect = "A"
-            Label23.Text = "ADD"
-            DataGridView2.Enabled = False
-            cmdUpdate.Enabled = True
+            GrpAddCorrect = "A"                  '''''''store crud status variable 
+            Label23.Text = "ADD"                 ''''''updated status text with ADD to let the user know which crud operation is going on 
+            DataGridView2.Enabled = False        '''''''DISABLED datagrid when user is adding a record 
+            cmdUpdate.Enabled = True             '''''''enabled buttons UPDATE and CANCEL 
             cmdCancel.Enabled = True
-            textenable()
-            TextBox2.Text = ""
-            ' TextBox1.Enabled = True
-            '  TextBox1.Text = ""
-            ' TextBox2.Enabled = True
+            textenable()                         '''''''enabled all form text boxes 
+            TextBox2.Text = ""                   '''''''celared textboxes
             TextBox3.Text = ""
-            ' TextBox3.Enabled = True
             TextBox4.Text = "0"
             TextBox4.Enabled = True
             TextBox5.Text = "0"
@@ -301,10 +309,10 @@ Public Class FrmGodownTransfer
             TextBox9.Text = "0"
             TextBox9.Enabled = True
             TextBox8.Enabled = True
-            ComboBox1.Enabled = True
+            ComboBox1.Enabled = True                '''''''enabled combo boxes
             ComboBox2.Enabled = False
             ComboBox3.Enabled = True
-            ComboBox1.SelectedIndex = ComboBox1.Items.IndexOf("")
+            ComboBox1.SelectedIndex = ComboBox1.Items.IndexOf("")   '''''''''Clear combo boxes
             ComboBox1.Text = ""
             ComboBox5.SelectedIndex = ComboBox3.Items.IndexOf("")
             ComboBox5.Text = ""
@@ -315,8 +323,8 @@ Public Class FrmGodownTransfer
             ComboBox4.SelectedIndex = ComboBox3.Items.IndexOf("")
             ComboBox4.Text = ""
             ComboBox1.Select()
-            DateTimePicker1.Value = New Date(Now.Year, Now.Month, 1)
-            navigatedisable()
+            DateTimePicker1.Value = New Date(Now.Year, Now.Month, 1)     '''''''current date as default date
+            navigatedisable()                                            ''''''disabled ADD,EDIT,DELETE button
             cmdAdd.Enabled = False
             Exit Sub
 
@@ -325,8 +333,7 @@ Public Class FrmGodownTransfer
         End Try
     End Sub
     Private Sub cmdFirst_Click(sender As Object, e As EventArgs) Handles cmdFirst.Click
-
-        '  DataGridView1_DoubleClick(DataGridView1, New DataGridViewRowEventArgs(1))
+        '''''''navigation button to go at 1st raw in datagridview
         DataGridView2.CurrentRow.Selected = False
         DataGridView2.Rows(0).Selected = True
         DataGridView2.CurrentCell = DataGridView2.Rows(0).Cells(0)
@@ -334,6 +341,7 @@ Public Class FrmGodownTransfer
         LodaDataToTextBox()
     End Sub
     Private Sub cmdPrev_Click(sender As Object, e As EventArgs) Handles cmdPrev.Click
+        '''''''navigation button to go at previous raw in datagridview
         Dim intRow As Integer = DataGridView2.CurrentRow.Index
         If intRow > 0 Then
             DataGridView2.CurrentRow.Selected = False
@@ -345,6 +353,7 @@ Public Class FrmGodownTransfer
     End Sub
 
     Private Sub cmdNext_Click(sender As Object, e As EventArgs) Handles cmdNext.Click
+        '''''''navigation button to go at next raw in datagridview
         Dim intRow As Integer = DataGridView2.CurrentRow.Index
         If intRow < DataGridView2.RowCount - 1 Then
             DataGridView2.CurrentRow.Selected = False
@@ -356,6 +365,7 @@ Public Class FrmGodownTransfer
     End Sub
 
     Private Sub cmdLast_Click(sender As Object, e As EventArgs) Handles cmdLast.Click
+        '''''''navigation button to go at last raw in datagridview
         DataGridView2.CurrentRow.Selected = False
         DataGridView2.Rows(DataGridView2.RowCount - 1).Selected = True
         DataGridView2.CurrentCell = DataGridView2.Rows(DataGridView2.RowCount - 1).Cells(0)
@@ -363,8 +373,9 @@ Public Class FrmGodownTransfer
         LodaDataToTextBox()
     End Sub
     Private Sub TxtSrch_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtSrch.KeyUp
+        '''''this event will fire when user write anything in search text box
+        '''''It will filter data from gdtrans table and bind with datagrid view
         MyConn = New OleDbConnection(connString)
-        'If MyConn.State = ConnectionState.Closed Then
         MyConn.Open()
         da = New OleDb.OleDbDataAdapter("SELECT [GDTRANS].*,P2.P_NAME AS PNAME1,P1.P_NAME AS PNAME2 from (([GDTRANS] INNER JOIN [PARTY] AS P2 on [GDTRANS].OP_CODE=P2.P_CODE) INNER JOIN [PARTY] AS P1 ON [GDTRANS].NP_CODE=P1.P_CODE) where " & indexorder & " Like '%" & TxtSrch.Text & "%' ORDER BY date", MyConn)
         ds = New DataSet
@@ -377,63 +388,51 @@ Public Class FrmGodownTransfer
 
     End Sub
     Private Sub DataGridView2_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGridView2.ColumnHeaderMouseClick
+        ''''''''set index order for searching and search textbox label accoarding to datagrid column user clicked 
         If e.ColumnIndex = 0 Then
             indexorder = "[GROUP]"
             GroupBox5.Text = "Search by Group Type"
-            '    DataGridView2.Sort(DataGridView2.Columns(0), SortOrder.Descending)
         End If
         If e.ColumnIndex = 1 Then
             indexorder = "GODWN_NO"
             GroupBox5.Text = "Search by Godown"
-            '   DataGridView2.Sort(DataGridView2.Columns(3), SortOrder.Descending)
         End If
         If e.ColumnIndex = 6 Then
             indexorder = "[DATE]"
             GroupBox5.Text = "Search by Date"
-            ' DataGridView2.Sort(DataGridView2.Columns(38), SortOrder.Descending)
         End If
         If e.ColumnIndex = 7 Then
             indexorder = "P2.P_NAME"
             GroupBox5.Text = "Search by Old tenant name"
-            ' DataGridView2.Sort(DataGridView2.Columns(38), SortOrder.Descending)
         End If
         If e.ColumnIndex = 8 Then
             indexorder = "P1.P_NAME"
             GroupBox5.Text = "Search by New tenant name"
-            ' DataGridView2.Sort(DataGridView2.Columns(38), SortOrder.Descending)
         End If
         LodaDataToTextBox()
     End Sub
     Private Sub ComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox2.SelectedIndexChanged
         If ComboBox2.SelectedIndex <> -1 Then
-            TextBox2.Text = ComboBox2.SelectedValue.ToString
+            TextBox2.Text = ComboBox2.SelectedValue.ToString    ''''change tenant code as per tenant name selected from old tenant name combo box
         End If
-    End Sub
-
-    Private Sub ComboBox2_GotFocus(sender As Object, e As EventArgs) Handles ComboBox2.GotFocus
-        'fillpartycombo()
-        'If GrpAddCorrect = "C" Then
-        '    If Not IsDBNull(DataGridView2.Item(38, DataGridView2.CurrentRow.Index).Value) Then
-        '        ComboBox2.Text = GetValue(DataGridView2.Item(7, DataGridView2.CurrentRow.Index).Value)
-        '        TextBox2.Text = GetValue(DataGridView2.Item(2, DataGridView2.CurrentRow.Index).Value)
-        '    End If
-        'End If
     End Sub
     Private Sub ComboBox3_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox3.SelectedIndexChanged
         If ComboBox3.SelectedIndex <> -1 Then
-            TextBox3.Text = ComboBox3.SelectedValue.ToString
+            TextBox3.Text = ComboBox3.SelectedValue.ToString    ''''change tenant code as per tenant name selected from new tenant name combo box
         End If
     End Sub
 
     Private Sub ComboBox3_GotFocus(sender As Object, e As EventArgs) Handles ComboBox3.GotFocus
+        '''''''''when new tenant name combo box got focus, clear it for ADD module
+        ''''''''for Edit module select item from combo box which is new tenant name from the griddataview row selected
         fillpartycombo1()
         ComboBox3.SelectedIndex = ComboBox3.Items.IndexOf("")
         ComboBox3.Text = ""
         TextBox3.Text = ""
         If GrpAddCorrect = "C" Then
             If Not IsDBNull(DataGridView2.Item(8, DataGridView2.CurrentRow.Index).Value) Then
-                ComboBox3.Text = GetValue(DataGridView2.Item(8, DataGridView2.CurrentRow.Index).Value)
-                TextBox3.Text = GetValue(DataGridView2.Item(4, DataGridView2.CurrentRow.Index).Value)
+                ComboBox3.Text = GetValue(DataGridView2.Item(8, DataGridView2.CurrentRow.Index).Value)    '''''new tenant name - np_name from gdtrans
+                TextBox3.Text = GetValue(DataGridView2.Item(4, DataGridView2.CurrentRow.Index).Value)     '''''New FrmTenant code - np_code from gdtrans
             End If
         End If
     End Sub
@@ -441,6 +440,7 @@ Public Class FrmGodownTransfer
         If Value IsNot Nothing Then Return Value.ToString() Else Return ""
     End Function
     Private Sub navigatedisable()
+        '''''enable navigation buttons
         cmdPrev.Enabled = False
         cmdNext.Enabled = False
         cmdFirst.Enabled = False
@@ -449,6 +449,7 @@ Public Class FrmGodownTransfer
     End Sub
 
     Private Sub navigateenable()
+        '''''disbale navigation buttons
         cmdPrev.Enabled = True
         cmdNext.Enabled = True
         cmdFirst.Enabled = True
@@ -456,6 +457,7 @@ Public Class FrmGodownTransfer
         TxtSrch.Enabled = True
     End Sub
     Public Function fillgstcombo()
+        ''''''fill gst combo box with details from GST table
         Try
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
@@ -476,6 +478,7 @@ Public Class FrmGodownTransfer
         End Try
     End Function
     Public Function fillgodowncombo()
+        ''''''''''fill godown number combo box using table godown - select current godowns only
         Try
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
@@ -496,6 +499,7 @@ Public Class FrmGodownTransfer
         End Try
     End Function
     Public Function fillpartycombo()
+        '''''''''fill old tenant name combo box using party table
         Try
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
@@ -519,6 +523,7 @@ Public Class FrmGodownTransfer
         End Try
     End Function
     Public Function fillpartyaddcombo(pcod As String)
+        ''''old tenant name in old combo box selected for tenant code passed as parameter
         Try
             If xcon.State = ConnectionState.Open Then
             Else
@@ -543,6 +548,7 @@ Public Class FrmGodownTransfer
         End Try
     End Function
     Public Function fillpartycombo1()
+        ''''''''fill new tenant name combo box using party table
         Try
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
@@ -563,8 +569,8 @@ Public Class FrmGodownTransfer
         End Try
     End Function
     Public Function fillgroupcombo()
+        ''''fill group combo box using group table
         Try
-            '  Dim authors As New AutoCompleteStringCollection
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
                 MyConn.Open()
@@ -584,17 +590,14 @@ Public Class FrmGodownTransfer
         End Try
     End Function
     Private Sub textenable()
+        '''''to enable textboxes, date picker and combo boxes
         Try
-            'TextBox1.Enabled = True
-            '  TextBox2.Enabled = True
-            ' TextBox3.Enabled = True
             TextBox4.Enabled = True
             TextBox5.Enabled = True
             TextBox6.Enabled = True
             TextBox7.Enabled = True
             TextBox8.Enabled = True
             ComboBox1.Enabled = True
-            '  ComboBox2.Enabled = True
             ComboBox3.Enabled = True
             ComboBox4.Enabled = True
             ComboBox5.Enabled = True
@@ -606,6 +609,7 @@ Public Class FrmGodownTransfer
     End Sub
 
     Private Sub textdisable()
+        ''''''''to disable text boxes, date picker and combo boxes
         Try
             TextBox2.Enabled = False
             TextBox3.Enabled = False
@@ -627,6 +631,7 @@ Public Class FrmGodownTransfer
     End Sub
 
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+        '''''''when uer change selection in group combo box, clear all text boxes and combo boxes
         fillgodowncombo()
         ComboBox5.SelectedIndex = ComboBox5.Items.IndexOf("")
         ComboBox5.Text = ""
@@ -643,47 +648,8 @@ Public Class FrmGodownTransfer
         'Label13.Text = ""
     End Sub
 
-    Private Sub ComboBox5_KeyUp(sender As Object, e As KeyEventArgs) Handles ComboBox5.KeyUp
-        'Dim index As Integer
-        'Dim actual As String
-        'Dim found As String
-
-        '' Do nothing for some keys such as navigation keys.
-        'If ((e.KeyCode = Keys.Back) Or
-        '    (e.KeyCode = Keys.Left) Or
-        '    (e.KeyCode = Keys.Right) Or
-        '    (e.KeyCode = Keys.Up) Or
-        '    (e.KeyCode = Keys.Delete) Or
-        '    (e.KeyCode = Keys.Down) Or
-        '    (e.KeyCode = Keys.PageUp) Or
-        '    (e.KeyCode = Keys.PageDown) Or
-        '    (e.KeyCode = Keys.Home) Or
-        '    (e.KeyCode = Keys.End)) Then
-
-        '    Return
-        'End If
-
-        '' Store the actual text that has been typed.
-        'actual = Me.ComboBox5.Text
-
-        '' Find the first match for the typed value.
-        'index = Me.ComboBox5.FindString(actual)
-
-        '' Get the text of the first match.
-        'If (index > -1) Then
-        '    found = Me.ComboBox5.Items(index).ToString()
-
-        '    ' Select this item from the list.
-        '    Me.ComboBox5.SelectedIndex = index
-
-        '    ' Select the portion of the text that was automatically
-        '    ' added so that additional typing will replace it.
-        '    Me.ComboBox5.SelectionStart = actual.Length
-        '    Me.ComboBox5.SelectionLength = found.Length
-        'End If
-    End Sub
-
     Private Sub ComboBox5_SelectedValueChanged(sender As Object, e As EventArgs) Handles ComboBox5.SelectedValueChanged
+        '''''when user select godown number from drop down get record for that group+godwn_no from godown table and fill text boxes and old tenant combo with that details
         Dim PCOD As String
         If ComboBox5.SelectedIndex >= 0 Then
             If xcon.State = ConnectionState.Open Then
@@ -691,28 +657,26 @@ Public Class FrmGodownTransfer
                 xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
             End If
 
-            'chkrs1.Open("SELECT * FROM GODOWN WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox5.SelectedValue.ToString & "' AND [STATUS]='C'", xcon)
             chkrs1.Open("SELECT * FROM GODOWN WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox5.SelectedValue.ToString & "'", xcon)
 
             Do While chkrs1.EOF = False
                 PCOD = chkrs1.Fields(1).Value
                 If Not IsDBNull(chkrs1.Fields(4).Value) Then
-                    TextBox4.Text = GetValue(chkrs1.Fields(4).Value)
+                    TextBox4.Text = GetValue(chkrs1.Fields(4).Value)    '''''survey number - survey in godown table
                 End If
                 If Not IsDBNull(chkrs1.Fields(5).Value) Then
-                    TextBox5.Text = GetValue(chkrs1.Fields(5).Value)
+                    TextBox5.Text = GetValue(chkrs1.Fields(5).Value)        '''''census number - censes in godown table
                 End If
                 If Not IsDBNull(chkrs1.Fields(18).Value) Then
-                    TextBox6.Text = GetValue(chkrs1.Fields(18).Value)
+                    TextBox6.Text = GetValue(chkrs1.Fields(18).Value)           ''''godown width - width in godown table
                 End If
                 If Not IsDBNull(chkrs1.Fields(19).Value) Then
-                    TextBox7.Text = GetValue(chkrs1.Fields(19).Value)
+                    TextBox7.Text = GetValue(chkrs1.Fields(19).Value)              '''''godown length - length in godown table
                 End If
                 If Not IsDBNull(chkrs1.Fields(20).Value) Then
-                    TextBox8.Text = GetValue(chkrs1.Fields(20).Value)
+                    TextBox8.Text = GetValue(chkrs1.Fields(20).Value)                 '''''godown size in square feet - sq in godown table
                 End If
-                If Not IsDBNull(chkrs1.Fields(37).Value) Then
-                    'ComboBox4.Text = GetValue(chkrs1.Fields(37).Value)
+                If Not IsDBNull(chkrs1.Fields(37).Value) Then                            '''''GST description as per gst code - GST in godown table
                     If GetValue(chkrs1.Fields(37).Value) = "997212" Then
                         ComboBox4.Text = "Rental Or Leasing Services Involving Own Or Leased Non-residential Property"
                     Else
@@ -746,13 +710,15 @@ Public Class FrmGodownTransfer
             saveold = "UPDATE [GODOWN] SET [STATUS]='D',TO_D='" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "' WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox5.Text & "' AND P_CODE='" & TextBox2.Text & "'"  ' sorry about that
             savenew = "INSERT INTO [GODOWN]([GROUP],P_CODE,GODWN_NO,SURVEY,CENSES,STATUS,FROM_D,MONTH_FR,YEAR_FR,WIDTH,LENGTH,SQ,MY_FLG,GST) VALUES('" & ComboBox1.SelectedValue.ToString & "','" & TextBox3.Text & "','" & ComboBox5.SelectedValue.ToString & "','" & TextBox4.Text & "','" & TextBox5.Text & "','C','" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','" & DateTimePicker1.Value.Month & "','" & DateTimePicker1.Value.Year & "','" & TextBox6.Text & "','" & TextBox7.Text & "','" & TextBox8.Text & "',' ','" & ComboBox4.SelectedValue.ToString & "')"
         End If
-        doSQL(save)
-        doSQL(saveold)
-        doSQL(savenew)
+        doSQL(save)   ''''''insert godown transfer record in gdtrans table
+        doSQL(saveold)  ''''''update status to 'D' for old tenant in godown table
+        doSQL(savenew)  '''''insert a new record for new tenant for same group+godown_no in godown table
         If TextBox1.Text.Trim <> "" And TextBox9.Text.Trim = "" Then
+            '''''''''''enter rent detail for new tenant in rent table
             save = "INSERT INTO [RENT](P_CODE,[GROUP],GODWN_NO,RENT,FR_MONTH,FR_YEAR) VALUES('" & TextBox3.Text & "','" & ComboBox1.SelectedValue.ToString & "','" & ComboBox5.SelectedValue.ToString & "','" & TextBox1.Text & "'," & DateTimePicker1.Value.Month & "," & DateTimePicker1.Value.Year & ")"
         Else
             If TextBox1.Text.Trim <> "" And TextBox9.Text.Trim <> "" Then
+                '''''''''''enter rent and permitted increase rent detail for new tenant in rent table
                 save = "INSERT INTO [RENT](P_CODE,[GROUP],GODWN_NO,RENT,PRENT,FR_MONTH,FR_YEAR) VALUES('" & TextBox3.Text & "','" & ComboBox1.SelectedValue.ToString & "','" & ComboBox5.SelectedValue.ToString & "','" & TextBox1.Text & "','" & TextBox9.Text & "'," & DateTimePicker1.Value.Month & "," & DateTimePicker1.Value.Year & ")"
             End If
         End If
@@ -765,6 +731,7 @@ Public Class FrmGodownTransfer
         ShowData()
     End Sub
     Private Sub doSQL(ByVal sql As String)
+        ''''''''''''''method for insert/update data in database table
         MyConn = New OleDbConnection(connString)
         If MyConn.State = ConnectionState.Closed Then
             MyConn.Open()
@@ -775,21 +742,19 @@ Public Class FrmGodownTransfer
             objcmd.CommandType = CommandType.Text
             objcmd.CommandText = sql
             objcmd.ExecuteNonQuery()
-            ' MsgBox("Data Inserted successfully in database", vbInformation)
             objcmd.Dispose()
         Catch ex As Exception
             MsgBox("Exception: Data Insertion Transfer of godown " & ex.Message)
         End Try
     End Sub
     Public Function checkDue(ptrcode As String, ctrDate As Date) As Boolean
+        '''''''''function to check any unpaid invoice before transfering godown
         Dim dueamt As Boolean = True
         If xcon.State = ConnectionState.Open Then
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
         Dim invno As String
-
-        'chkrs1.Open("SELECT * FROM GODOWN WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox5.SelectedValue.ToString & "' AND [STATUS]='C'", xcon)
         chkrs3.Open("SELECT * FROM BILL WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox5.SelectedValue.ToString & "' AND P_CODE='" & ptrcode & "' and REC_NO IS NULL AND REC_DATE IS NULL", xcon)
         Do While chkrs3.EOF = False
             invno = chkrs3.Fields(0).Value
@@ -808,20 +773,12 @@ Public Class FrmGodownTransfer
     End Function
     Private Sub cmdUpdate_Click(sender As Object, e As EventArgs) Handles cmdUpdate.Click
         If ValidateChildren() And checkDue(TextBox2.Text, DateTimePicker1.Value) Then
-            'If ValidateChildren() Then
-            insertData()
+            insertData()     '''''''insert data in gdtrans and godown table
             DataGridView2.Enabled = True
-            If GrpAddCorrect = "C" Then
-                cmdUpdate.Enabled = False
-                cmdCancel.Enabled = False
-                cmdAdd.Enabled = True
-                textdisable()
-            Else
-                cmdUpdate.Enabled = False
-                cmdCancel.Enabled = False
-                cmdAdd.Enabled = True
-                textdisable()
-            End If
+            cmdUpdate.Enabled = False
+            cmdCancel.Enabled = False
+            cmdAdd.Enabled = True
+            textdisable()
             Label23.Text = "VIEW"
             GrpAddCorrect = ""
             navigateenable()
@@ -835,7 +792,6 @@ Public Class FrmGodownTransfer
     Private Sub ComboBox1_Validating(sender As Object, e As CancelEventArgs) Handles ComboBox1.Validating
         Dim errorMsg As String = "Please Select godown type"
         If bValidatetype = True And ComboBox1.Text.Trim.Equals("") And GrpAddCorrect = "A" Then
-            ' Cancel the event and select the text to be corrected by the user.
             e.Cancel = True
             ComboBox1.Select(0, ComboBox1.Text.Length)
             ' Set the ErrorProvider error with the text to display. 
@@ -899,37 +855,44 @@ Public Class FrmGodownTransfer
         End If
     End Sub
     Private Sub TextBox1_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox1.KeyPress
+        '''''allow only numeric entry in rent textbox
         If (Not e.KeyChar = ChrW(Keys.Back) And ("0123456789.").IndexOf(e.KeyChar) = -1) Or (e.KeyChar = "." And TextBox1.Text.ToCharArray().Count(Function(c) c = ".") > 0) Then
             e.Handled = True
         End If
     End Sub
     Private Sub TextBox9_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox9.KeyPress
+        '''''allow only numeric entry in permitted increase rent textbox
         If (Not e.KeyChar = ChrW(Keys.Back) And ("0123456789.").IndexOf(e.KeyChar) = -1) Or (e.KeyChar = "." And TextBox9.Text.ToCharArray().Count(Function(c) c = ".") > 0) Then
             e.Handled = True
         End If
     End Sub
     Private Sub TextBox6_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox6.KeyPress
+        '''''allow only numeric entry in length textbox
         If (Not e.KeyChar = ChrW(Keys.Back) And ("0123456789.").IndexOf(e.KeyChar) = -1) Or (e.KeyChar = "." And TextBox6.Text.ToCharArray().Count(Function(c) c = ".") > 0) Then
             e.Handled = True
         End If
     End Sub
     Private Sub TextBox7_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox7.KeyPress
+        '''''allow only numeric entry in width textbox
         If (Not e.KeyChar = ChrW(Keys.Back) And ("0123456789.").IndexOf(e.KeyChar) = -1) Or (e.KeyChar = "." And TextBox7.Text.ToCharArray().Count(Function(c) c = ".") > 0) Then
             e.Handled = True
         End If
     End Sub
     Private Sub TextBox8_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox8.KeyPress
+        '''''allow only numeric entry in size textbox
         If (Not e.KeyChar = ChrW(Keys.Back) And ("0123456789.").IndexOf(e.KeyChar) = -1) Or (e.KeyChar = "." And TextBox8.Text.ToCharArray().Count(Function(c) c = ".") > 0) Then
             e.Handled = True
         End If
     End Sub
 
     Private Sub DataGridView2_Click(sender As Object, e As EventArgs) Handles DataGridView2.Click
+        '''''''when user click on datagrid view show that record in form
         rownum = DataGridView2.CurrentRow.Index
         LodaDataToTextBox()
     End Sub
 
     Private Sub DataGridView2_KeyDown(sender As Object, e As KeyEventArgs) Handles DataGridView2.KeyDown
+        ''''''''when user select datagrid view row using up, down arrow key and press enter - show that row data in form
         rownum = DataGridView2.CurrentRow.Index
         If e.KeyCode.Equals(Keys.Enter) Then
             LodaDataToTextBox()
@@ -937,12 +900,14 @@ Public Class FrmGodownTransfer
     End Sub
 
     Private Sub DataGridView2_KeyUp(sender As Object, e As KeyEventArgs) Handles DataGridView2.KeyUp
+        ''''''''when user select datagrid view row using up, down arrow key and press enter - show that row data in form
         rownum = DataGridView2.CurrentRow.Index
         If e.KeyCode.Equals(Keys.Enter) Then
             LodaDataToTextBox()
         End If
     End Sub
     Private Sub DataGridView2_DoubleClick(sender As Object, e As EventArgs) Handles DataGridView2.DoubleClick
+        '''''''when user double click on datagrid view show that record in form
         rownum = DataGridView2.CurrentRow.Index
         LodaDataToTextBox()
     End Sub
@@ -990,13 +955,5 @@ Public Class FrmGodownTransfer
                 Me.ErrorProvider1.SetError(ComboBox2, errorMsg)
             End If
         End If
-    End Sub
-
-    Private Sub TxtSrch_TextChanged(sender As Object, e As EventArgs) Handles TxtSrch.TextChanged
-
-    End Sub
-
-    Private Sub Label23_Click(sender As Object, e As EventArgs) Handles Label23.Click
-
     End Sub
 End Class

@@ -4,6 +4,12 @@ Imports System.Globalization
 Imports System.IO
 Imports PdfSharp.Drawing
 Imports PdfSharp.Pdf
+''' <summary>
+''' tables used - clgdwn,party
+''' this is form to accept inputs from user to view/print godown close
+''' Only report view is complete. For report print not checked alignments and font size
+''' FrmGdCloseView.vb is used to hold report view 
+''' </summary>
 Public Class FrmGdClose
     Dim formloaded As Boolean = False
     Dim xcon As New ADODB.Connection    ''''''''variable is used to open a connection
@@ -20,6 +26,7 @@ Public Class FrmGdClose
     Dim fnum As Integer
     Dim fnumm As Integer
     Private Sub FrmGdClose_Load(sender As Object, e As EventArgs) Handles Me.Load
+        '''''''set position of form
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
         Me.Left = 0
@@ -31,6 +38,7 @@ Public Class FrmGdClose
     End Sub
 
     Private Sub FrmGdClose_Move(sender As Object, e As EventArgs) Handles Me.Move
+        '''''''keep position of form fix
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height
@@ -41,12 +49,10 @@ Public Class FrmGdClose
     End Sub
 
     Private Sub ShowData()
-        '  konek() 'open our connection
+        '''''show godown close/suspend detail to godown datagrid using clgdwn table
         Try
             MyConn = New OleDbConnection(connString)
-            'If MyConn.State = ConnectionState.Closed Then
             MyConn.Open()
-            ' End If
             da = New OleDb.OleDbDataAdapter("SELECT [CLGDWN].*,[PARTY].P_NAME from [CLGDWN] INNER JOIN [PARTY] on [CLGDWN].P_CODE=[PARTY].P_CODE order by [CLGDWN].TO_D,[CLGDWN].GROUP,[CLGDWN].GODWN_NO", MyConn)
             ds = New DataSet
             ds.Clear()
@@ -67,7 +73,6 @@ Public Class FrmGdClose
             DataGridView2.Columns(2).HeaderText = "Godown"
             DataGridView2.Columns(7).HeaderText = "Tenant"
             DataGridView2.Columns(3).HeaderText = "Date"
-            '  DataGridView2.Columns(5).HeaderText = "Reason"
             DataGridView2.Columns(7).Width = 250
             DataGridView2.Columns(5).Width = 100
 
@@ -76,11 +81,10 @@ Public Class FrmGdClose
         End Try
     End Sub
     Private Sub TxtSrch_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtSrch.KeyUp
+        '''''''''search godown datagrid for the text user type in search text box
         MyConn = New OleDbConnection(connString)
-        'If MyConn.State = ConnectionState.Closed Then
         MyConn.Open()
         da = New OleDb.OleDbDataAdapter("SELECT [CLGDWN].*,[PARTY].P_NAME from [CLGDWN] INNER JOIN [PARTY] on [CLGDWN].P_CODE=[PARTY].P_CODE where " & indexorder & " Like '%" & TxtSrch.Text & "%' ORDER BY [CLGDWN].TO_D,[CLGDWN].GROUP,[CLGDWN].GODWN_NO", MyConn)
-        'da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where [GODOWN].GROUP Like '%" & TxtSrch.Text & "%' ORDER BY [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
         ds = New DataSet
         ds.Clear()
         da.Fill(ds)
@@ -91,6 +95,7 @@ Public Class FrmGdClose
 
     End Sub
     Private Sub DataGridView2_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGridView2.ColumnHeaderMouseClick
+        ''''''set order of godown datagrid as user click on header of datagrid column
         If e.ColumnIndex = 7 Then
             indexorder = "[PARTY].P_NAME"
             GroupBox5.Text = "Search by tenant name"
@@ -100,14 +105,15 @@ Public Class FrmGdClose
         End If
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        ''''''''report view
         If (DateTimePicker2.Value.Date < DateTimePicker1.Value.Date) Then
             MsgBox("To Date must be equal or grater than From Date")
             DateTimePicker1.Focus()
             Exit Sub
         End If
 
-        fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
-        fnumm = 2
+        fnum = FreeFile() '''''''''Get FreeFile No. for .dat file'''''''''''
+        fnumm = 2     '''''''''for .csv file'''''''''''''''''
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
         FileOpen(fnum, Application.StartupPath & "\Reports\Gdclosedlist.dat", OpenMode.Output)
@@ -116,7 +122,7 @@ Public Class FrmGdClose
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
-        Dim str As String = "SELECT [CLGDWN].*,[PARTY].P_NAME from [CLGDWN] INNER JOIN [PARTY] on [CLGDWN].P_CODE=[PARTY].P_CODE where [CLGDWN].[TO_D] >=format('" & Convert.ToDateTime(DateTimePicker1.Value) & "','dd/mm/yyyy') AND [CLGDWN].[TO_D]<=format('" & Convert.ToDateTime(DateTimePicker2.Value) & "','dd/mm/yyyy') order by [CLGDWN].TO_D,[CLGDWN].GROUP,[CLGDWN].GODWN_NO"
+        Dim str As String = "SELECT [CLGDWN].*,[PARTY].P_NAME from [CLGDWN] INNER JOIN [PARTY] on [CLGDWN].P_CODE=[PARTY].P_CODE where [CLGDWN].[TO_D] >=format('" & Convert.ToDateTime(DateTimePicker1.Value.ToShortDateString) & "','dd/mm/yyyy') AND [CLGDWN].[TO_D]<=format('" & Convert.ToDateTime(DateTimePicker2.Value.ToShortDateString) & "','dd/mm/yyyy') order by [CLGDWN].TO_D,[CLGDWN].GROUP,[CLGDWN].GODWN_NO"
         chkrs1.Open(str, xcon)
         If chkrs1.BOF = False Then
             chkrs1.MoveFirst()
@@ -125,8 +131,6 @@ Public Class FrmGdClose
         Dim counter As Integer = 1
 
         Do While chkrs1.EOF = False
-
-
             If first Then
                 Print(fnum, GetStringToPrint(107, "Closed / Suspended Godown List From Date : " & DateTimePicker1.Value.ToShortDateString & " to " & DateTimePicker2.Value.ToShortDateString, "S") & vbNewLine)
                 Print(fnum, StrDup(14, " ") & vbNewLine)
@@ -159,11 +163,13 @@ Public Class FrmGdClose
         MyConn.Close()
         FileClose(fnum)
         FileClose(fnumm)
+        ''''''''display created .dat file in richtextbox of report view form
         FrmGdCloseView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Gdclosedlist.dat", RichTextBoxStreamType.PlainText)
-        FrmGdCloseView.Show()
-        CreatePDF(Application.StartupPath & "\Reports\Gdclosedlist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
+        FrmGdCloseView.Show()    ''''show report
+        CreatePDF(Application.StartupPath & "\Reports\Gdclosedlist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)    ''''''convert .dat file to pdf file
     End Sub
     Private Function CreatePDF(strReportFilePath As String, invoice_no As String)
+        ''''''''convert dat file to pdf file
         Try
             Dim line As String
             Dim readFile As System.IO.TextReader = New StreamReader(strReportFilePath)
@@ -217,10 +223,11 @@ Public Class FrmGdClose
     End Function
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        Me.Close()
+        Me.Close()     '''''close form
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        ''''report printing
         If (DateTimePicker2.Value.Date < DateTimePicker1.Value.Date) Then
             MsgBox("To Date must be equal or grater than From Date")
             DateTimePicker1.Focus()
@@ -235,7 +242,7 @@ Public Class FrmGdClose
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
-        Dim str As String = "SELECT [CLGDWN].*,[PARTY].P_NAME from [CLGDWN] INNER JOIN [PARTY] on [CLGDWN].P_CODE=[PARTY].P_CODE where [CLGDWN].[TO_D] >=format('" & Convert.ToDateTime(DateTimePicker1.Value) & "','dd/mm/yyyy') AND [CLGDWN].[TO_D]<=format('" & Convert.ToDateTime(DateTimePicker2.Value) & "','dd/mm/yyyy') order by [CLGDWN].TO_D,[CLGDWN].GROUP,[CLGDWN].GODWN_NO"
+        Dim str As String = "SELECT [CLGDWN].*,[PARTY].P_NAME from [CLGDWN] INNER JOIN [PARTY] on [CLGDWN].P_CODE=[PARTY].P_CODE where [CLGDWN].[TO_D] >=format('" & Convert.ToDateTime(DateTimePicker1.Value.ToShortDateString) & "','dd/mm/yyyy') AND [CLGDWN].[TO_D]<=format('" & Convert.ToDateTime(DateTimePicker2.Value.ToShortDateString) & "','dd/mm/yyyy') order by [CLGDWN].TO_D,[CLGDWN].GROUP,[CLGDWN].GODWN_NO"
         chkrs1.Open(str, xcon)
         If chkrs1.BOF = False Then
             chkrs1.MoveFirst()
@@ -275,12 +282,12 @@ Public Class FrmGdClose
         FrmGdCloseView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Gdclosedlist.dat", RichTextBoxStreamType.PlainText)
         FrmGdCloseView.Show()
         CreatePDF(Application.StartupPath & "\Reports\Gdclosedlist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
+
+        '''''''send pdf file to default printer
         Dim PrintPDFFile As New ProcessStartInfo
         PrintPDFFile.UseShellExecute = True
-
         PrintPDFFile.Verb = "print"
         PrintPDFFile.WindowStyle = ProcessWindowStyle.Normal
-        '.Hidden
         PrintPDFFile.FileName = Application.StartupPath & "\Reports\" & TextBox5.Text & ".pdf"
         Process.Start(PrintPDFFile)
     End Sub

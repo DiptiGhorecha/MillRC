@@ -5,6 +5,12 @@ Imports System.Text.RegularExpressions
 Imports PdfSharp.Drawing
 Imports PdfSharp.Pdf
 Imports PdfSharp.Pdf.IO
+''' <summary>
+''' tables used - gdtrans,party
+''' this is form to accept inputs from user to view/print godown transfer master
+''' Only report view is complete. For report print not checked alignments and font size
+''' FrmGdTransView.vb is used to hold report view 
+''' </summary>
 Public Class FrmGdTrans
     Dim chkrs As New ADODB.Recordset
     Dim chkrs1 As New ADODB.Recordset
@@ -26,18 +32,20 @@ Public Class FrmGdTrans
     Dim fnum As Integer
     Dim fnumm As Integer
     Private Sub FrmGdTrans_Load(sender As Object, e As EventArgs) Handles Me.Load
+        '''''''set position of form
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
         Me.Left = 0
         Me.KeyPreview = True
-        DateTimePicker1.Value = DateTime.Now
-        DateTimePicker2.Value = DateTime.Now
+
+        DateTimePicker1.Value = DateTime.Now    ''''assign current date to from transfer date
+        DateTimePicker2.Value = DateTime.Now    ''''assign current date to To transfer date
         ShowData()
         formloaded = True
     End Sub
     Private Sub TxtSrch_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtSrch.KeyUp
+        '''''''''search transfer datagrid for the text user type in search text box
         MyConn = New OleDbConnection(connString)
-        'If MyConn.State = ConnectionState.Closed Then
         MyConn.Open()
         da = New OleDb.OleDbDataAdapter("SELECT [GDTRANS].*,P2.P_NAME AS PNAME1,P1.P_NAME AS PNAME2 from (([GDTRANS] INNER JOIN [PARTY] AS P2 on [GDTRANS].OP_CODE=P2.P_CODE) INNER JOIN [PARTY] AS P1 ON [GDTRANS].NP_CODE=P1.P_CODE) where " & indexorder & " Like '%" & TxtSrch.Text & "%' ORDER BY date", MyConn)
         ds = New DataSet
@@ -50,35 +58,32 @@ Public Class FrmGdTrans
 
     End Sub
     Private Sub DataGridView2_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGridView2.ColumnHeaderMouseClick
+        ''''''set order of transfer datagrid as user click on header of datagrid column
         If e.ColumnIndex = 0 Then
             indexorder = "[GROUP]"
             GroupBox5.Text = "Search by Group Type"
-            '    DataGridView2.Sort(DataGridView2.Columns(0), SortOrder.Descending)
         End If
         If e.ColumnIndex = 1 Then
             indexorder = "GODWN_NO"
             GroupBox5.Text = "Search by Godown"
-            '   DataGridView2.Sort(DataGridView2.Columns(3), SortOrder.Descending)
         End If
         If e.ColumnIndex = 6 Then
             indexorder = "[DATE]"
             GroupBox5.Text = "Search by Date"
-            ' DataGridView2.Sort(DataGridView2.Columns(38), SortOrder.Descending)
         End If
         If e.ColumnIndex = 7 Then
             indexorder = "P2.P_NAME"
             GroupBox5.Text = "Search by Old tenant name"
-            ' DataGridView2.Sort(DataGridView2.Columns(38), SortOrder.Descending)
         End If
         If e.ColumnIndex = 8 Then
             indexorder = "P1.P_NAME"
             GroupBox5.Text = "Search by New tenant name"
-            ' DataGridView2.Sort(DataGridView2.Columns(38), SortOrder.Descending)
         End If
 
     End Sub
 
     Private Sub FrmGdTrans_Move(sender As Object, e As EventArgs) Handles Me.Move
+        '''''''keep position of form fix
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height
@@ -89,12 +94,10 @@ Public Class FrmGdTrans
     End Sub
 
     Private Sub ShowData()
-        '  konek() 'open our connection
+        '''''show godown transfer detail to transfer datagrid using gdtrans table
         Try
             MyConn = New OleDbConnection(connString)
-            'If MyConn.State = ConnectionState.Closed Then
             MyConn.Open()
-            ' End If
             da = New OleDb.OleDbDataAdapter("SELECT [GDTRANS].*,P2.P_NAME AS PNAME1,P1.P_NAME AS PNAME2 from (([GDTRANS] INNER JOIN [PARTY] AS P2 on [GDTRANS].OP_CODE=P2.P_CODE) INNER JOIN [PARTY] AS P1 ON [GDTRANS].NP_CODE=P1.P_CODE) order by DATE", MyConn)
             ds = New DataSet
             ds.Clear()
@@ -104,9 +107,6 @@ Public Class FrmGdTrans
             da.Dispose()
             ds.Dispose()
             MyConn.Close() ' close connection
-            'For i As Integer = 0 To DataGridView2.Columns.Count - 1
-            '    DataGridView2.Columns(i).Visible = False
-            'Next
             DataGridView2.Columns(1).Visible = False
             DataGridView2.Columns(2).Visible = False
             DataGridView2.Columns(3).Visible = False
@@ -132,14 +132,13 @@ Public Class FrmGdTrans
             DataGridView2.Columns(6).HeaderText = "Transfer Date"
             DataGridView2.Columns(7).HeaderText = "Old Tenant"
             DataGridView2.Columns(8).HeaderText = "New Tenant"
-
-            'DataGridView2.Rows(1).Selected = True
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        '''''report view
         If (DateTimePicker2.Value.Date < DateTimePicker1.Value.Date) Then
             MsgBox("To Transfer Date must be equal or grater than From Transfer Date")
             DateTimePicker1.Focus()
@@ -147,7 +146,7 @@ Public Class FrmGdTrans
         End If
 
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
-        fnum = 2
+        fnumm = 2   ''''''''for .csv file'''''''''''''''''''''
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
         FileOpen(fnum, Application.StartupPath & "\Reports\Gdtranslist.dat", OpenMode.Output)
@@ -156,7 +155,8 @@ Public Class FrmGdTrans
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
-        Dim str As String = "SELECT [GDTRANS].*,P2.P_NAME AS PNAME1,P1.P_NAME AS PNAME2 from (([GDTRANS] INNER JOIN [PARTY] AS P2 on [GDTRANS].OP_CODE=P2.P_CODE) INNER JOIN [PARTY] AS P1 ON [GDTRANS].NP_CODE=P1.P_CODE) where [GDTRANS].[DATE]>=format('" & Convert.ToDateTime(DateTimePicker1.Value) & "','dd/mm/yyyy') AND [GDTRANS].[DATE]<=format('" & Convert.ToDateTime(DateTimePicker2.Value) & "','dd/mm/yyyy')  order by Date"
+
+        Dim str As String = "SELECT [GDTRANS].*,P2.P_NAME AS PNAME1,P1.P_NAME AS PNAME2 from (([GDTRANS] INNER JOIN [PARTY] AS P2 on [GDTRANS].OP_CODE=P2.P_CODE) INNER JOIN [PARTY] AS P1 ON [GDTRANS].NP_CODE=P1.P_CODE) where [GDTRANS].[DATE]>=format('" & Convert.ToDateTime(DateTimePicker1.Value.ToShortDateString) & "','dd/mm/yyyy') AND [GDTRANS].[DATE]<=format('" & Convert.ToDateTime(DateTimePicker2.Value.ToShortDateString) & "','dd/mm/yyyy')  order by Date"
         chkrs1.Open(str, xcon)
         If chkrs1.BOF = False Then
             chkrs1.MoveFirst()
@@ -194,11 +194,15 @@ Public Class FrmGdTrans
         MyConn.Close()
         FileClose(fnum)
         FileClose(fnumm)
+        '''''''display created .dat file to richtextbox of report view form
         FrmGdTransView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Gdtranslist.dat", RichTextBoxStreamType.PlainText)
+        ''''''show report
         FrmGdTransView.Show()
+        ''''''convert pdf file from dat file
         CreatePDF(Application.StartupPath & "\Reports\Gdtranslist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
     End Sub
     Private Function CreatePDF(strReportFilePath As String, invoice_no As String)
+        '''''''convert pdf file from dat file
         Try
             Dim line As String
             Dim readFile As System.IO.TextReader = New StreamReader(strReportFilePath)
@@ -243,7 +247,6 @@ Public Class FrmGdTrans
             pdf.Save(pdfFilename)
             readFile.Close()
             readFile = Nothing
-            ' Process.Start(pdfFilename)
             pdf.Close()
 
         Catch ex As Exception
@@ -252,6 +255,7 @@ Public Class FrmGdTrans
     End Function
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        ''''''''report printing
         If (DateTimePicker2.Value.Date < DateTimePicker1.Value.Date) Then
             MsgBox("To Transfer Date must be equal or grater than From Transfer Date")
             DateTimePicker1.Focus()
@@ -266,7 +270,7 @@ Public Class FrmGdTrans
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
-        Dim str As String = "SELECT [GDTRANS].*,P2.P_NAME AS PNAME1,P1.P_NAME AS PNAME2 from (([GDTRANS] INNER JOIN [PARTY] AS P2 on [GDTRANS].OP_CODE=P2.P_CODE) INNER JOIN [PARTY] AS P1 ON [GDTRANS].NP_CODE=P1.P_CODE) where [GDTRANS].[DATE]>=format('" & Convert.ToDateTime(DateTimePicker1.Value) & "','dd/mm/yyyy') AND [GDTRANS].[DATE]<=format('" & Convert.ToDateTime(DateTimePicker2.Value) & "','dd/mm/yyyy')  order by Date"
+        Dim str As String = "SELECT [GDTRANS].*,P2.P_NAME AS PNAME1,P1.P_NAME AS PNAME2 from (([GDTRANS] INNER JOIN [PARTY] AS P2 on [GDTRANS].OP_CODE=P2.P_CODE) INNER JOIN [PARTY] AS P1 ON [GDTRANS].NP_CODE=P1.P_CODE) where [GDTRANS].[DATE]>=format('" & Convert.ToDateTime(DateTimePicker1.Value.ToShortDateString) & "','dd/mm/yyyy') AND [GDTRANS].[DATE]<=format('" & Convert.ToDateTime(DateTimePicker2.Value.ToShortDateString) & "','dd/mm/yyyy')  order by Date"
         chkrs1.Open(str, xcon)
         If chkrs1.BOF = False Then
             chkrs1.MoveFirst()
@@ -301,6 +305,8 @@ Public Class FrmGdTrans
         FrmGdTransView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Gdtranslist.dat", RichTextBoxStreamType.PlainText)
         FrmGdTransView.Show()
         CreatePDF(Application.StartupPath & "\Reports\Gdtranslist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
+
+        ''''send pdf file to default printer
         Dim PrintPDFFile As New ProcessStartInfo
         PrintPDFFile.UseShellExecute = True
 
@@ -312,6 +318,6 @@ Public Class FrmGdTrans
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        Me.Close()
+        Me.Close()   ''''close the form
     End Sub
 End Class

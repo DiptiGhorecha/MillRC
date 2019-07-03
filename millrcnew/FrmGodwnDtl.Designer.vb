@@ -37,13 +37,21 @@ Partial Class FrmGodwnDtl
         Me.Button3 = New System.Windows.Forms.Button()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.Button1 = New System.Windows.Forms.Button()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.DateTimePicker2 = New System.Windows.Forms.DateTimePicker()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.DateTimePicker3 = New System.Windows.Forms.DateTimePicker()
+        Me.DateTimePicker4 = New System.Windows.Forms.DateTimePicker()
+        Me.Label8 = New System.Windows.Forms.Label()
+        Me.DateTimePicker5 = New System.Windows.Forms.DateTimePicker()
         CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox5.SuspendLayout()
         Me.SuspendLayout()
         '
         'TextBox1
         '
-        Me.TextBox1.Location = New System.Drawing.Point(131, 58)
+        Me.TextBox1.Location = New System.Drawing.Point(113, 58)
         Me.TextBox1.Name = "TextBox1"
         Me.TextBox1.Size = New System.Drawing.Size(120, 20)
         Me.TextBox1.TabIndex = 2
@@ -53,7 +61,7 @@ Partial Class FrmGodwnDtl
         Me.ComboBox1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append
         Me.ComboBox1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource
         Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(130, 24)
+        Me.ComboBox1.Location = New System.Drawing.Point(113, 24)
         Me.ComboBox1.Name = "ComboBox1"
         Me.ComboBox1.Size = New System.Drawing.Size(121, 21)
         Me.ComboBox1.Sorted = True
@@ -71,7 +79,7 @@ Partial Class FrmGodwnDtl
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(19, 58)
+        Me.Label1.Location = New System.Drawing.Point(17, 58)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(93, 13)
         Me.Label1.TabIndex = 65
@@ -81,16 +89,16 @@ Partial Class FrmGodwnDtl
         '
         Me.DataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DataGridView2.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically
-        Me.DataGridView2.Location = New System.Drawing.Point(319, 24)
+        Me.DataGridView2.Location = New System.Drawing.Point(405, 24)
         Me.DataGridView2.Name = "DataGridView2"
-        Me.DataGridView2.Size = New System.Drawing.Size(437, 257)
+        Me.DataGridView2.Size = New System.Drawing.Size(409, 257)
         Me.DataGridView2.TabIndex = 69
         Me.DataGridView2.TabStop = False
         '
         'GroupBox5
         '
         Me.GroupBox5.Controls.Add(Me.TxtSrch)
-        Me.GroupBox5.Location = New System.Drawing.Point(319, 301)
+        Me.GroupBox5.Location = New System.Drawing.Point(405, 301)
         Me.GroupBox5.Name = "GroupBox5"
         Me.GroupBox5.Size = New System.Drawing.Size(200, 50)
         Me.GroupBox5.TabIndex = 73
@@ -106,23 +114,22 @@ Partial Class FrmGodwnDtl
         '
         'DateTimePicker1
         '
-        Me.DateTimePicker1.Location = New System.Drawing.Point(130, 89)
+        Me.DateTimePicker1.Location = New System.Drawing.Point(113, 162)
         Me.DateTimePicker1.Name = "DateTimePicker1"
-        Me.DateTimePicker1.Size = New System.Drawing.Size(146, 20)
+        Me.DateTimePicker1.Size = New System.Drawing.Size(131, 20)
         Me.DateTimePicker1.TabIndex = 3
         '
         'Label2
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(19, 89)
+        Me.Label2.Location = New System.Drawing.Point(19, 162)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(69, 13)
+        Me.Label2.Size = New System.Drawing.Size(69, 32)
         Me.Label2.TabIndex = 159
-        Me.Label2.Text = "As on Date : "
+        Me.Label2.Text = "Outstanding as on Date : "
         '
         'TextBox5
         '
-        Me.TextBox5.Location = New System.Drawing.Point(131, 121)
+        Me.TextBox5.Location = New System.Drawing.Point(113, 194)
         Me.TextBox5.Name = "TextBox5"
         Me.TextBox5.Size = New System.Drawing.Size(132, 20)
         Me.TextBox5.TabIndex = 4
@@ -130,7 +137,7 @@ Partial Class FrmGodwnDtl
         '
         'Label6
         '
-        Me.Label6.Location = New System.Drawing.Point(19, 121)
+        Me.Label6.Location = New System.Drawing.Point(19, 194)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(91, 41)
         Me.Label6.TabIndex = 158
@@ -138,7 +145,7 @@ Partial Class FrmGodwnDtl
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(163, 174)
+        Me.Button3.Location = New System.Drawing.Point(163, 245)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(50, 22)
         Me.Button3.TabIndex = 7
@@ -147,7 +154,7 @@ Partial Class FrmGodwnDtl
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(94, 174)
+        Me.Button2.Location = New System.Drawing.Point(94, 245)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(50, 22)
         Me.Button2.TabIndex = 6
@@ -156,18 +163,90 @@ Partial Class FrmGodwnDtl
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(22, 174)
+        Me.Button1.Location = New System.Drawing.Point(22, 245)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(50, 22)
         Me.Button1.TabIndex = 5
         Me.Button1.Text = "View"
         Me.Button1.UseVisualStyleBackColor = True
         '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(19, 126)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(67, 13)
+        Me.Label4.TabIndex = 160
+        Me.Label4.Text = "Receipt from"
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(19, 92)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(65, 13)
+        Me.Label5.TabIndex = 161
+        Me.Label5.Text = "Invoice from"
+        '
+        'DateTimePicker2
+        '
+        Me.DateTimePicker2.Location = New System.Drawing.Point(113, 92)
+        Me.DateTimePicker2.Name = "DateTimePicker2"
+        Me.DateTimePicker2.Size = New System.Drawing.Size(131, 20)
+        Me.DateTimePicker2.TabIndex = 162
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(251, 92)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(16, 13)
+        Me.Label7.TabIndex = 163
+        Me.Label7.Text = "to"
+        '
+        'DateTimePicker3
+        '
+        Me.DateTimePicker3.Location = New System.Drawing.Point(268, 92)
+        Me.DateTimePicker3.Name = "DateTimePicker3"
+        Me.DateTimePicker3.Size = New System.Drawing.Size(131, 20)
+        Me.DateTimePicker3.TabIndex = 164
+        '
+        'DateTimePicker4
+        '
+        Me.DateTimePicker4.Location = New System.Drawing.Point(269, 126)
+        Me.DateTimePicker4.Name = "DateTimePicker4"
+        Me.DateTimePicker4.Size = New System.Drawing.Size(131, 20)
+        Me.DateTimePicker4.TabIndex = 167
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.Location = New System.Drawing.Point(252, 126)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(16, 13)
+        Me.Label8.TabIndex = 166
+        Me.Label8.Text = "to"
+        '
+        'DateTimePicker5
+        '
+        Me.DateTimePicker5.Location = New System.Drawing.Point(114, 126)
+        Me.DateTimePicker5.Name = "DateTimePicker5"
+        Me.DateTimePicker5.Size = New System.Drawing.Size(131, 20)
+        Me.DateTimePicker5.TabIndex = 165
+        '
         'FrmGodwnDtl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(777, 363)
+        Me.ClientSize = New System.Drawing.Size(837, 363)
+        Me.Controls.Add(Me.DateTimePicker4)
+        Me.Controls.Add(Me.Label8)
+        Me.Controls.Add(Me.DateTimePicker5)
+        Me.Controls.Add(Me.DateTimePicker3)
+        Me.Controls.Add(Me.Label7)
+        Me.Controls.Add(Me.DateTimePicker2)
+        Me.Controls.Add(Me.Label5)
+        Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.Button1)
@@ -206,4 +285,12 @@ Partial Class FrmGodwnDtl
     Friend WithEvents Button3 As Button
     Friend WithEvents Button2 As Button
     Friend WithEvents Button1 As Button
+    Friend WithEvents Label4 As Label
+    Friend WithEvents Label5 As Label
+    Friend WithEvents DateTimePicker2 As DateTimePicker
+    Friend WithEvents Label7 As Label
+    Friend WithEvents DateTimePicker3 As DateTimePicker
+    Friend WithEvents DateTimePicker4 As DateTimePicker
+    Friend WithEvents Label8 As Label
+    Friend WithEvents DateTimePicker5 As DateTimePicker
 End Class

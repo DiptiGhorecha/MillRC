@@ -4,6 +4,11 @@ Imports System.IO
 Imports PdfSharp.Drawing
 Imports PdfSharp.Pdf
 Imports PdfSharp.Pdf.IO
+''' <summary>
+''' tables used - receipt, party, group ,godown, bill, gst
+''' this is form to accept inputs from user to view/print receipts
+''' Form21.vb is used to hold report view
+''' </summary>
 Public Class FrmRecPrnGdnwise
     Dim chkrs As New ADODB.Recordset
     Dim chkrs1 As New ADODB.Recordset
@@ -32,26 +37,26 @@ Public Class FrmRecPrnGdnwise
     Dim godownfilled As Boolean = False
 
     Private Sub FrmRecPrnGdnwise_Load(sender As Object, e As EventArgs) Handles Me.Load
+        ''''''set position of the form
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
         Me.Left = 0
         Me.KeyPreview = True
-        ' GroupBox5.Visible = False
-        '  DataGridView2.Enabled = False
         For Each column As DataGridViewColumn In DataGridView1.Columns
             column.SortMode = DataGridViewColumnSortMode.NotSortable
         Next
-        fillgroupcombo()
+        fillgroupcombo()    ''''''fill godown group combobox using group table and clear selection
         groupfilled = True
         ComboBox1.SelectedIndex = ComboBox1.Items.IndexOf("")
         ComboBox1.Text = ""
-        fillgodowncombo()
+        fillgodowncombo()      ''''''fill godown number combobox using godown table and clear selection
         godownfilled = True
         ComboBox2.SelectedIndex = ComboBox2.Items.IndexOf("")
         ComboBox2.Text = ""
-        showdata(ComboBox1.Text, ComboBox2.Text)
+        showdata(ComboBox1.Text, ComboBox2.Text)  ''''fill receipt data grid with receipt for selected criteria using receipt table
     End Sub
     Public Function showdata(grp As String, gdn As String)
+        ''''fill receipt data grid with receipt for selected criteria using receipt table
         Try
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
@@ -86,6 +91,7 @@ Public Class FrmRecPrnGdnwise
         End Try
     End Function
     Public Function fillgodowncombo()
+        ''''''fill godown combo with godown number using godown table
         Try
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
@@ -106,8 +112,8 @@ Public Class FrmRecPrnGdnwise
         End Try
     End Function
     Public Function fillgroupcombo()
+        ''''''fill godown group combo using group table
         Try
-            '  Dim authors As New AutoCompleteStringCollection
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
                 MyConn.Open()
@@ -122,15 +128,12 @@ Public Class FrmRecPrnGdnwise
             dag.Dispose()
             dsg.Dispose()
             MyConn.Close() ' close connection
-            For i = 0 To ComboBox1.Items.Count - 1
-                '      authors.Add(ComboBox1.Items(i).ToString)
-            Next i
         Catch ex As Exception
             MessageBox.Show("Group combo fill :" & ex.Message)
         End Try
     End Function
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
-        ' ShowData(ComboBox1.Text, "")
+        ''''when user select group, fill godown number combo for that group and show receipt data to datagrid
         If groupfilled Then
             fillgodowncombo()
             showdata(ComboBox1.Text, "")
@@ -138,10 +141,11 @@ Public Class FrmRecPrnGdnwise
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        Me.Close()
+        Me.Close()  '''''close form
     End Sub
 
     Private Sub ComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox2.SelectedIndexChanged
+        ''''when user select godown number from godown number combo show receipt data to datagrid
         If godownfilled Then
             showdata(ComboBox1.Text, ComboBox2.Text)
         End If
@@ -150,18 +154,14 @@ Public Class FrmRecPrnGdnwise
         If Value IsNot Nothing Then Return Value.ToString() Else Return ""
     End Function
     Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
-        '  DataGridView2(e.ColumnIndex, e.RowIndex).[ReadOnly] = True
+        '''''''check/uncheck check boxes in datagrid
         If (DataGridView1.CurrentCell.ColumnIndex = 0) Then
-            '  DataGridView2(e.ColumnIndex, e.RowIndex).[ReadOnly] = False
-            'DataGridView2.BeginEdit(False)
-
             Dim CheckState As Boolean = DataGridView1.CurrentCell.Value
             If (CheckState = False) Then
                 DataGridView1.CurrentCell.Value = True
             Else
                 DataGridView1.CurrentCell.Value = False
             End If
-
         End If
     End Sub
     Private Sub KeyUpHandler(ByVal o As Object, ByVal e As KeyEventArgs)
@@ -175,7 +175,7 @@ Public Class FrmRecPrnGdnwise
 
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-
+        ''''report view
         If DataGridView1.RowCount <= 0 Then
             MsgBox("No data exist for this godown")
             ComboBox1.Focus()
@@ -186,8 +186,6 @@ Public Class FrmRecPrnGdnwise
             ComboBox2.Focus()
             Exit Sub
         End If
-        ' Dim startBill1 As String = TextBox1.Text.Substring(0, 4) & "_" & DateTime.ParseExact(TextBox1.Text.Substring(8, 3), "MMM", CultureInfo.CurrentCulture).Month & "_" & TextBox1.Text.Substring(12, 3)
-        ' Dim endBill1 As String = TextBox2.Text.Substring(0, 4) & "_" & DateTime.ParseExact(TextBox2.Text.Substring(8, 3), "MMM", CultureInfo.CurrentCulture).Month & "_" & TextBox2.Text.Substring(12, 3)
         Dim recNoList As New List(Of String)()
         Dim recDateList As New List(Of Date)()
         Dim xline As Integer = 0
@@ -195,13 +193,9 @@ Public Class FrmRecPrnGdnwise
             If DataGridView1.Item(0, X).Value = True Then
                 recNoList.Add(GetValue(DataGridView1.Item(5, X).Value))
                 recDateList.Add(Convert.ToDateTime(DataGridView1.Item(4, X).Value))
-
-                ' FILE_NO = FILE_NO.Replace(" ", "_")
             End If
         Next
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
-
-        'Dim xline As Integer = 0
         If (Not System.IO.Directory.Exists(Application.StartupPath & "\Reports")) Then
             System.IO.Directory.CreateDirectory(Application.StartupPath & "\Reports\")
         End If
@@ -219,7 +213,6 @@ Public Class FrmRecPrnGdnwise
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
         For X As Integer = 0 To myArray.Length - 1
-            'Dim strn As String = "SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].REC_DATE=Format(#" & Convert.ToDateTime(recDateList(X)) & "#,'dd/mm/yyyy') AND REC_NO=" & recNoList(X) & " order by [RECEIPT].REC_NO"
             Dim strn As String = "SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].REC_DATE=Format('" & Convert.ToDateTime(recDateList(X)) & "','dd/mm/yyyy') AND REC_NO=" & recNoList(X) & " order by [RECEIPT].REC_NO"
             chkrs1.Open(strn, xcon)
             If chkrs1.EOF = False Then
@@ -227,17 +220,11 @@ Public Class FrmRecPrnGdnwise
             End If
             Dim advance As Double = chkrs1.Fields(5).Value
             For xX As Integer = 1 To Convert.ToInt16(TextBox6.Text.Trim)
-
-                '   Print(fnum, GetStringToPrint(6, " ", "S") & GetStringToPrint(50, "THE MOTILAL HIRABHAI ESTATE & WAREHOUSE LIMITED", "S") & vbNewLine)
-                '   Print(fnum, GetStringToPrint(14, " ", "S") & GetStringToPrint(60, "OUTSIDE PREM DARWAJA, AHMEDABAD - 380 002, Gujarat, INDIA.", "S") & vbNewLine)
-                '  Print(fnum, GetStringToPrint(17, " ", "S") & GetStringToPrint(50, "Ph. :(079)22161537 E-mail: contact@mhwarehouse.com", "S") & vbNewLine)
                 Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
                 Print(fnum, GetStringToPrint(17, "Receipt No.: GST-", "S") & GetStringToPrint(5, Trim(recNoList(X)), "S") & GetStringToPrint(41, " ", "S") & GetStringToPrint(7, "Date : ", "S") & GetStringToPrint(10, Trim(recDateList(X)), "S") & vbNewLine)
                 Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
                 xline = 6
                 ''''''''''''''''''''''godown detail start
-
-
                 chkrs4.Open("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE WHERE [GROUP]='" & ComboBox1.Text & "' AND GODWN_NO='" & ComboBox2.Text & "' AND [STATUS]='C' ", xcon)
                 Dim census As String = ""
                 Dim survey As String = ""
@@ -270,7 +257,6 @@ Public Class FrmRecPrnGdnwise
                     pname = chkrs4.Fields(38).Value
                     pcode1 = chkrs4.Fields(1).Value
                     chkrs2.Open("SELECT * FROM RENT WHERE [GROUP]='" & ComboBox1.Text & "' and GODWN_NO='" & ComboBox2.Text & "' and P_CODE ='" & chkrs4.Fields(1).Value & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
-                    '''    Dim amtt As Double = 0
                     If chkrs2.EOF = False Then
                         chkrs2.MoveFirst()
                         amtt = chkrs2.Fields(4).Value
@@ -306,16 +292,12 @@ Public Class FrmRecPrnGdnwise
 
                     net = amtt + gst_amt
                     CGST_TAXAMT = gst_amt / 2
-
-
-                    'CGST_TAXAMT = amt * CGST_RATE / 100
                     CGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
-                    'SGST_TAXAMT = amt * SGST_RATE / 100
                     SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
                 End If
                 chkrs4.Close()
+                '''''''''''''''''''godown detail end''''''''''''''''''''''''''
 
-                '''''''''''''''''''godown detail end
                 '''''''''''''''''''against bill and period start''''''''''''''
                 Dim grp As String = ComboBox1.Text
                 Dim gdn As String = ComboBox2.Text
@@ -354,7 +336,6 @@ Public Class FrmRecPrnGdnwise
                         End If
 
                         pname = chkrs2.Fields(15).Value
-                        pcode1 = chkrs2.Fields(3).Value
                         adjusted_amt = adjusted_amt + chkrs2.Fields(10).Value
                         last_bldate = chkrs2.Fields(4).Value
                         If agcount < 7 Then
@@ -386,7 +367,6 @@ Public Class FrmRecPrnGdnwise
                     End If
                 Loop
                 chkrs2.Close()
-                '   End If
                 If against.Length > 2 Then
                     against = against.Substring(0, against.Length - 2)
                 End If
@@ -407,14 +387,11 @@ Public Class FrmRecPrnGdnwise
                 ''''''''''''''find out if any advance is left after adjustment start
                 Dim lastbilladjusted As Integer = 0
                 Dim advanceamt As Double = 0
-
-                '  Dim last_bldate As DateTime
                 advanceamt = chkrs1.Fields(5).Value - adjusted_amt
                 If advanceamt > 0 Then
                     Dim Rss As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[GODOWN].FROM_D From [BILL] As t2 inner join GODOWN on t2.[GROUP]=[GODOWN].[GROUP] AND t2.[GODWN_NO]=[GODOWN].GODWN_NO Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' and t2.[P_CODE] ='" & pcode1 & "' AND ((t2.REC_NO IS NOT NULL AND t2.REC_DATE IS NOT NULL)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                     chkrs5.Open(Rss, xcon)
                     Do While chkrs5.EOF = False
-                        '  chkrs5.MoveLast()
                         If chkrs1.Fields(3).Value >= chkrs5.Fields(4).Value Then
                             lastbilladjusted = chkrs5.Fields(0).Value
                             last_bldate = chkrs5.Fields(4).Value
@@ -428,8 +405,6 @@ Public Class FrmRecPrnGdnwise
                         Rss = "SELECT FROM_D From GODOWN Where [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND [STATUS]='C' AND P_CODE='" & pcode1 & "' order by [GROUP]+GODWN_NO"
                         chkrs5.Open(Rss, xcon)
                         If chkrs5.EOF = False Then
-                            ' chkrs5.MoveLast()
-                            'lastbilladjusted = chkrs5.Fields(13).Value
                             last_bldate = chkrs5.Fields(0).Value
                         End If
                         chkrs5.Close()
@@ -451,10 +426,8 @@ Public Class FrmRecPrnGdnwise
                                 advanceamt = advanceamt - net
                                 TONO = FROMNO
                                 FIRSTREC = False
-                                'last_bldate = chkrs5.Fields(0).Value
                             End If
                         Else
-                            '  TONO = MonthName(sdt.AddMonths(dtcounter).Month, False) & "-" & sdt.AddMonths(dtcounter).Year
                             TONO = MonthName(last_bldate.AddMonths(dtcounter).Month, False) & "-" & last_bldate.AddMonths(dtcounter).Year
                             advanceamt = advanceamt - net
                             dtcounter = dtcounter + 1
@@ -471,8 +444,6 @@ Public Class FrmRecPrnGdnwise
                 Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
                 xline = xline + 1
                 Print(fnum, GetStringToPrint(20, "For the period from ", "S") & GetStringToPrint(45, Trim(FROMNO) & " to " & Trim(TONO), "S") & vbNewLine)
-
-
 
 
                 If Trim(against1).Equals("") And chkrs1.Fields(6).Value = True Then
@@ -543,10 +514,8 @@ Public Class FrmRecPrnGdnwise
                     inword = inwordd.Substring(0, inwordd.Length)
                     Print(fnum, GetStringToPrint(16, "In Words   : Rs.", "S") & GetStringToPrint(50, inword, "S") & vbNewLine)
                     xline = xline + 1
-                    'Print(fnum, Space(23) & GetStringToPrint(61, inword1, "S") & vbNewLine)
                 End If
-                '  Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
-                ' xline = xline + 1
+
                 Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
                 xline = xline + 1
                 '''''''''''''''''rent detail
@@ -567,7 +536,7 @@ Public Class FrmRecPrnGdnwise
                 End If
                 chkrs2.Close()
 
-                ''''''''''''''''''''''''''''''''''''''''''''last change
+                ''''''''''''''''''''''''''''''''''''''''''''sgst amount ,cgst amount, sgstnrate and cgst rate using rent, gst tables
 
                 chkrs2.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs1.Fields(1).Value & "' and GODWN_NO='" & chkrs1.Fields(2).Value & "' and P_CODE ='" & pcode1 & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
                 ''   Dim amtt As Double = 0
@@ -614,20 +583,17 @@ Public Class FrmRecPrnGdnwise
                 'SGST_TAXAMT = amt * SGST_RATE / 100
                 SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
 
-                ''''''''''''''''''''''''''''''''''''''''''''last change
-
-
+                ''''''''''''''''''''''''''''''''''''''''''''sgst amount ,cgst amount, sgstnrate and cgst rate using rent, gst tables
                 '''''''''''''''''rent detail
+
+
+
                 Print(fnum, GetStringToPrint(16, "Per Month  : Rs.", "S") & GetStringToPrint(9, Format(amt, "#####0.00"), "S") & GetStringToPrint(3, " + ", "S") & GetStringToPrint(9, Format(CGST_TAXAMT, "#####0.00"), "S") & GetStringToPrint(3, " + ", "S") & GetStringToPrint(9, Format(SGST_TAXAMT, "#####0.00"), "S") & vbNewLine)
                 xline = xline + 1
-                ' Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
-                ' xline = xline + 1
                 If chkrs1.Fields(7).Value.Equals("Q") Then
                     Print(fnum, GetStringToPrint(13, "Cheque No. : ", "S") & GetStringToPrint(15, chkrs1.Fields(10).Value, "S") & GetStringToPrint(11, "Bank Name", "S") & GetStringToPrint(35, chkrs1.Fields(8).Value, "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(13, "Branch     : ", "S") & GetStringToPrint(35, chkrs1.Fields(9).Value, "S") & vbNewLine)
                     xline = xline + 2
-                    ' Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
-                    ' xline = xline + 1
                 End If
 
                 Dim mnth As Integer = chkrs1.Fields(5).Value / (amt + CGST_TAXAMT + SGST_TAXAMT)
@@ -648,7 +614,6 @@ Public Class FrmRecPrnGdnwise
                     Print(fnum, GetStringToPrint(54, " ", "S") & GetStringToPrint(20, "Authorised Signatory", "S") & vbNewLine)
                 End If
                 xline = xline + 1
-                'MsgBox(xline)
                 For cc As Integer = xline + 1 To 29
                     Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
                 Next
@@ -659,13 +624,13 @@ Public Class FrmRecPrnGdnwise
         Next
         xcon.Close()
         FileClose(fnum)
+        '''''load created .dat file in view form
         Form21.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Recprint1.dat", RichTextBoxStreamType.PlainText)
-        Form21.Show()
-        CreatePDF(Application.StartupPath & "\Reports\Recprint1.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
-
-
+        Form21.Show()  '''''show report form
+        CreatePDF(Application.StartupPath & "\Reports\Recprint1.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)    '''''convert .dat file to .pdf file
     End Sub
     Private Function CreatePDF(strReportFilePath As String, invoice_no As String)
+        '''''convert .dat file to .pdf file
         Try
             Dim line As String
             Dim readFile As System.IO.TextReader = New StreamReader(strReportFilePath)
@@ -677,7 +642,7 @@ Public Class FrmRecPrnGdnwise
             pdfPage.Orientation = PdfSharp.PageOrientation.Portrait
             pdfPage.TrimMargins.Left = 15
 
-            pdfPage.Height = 842
+            pdfPage.Height = 852
             pdfPage.Width = 595
 
             Dim graph As XGraphics = XGraphics.FromPdfPage(pdfPage)
@@ -692,7 +657,7 @@ Public Class FrmRecPrnGdnwise
                 If line Is Nothing Then
                     Exit While
                 Else
-                    If counter > 54 Then
+                    If counter > 58 Then
                         counter = 1
                         pdfPage = pdf.AddPage()
                         graph = XGraphics.FromPdfPage(pdfPage)
@@ -701,28 +666,24 @@ Public Class FrmRecPrnGdnwise
                         pdfPage.TrimMargins.Left = 15
 
                         pdfPage.Width = 595    ' 842
-                        pdfPage.Height = 842
+                        pdfPage.Height = 852
                         yPoint = 77
                     End If
                     Dim image As XImage = image.FromFile(Application.StartupPath & "\logo.png")
                     If counter = 1 Then
-                        '     font = New XFont("COURIER NEW", 14, XFontStyle.Bold)
-                        ' If ChkLogo.Checked Then
                         If ChkLogo.Checked Then
                             graph.DrawImage(image, 0, 0, image.Width, image.Height)
                         End If
-                        yPoint = image.Height + 10
+                        yPoint = image.Height + 25
                         ' If
                     Else
-                            If counter = 28 Then
-                            '     font = New XFont("COURIER NEW", 14, XFontStyle.Bold)
-                            ' If ChkLogo.Checked Then
+                        If counter = 30 Then
                             If ChkLogo.Checked Then
                                 graph.DrawImage(image, 0, yPoint, image.Width, image.Height)
                             End If
-                            yPoint = yPoint + image.Height + 10
+                            yPoint = yPoint + image.Height - 20
                         Else
-                                font = New XFont("COURIER NEW", 10, XFontStyle.Regular)
+                            font = New XFont("COURIER NEW", 10, XFontStyle.Regular)
                         End If
                     End If
 
@@ -735,7 +696,6 @@ Public Class FrmRecPrnGdnwise
             pdf.Save(pdfFilename)
             readFile.Close()
             readFile = Nothing
-            ' Process.Start(pdfFilename)
             pdf.Close()
 
         Catch ex As Exception
@@ -743,20 +703,23 @@ Public Class FrmRecPrnGdnwise
         End Try
     End Function
     Private Sub TextBox6_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox6.KeyPress
+        '''''allow only numerics
         If Not IsNumeric(e.KeyChar) And Not e.KeyChar = ChrW(Keys.Back) Then
             e.Handled = True
         End If
     End Sub
 
     Private Sub FrmRecPrnGdnwise_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        ''''if focus is on godown number combobox and user press F1 key Help form will be visible
         If e.KeyCode = Keys.F1 And (Me.ActiveControl.Name = "ComboBox2") Then
             helpgrpcombo = ComboBox1
-        helpgdncombo = ComboBox2
+            helpgdncombo = ComboBox2
             GodownHelp.Show()
         End If
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        ''''''report print
         If DataGridView1.RowCount <= 0 Then
             MsgBox("No data exist for this godown")
             ComboBox1.Focus()
@@ -767,8 +730,6 @@ Public Class FrmRecPrnGdnwise
             ComboBox2.Focus()
             Exit Sub
         End If
-        ' Dim startBill1 As String = TextBox1.Text.Substring(0, 4) & "_" & DateTime.ParseExact(TextBox1.Text.Substring(8, 3), "MMM", CultureInfo.CurrentCulture).Month & "_" & TextBox1.Text.Substring(12, 3)
-        ' Dim endBill1 As String = TextBox2.Text.Substring(0, 4) & "_" & DateTime.ParseExact(TextBox2.Text.Substring(8, 3), "MMM", CultureInfo.CurrentCulture).Month & "_" & TextBox2.Text.Substring(12, 3)
         Dim recNoList As New List(Of String)()
         Dim recDateList As New List(Of Date)()
         Dim xline As Integer = 0
@@ -776,8 +737,6 @@ Public Class FrmRecPrnGdnwise
             If DataGridView1.Item(0, X).Value = True Then
                 recNoList.Add(GetValue(DataGridView1.Item(5, X).Value))
                 recDateList.Add(Convert.ToDateTime(DataGridView1.Item(4, X).Value))
-
-                ' FILE_NO = FILE_NO.Replace(" ", "_")
             End If
         Next
 
@@ -789,7 +748,6 @@ Public Class FrmRecPrnGdnwise
         End If
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
 
-        'Dim xline As Integer = 0
         If (Not System.IO.Directory.Exists(Application.StartupPath & "\Reports")) Then
             System.IO.Directory.CreateDirectory(Application.StartupPath & "\Reports\")
         End If
@@ -807,16 +765,10 @@ Public Class FrmRecPrnGdnwise
             End If
             For xX As Integer = 1 To Convert.ToInt16(TextBox6.Text.Trim)
 
-                '  Print(fnum, GetStringToPrint(6, " ", "S") & GetStringToPrint(50, "THE MOTILAL HIRABHAI ESTATE & WAREHOUSE LIMITED", "S") & vbNewLine)
-                '  Print(fnum, GetStringToPrint(14, " ", "S") & GetStringToPrint(60, "OUTSIDE PREM DARWAJA, AHMEDABAD - 380 002, Gujarat, INDIA.", "S") & vbNewLine)
-                '  Print(fnum, GetStringToPrint(17, " ", "S") & GetStringToPrint(50, "Ph. :(079)22161537 E-mail: contact@mhwarehouse.com", "S") & vbNewLine)
-                Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
                 Print(fnum, GetStringToPrint(17, "Receipt No.: GST-", "S") & GetStringToPrint(5, Trim(recNoList(X)), "S") & GetStringToPrint(41, " ", "S") & GetStringToPrint(7, "Date : ", "S") & GetStringToPrint(10, Trim(recDateList(X)), "S") & vbNewLine)
                 Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
-                xline = 6
+                xline = 2
                 ''''''''''''''''''''''godown detail start
-
-
                 chkrs4.Open("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE WHERE [GROUP]='" & ComboBox1.Text & "' AND GODWN_NO='" & ComboBox2.Text & "' AND [STATUS]='C' ", xcon)
                 Dim census As String = ""
                 Dim survey As String = ""
@@ -849,7 +801,6 @@ Public Class FrmRecPrnGdnwise
                     pname = chkrs4.Fields(38).Value
                     pcode1 = chkrs4.Fields(1).Value
                     chkrs2.Open("SELECT * FROM RENT WHERE [GROUP]='" & ComboBox1.Text & "' and GODWN_NO='" & ComboBox2.Text & "' and P_CODE ='" & chkrs4.Fields(1).Value & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
-                    ''     Dim amtt As Double = 0
                     If chkrs2.EOF = False Then
                         chkrs2.MoveFirst()
                         amtt = chkrs2.Fields(4).Value
@@ -885,16 +836,13 @@ Public Class FrmRecPrnGdnwise
 
                     net = amtt + gst_amt
                     CGST_TAXAMT = gst_amt / 2
-
-
-                    'CGST_TAXAMT = amt * CGST_RATE / 100
                     CGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
-                    'SGST_TAXAMT = amt * SGST_RATE / 100
                     SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
                 End If
                 chkrs4.Close()
 
                 '''''''''''''''''''godown detail end
+
                 '''''''''''''''''''against bill and period start''''''''''''''
                 Dim grp As String = ComboBox1.Text
                 Dim gdn As String = ComboBox2.Text
@@ -910,23 +858,13 @@ Public Class FrmRecPrnGdnwise
                 Dim agcount As Integer = 0
                 Dim adjusted_amt As Double = 0
                 Dim last_bldate As DateTime
-                '  If chkrs1.Fields(6).Value = True Then
-
-                '  Else
-
-                Dim RS As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
+                Dim RS As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=format(#" & Convert.ToDateTime(invdt) & "#,'dd/mm/yyyy'))) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=format(#" & Convert.ToDateTime(invdt) & "#,'dd/mm/yyyy'))) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                 chkrs2.Open("SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=format('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=format('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO", xcon)
 
                 Do While chkrs2.EOF = False
 
                     If chkrs2.Fields(13).Value >= inv And chkrs2.Fields(14).Value <= invdt And chkrs1.Fields(3).Value >= chkrs2.Fields(4).Value Then
-                        'If FIRSTREC Then
-                        '    FROMNO = MonthName(Convert.ToDateTime(chkrs2.Fields(4).Value).Month, False) & "-" & Convert.ToDateTime(chkrs2.Fields(4).Value).Year
-                        '    TONO = FROMNO
-                        '    FIRSTREC = False
-                        'Else
-                        '    TONO = MonthName(Convert.ToDateTime(chkrs2.Fields(4).Value).Month, False) & "-" & Convert.ToDateTime(chkrs2.Fields(4).Value).Year
-                        'End If
+                        '''''''''''''''''''''''''''''get from month and to month for adjustment
                         If FIRSTREC Then
                             chkrs6.Open("Select FROM_DATE,TO_DATE FROM BILL_TR WHERE [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND INVOICE_NO='" & chkrs2.Fields(0).Value & "' and  BILL_DATE=format('" & Convert.ToDateTime(chkrs2.Fields(4).Value) & "','dd/mm/yyyy') ", xcon)
                             If chkrs6.EOF = False Then
@@ -942,9 +880,11 @@ Public Class FrmRecPrnGdnwise
                         Else
                             TONO = MonthName(Convert.ToDateTime(chkrs2.Fields(4).Value).Month, False) & " - " & Convert.ToDateTime(chkrs2.Fields(4).Value).Year
                         End If
-                        last_bldate = chkrs2.Fields(4).Value
+                        '''''''''''''''''''''''''''''get from month and to month for adjustment
+
                         pname = chkrs2.Fields(15).Value
                         adjusted_amt = adjusted_amt + chkrs2.Fields(10).Value
+                        last_bldate = chkrs2.Fields(4).Value
                         If agcount < 7 Then
                             against = against + "GO-" & chkrs2.Fields(0).Value & ", "
                         Else
@@ -964,7 +904,6 @@ Public Class FrmRecPrnGdnwise
 
                         agcount = agcount + 1
 
-
                     End If
                     If chkrs2.EOF = False Then
                         chkrs2.MoveNext()
@@ -974,7 +913,6 @@ Public Class FrmRecPrnGdnwise
                     End If
                 Loop
                 chkrs2.Close()
-                '   End If
                 If against.Length > 2 Then
                     against = against.Substring(0, against.Length - 2)
                 End If
@@ -995,14 +933,11 @@ Public Class FrmRecPrnGdnwise
                 ''''''''''''''find out if any advance is left after adjustment start
                 Dim lastbilladjusted As Integer = 0
                 Dim advanceamt As Double = 0
-
-                ' Dim last_bldate As DateTime
                 advanceamt = chkrs1.Fields(5).Value - adjusted_amt
                 If advanceamt > 0 Then
                     Dim Rss As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[GODOWN].FROM_D From [BILL] As t2 inner join GODOWN on t2.[GROUP]=[GODOWN].[GROUP] AND t2.[GODWN_NO]=[GODOWN].GODWN_NO Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' and t2.[P_CODE] ='" & pcode1 & "' AND ((t2.REC_NO IS NOT NULL AND t2.REC_DATE IS NOT NULL)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                     chkrs5.Open(Rss, xcon)
                     Do While chkrs5.EOF = False
-                        '  chkrs5.MoveLast()
                         If chkrs1.Fields(3).Value >= chkrs5.Fields(4).Value Then
                             lastbilladjusted = chkrs5.Fields(0).Value
                             last_bldate = chkrs5.Fields(4).Value
@@ -1016,8 +951,6 @@ Public Class FrmRecPrnGdnwise
                         Rss = "SELECT FROM_D From GODOWN Where [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND [STATUS]='C' AND P_CODE='" & pcode1 & "' order by [GROUP]+GODWN_NO"
                         chkrs5.Open(Rss, xcon)
                         If chkrs5.EOF = False Then
-                            ' chkrs5.MoveLast()
-                            'lastbilladjusted = chkrs5.Fields(13).Value
                             last_bldate = chkrs5.Fields(0).Value
                         End If
                         chkrs5.Close()
@@ -1039,26 +972,26 @@ Public Class FrmRecPrnGdnwise
                                 advanceamt = advanceamt - net
                                 TONO = FROMNO
                                 FIRSTREC = False
-                                'last_bldate = chkrs5.Fields(0).Value
                             End If
                         Else
-                            TONO = MonthName(sdt.AddMonths(dtcounter).Month, False) & "-" & sdt.AddMonths(dtcounter).Year
+                            TONO = MonthName(last_bldate.AddMonths(dtcounter).Month, False) & "-" & last_bldate.AddMonths(dtcounter).Year
                             advanceamt = advanceamt - net
                             dtcounter = dtcounter + 1
                         End If
                     Loop
                 End If
                 '''''''''''''find out if any advance is left after adjustment end
+
                 Print(fnum, GetStringToPrint(13, "Party Name : ", "S") & GetStringToPrint(55, pname, "S") & vbNewLine)
                 Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
-                xline = xline + 1
+                xline = xline + 2
                 Print(fnum, GetStringToPrint(13, "Godown No. : ", "S") & GetStringToPrint(15, Trim(chkrs1.Fields(1).Value) & " " & Trim(chkrs1.Fields(2).Value), "S") & vbNewLine)
                 Print(fnum, GetStringToPrint(13, "Survey No. : ", "S") & GetStringToPrint(12, survey, "S") & "    " & GetStringToPrint(13, "Census No. : ", "S") & GetStringToPrint(12, census, "S") & vbNewLine)
-                xline = xline + 3
+                xline = xline + 2
                 Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
                 xline = xline + 1
                 Print(fnum, GetStringToPrint(20, "For the period from ", "S") & GetStringToPrint(45, Trim(FROMNO) & " to " & Trim(TONO), "S") & vbNewLine)
-
+                xline = xline + 1
 
 
 
@@ -1074,7 +1007,7 @@ Public Class FrmRecPrnGdnwise
                     Print(fnum, GetStringToPrint(13, "Against Bill : ", "S") & GetStringToPrint(68, against, "S") & vbNewLine)
                 End If
 
-                xline = xline + 2
+                xline = xline + 1
                 If Trim(against1).Equals("") Then
                 Else
                     If Trim(against2).Equals("") And chkrs1.Fields(6).Value = True Then
@@ -1095,6 +1028,8 @@ Public Class FrmRecPrnGdnwise
                     xline = xline + 1
                 End If
                 If Trim(against3).Equals("") Then
+                    Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
+                    xline = xline + 1
                 Else
                     If chkrs1.Fields(6).Value = True Then
                         Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(63, against3 & ", Advance", "S") & vbNewLine)
@@ -1104,11 +1039,8 @@ Public Class FrmRecPrnGdnwise
 
                     xline = xline + 1
                 End If
-                Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
-                xline = xline + 1
-
                 Print(fnum, GetStringToPrint(13, "Amount Rs. : ", "S") & GetStringToPrint(10, Format(chkrs1.Fields(5).Value, "#####0.00"), "S"))
-                'xline = xline + 1
+
                 If chkrs1.Fields(7).Value.Equals("C") Then
                     Print(fnum, GetStringToPrint(8, "By Cash ", "S") & vbNewLine)
                     xline = xline + 1
@@ -1130,12 +1062,13 @@ Public Class FrmRecPrnGdnwise
                     inword = inwordd.Substring(0, inwordd.Length)
                     Print(fnum, GetStringToPrint(16, "In Words   : Rs.", "S") & GetStringToPrint(50, inword, "S") & vbNewLine)
                     xline = xline + 1
-                    'Print(fnum, Space(23) & GetStringToPrint(61, inword1, "S") & vbNewLine)
                 End If
-                '  Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
-                ' xline = xline + 1
-                Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
-                xline = xline + 1
+                If Trim(against2).Equals("") Then
+                    Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
+                    xline = xline + 1
+                Else
+
+                End If
                 '''''''''''''''''rent detail
                 chkrs2.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs1.Fields(1).Value & "' and GODWN_NO='" & chkrs1.Fields(2).Value & "' and P_CODE ='" & pcode1 & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
                 Dim amt As Double
@@ -1154,7 +1087,7 @@ Public Class FrmRecPrnGdnwise
                 End If
                 chkrs2.Close()
 
-                ''''''''''''''''''''''''''''''''''''''''''''last change
+                ''''''''''''''''''''''''''''''''''''''''''''sgst amount ,cgst amount, sgstnrate and cgst rate using rent, gst tables
 
                 chkrs2.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs1.Fields(1).Value & "' and GODWN_NO='" & chkrs1.Fields(2).Value & "' and P_CODE ='" & pcode1 & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
                 ''   Dim amtt As Double = 0
@@ -1201,20 +1134,16 @@ Public Class FrmRecPrnGdnwise
                 'SGST_TAXAMT = amt * SGST_RATE / 100
                 SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
 
-                ''''''''''''''''''''''''''''''''''''''''''''last change
-
-
+                ''''''''''''''''''''''''''''''''''''''''''''sgst amount ,cgst amount, sgstnrate and cgst rate using rent, gst tables
                 '''''''''''''''''rent detail
+
+
                 Print(fnum, GetStringToPrint(16, "Per Month  : Rs.", "S") & GetStringToPrint(9, Format(amt, "#####0.00"), "S") & GetStringToPrint(3, " + ", "S") & GetStringToPrint(9, Format(CGST_TAXAMT, "#####0.00"), "S") & GetStringToPrint(3, " + ", "S") & GetStringToPrint(9, Format(SGST_TAXAMT, "#####0.00"), "S") & vbNewLine)
                 xline = xline + 1
-                ' Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
-                ' xline = xline + 1
                 If chkrs1.Fields(7).Value.Equals("Q") Then
                     Print(fnum, GetStringToPrint(13, "Cheque No. : ", "S") & GetStringToPrint(15, chkrs1.Fields(10).Value, "S") & GetStringToPrint(11, "Bank Name", "S") & GetStringToPrint(35, chkrs1.Fields(8).Value, "S") & vbNewLine)
                     Print(fnum, GetStringToPrint(13, "Branch     : ", "S") & GetStringToPrint(35, chkrs1.Fields(9).Value, "S") & vbNewLine)
                     xline = xline + 2
-                    ' Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
-                    ' xline = xline + 1
                 End If
 
                 Dim mnth As Integer = chkrs1.Fields(5).Value / (amt + CGST_TAXAMT + SGST_TAXAMT)
@@ -1235,20 +1164,19 @@ Public Class FrmRecPrnGdnwise
                     Print(fnum, GetStringToPrint(54, " ", "S") & GetStringToPrint(20, "Authorised Signatory", "S") & vbNewLine)
                 End If
                 xline = xline + 1
-                'MsgBox(xline)
                 For cc As Integer = xline + 1 To 29
                     Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
                 Next
-                Print(fnum, StrDup(80, "-") & vbNewLine)
             Next
             chkrs1.Close()
-
         Next
         xcon.Close()
         FileClose(fnum)
+        ''''display created .dat file in report view form
         Form21.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Recprint1.dat", RichTextBoxStreamType.PlainText)
-        Form21.Show()
-        CreatePDF(Application.StartupPath & "\Reports\Recprint1.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
+        Form21.Show()   ''''show report form
+        CreatePDF(Application.StartupPath & "\Reports\Recprint1.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)  '''''create pdf file for the .dat file
+        ''''''''send pdf file to default printer
         Dim PrintPDFFile As New ProcessStartInfo
         PrintPDFFile.UseShellExecute = True
         PrintPDFFile.Verb = "print"
@@ -1258,8 +1186,8 @@ Public Class FrmRecPrnGdnwise
     End Sub
 
     Private Sub ComboBox2_TextChanged(sender As Object, e As EventArgs) Handles ComboBox2.TextChanged
+        '''''if user select godown number by typing characters in godown combo, fill receipt datagrid for selection criteria
         If godownfilled Then
-
             showdata(ComboBox1.Text, ComboBox2.Text)
         End If
     End Sub

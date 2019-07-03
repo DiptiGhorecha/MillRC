@@ -1,8 +1,13 @@
-﻿Public Class Form23
+﻿''' <summary>
+''' report view form - outstanding report
+''' In this module we are displaying .dat file in reachtextbox
+''' </summary>
+Public Class Form23
     Dim formloaded As Boolean = False
     Private checkPrint As Integer
 
     Private Sub Form23_Load(sender As Object, e As EventArgs) Handles Me.Load
+        '''''set position,size of form and richtextbox
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
         Me.Left = 0
@@ -14,6 +19,7 @@
     End Sub
 
     Private Sub Form23_Move(sender As Object, e As EventArgs) Handles Me.Move
+        ''''keep position of the form fix
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height

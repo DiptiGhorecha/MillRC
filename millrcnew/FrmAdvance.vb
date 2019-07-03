@@ -5,6 +5,12 @@ Imports System.Runtime.InteropServices
 Imports System.Security.Cryptography
 Imports System.Text
 Imports System.Data.OleDb
+''' <summary>
+''' tables used - advances,godown,party,group,bill
+''' When user very first time start to use this software , advance amount received from existing tenants will entered first
+''' If advances for any tenant will entered after invoices generated for many months, this module will update the advance flag to TRUE and update receipt number and receipt date in bill table
+''' 
+''' </summary>
 Public Class FrmAdvance
     Dim chkrs As New ADODB.Recordset
     Dim chkrs1 As New ADODB.Recordset
@@ -51,29 +57,29 @@ Public Class FrmAdvance
 
     Private Sub FrmAdvance_Load(sender As Object, e As EventArgs) Handles Me.Load
         Try
+            '''''''Setting form position top left corner of mdi
             Me.MdiParent = MainMDIForm
             Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
             Me.Left = 0
             Me.MaximizeBox = False
-            ' Frame1.Visible = False
-
+            '''''''enabled/disabled form components
             cmdAdd.Enabled = True
             cmdClose.Enabled = True
             cmdDelete.Enabled = True
             cmdDelete.Enabled = True
             cmdUpdate.Enabled = False
             cmdCancel.Enabled = False
-            textdisable()
+            textdisable()         ''''disable text boxes
             GrpAddCorrect = ""
-            fillgroupcombo()
-            fillgodowncombo()
-            fillpartycombo()
-            ComboBox1.SelectedIndex = ComboBox1.Items.IndexOf("")
-            ComboBox5.SelectedIndex = ComboBox5.Items.IndexOf("")
-            ComboBox2.SelectedIndex = ComboBox2.Items.IndexOf("")
-            ShowData()
+            fillgroupcombo()     ''''''fill godown group code drop down
+            fillgodowncombo()  '''''fill godown code drop down
+            fillpartycombo()   '''''fill tenant name drop down
+            ComboBox1.SelectedIndex = ComboBox1.Items.IndexOf("")   ''''clear group combo selection
+            ComboBox5.SelectedIndex = ComboBox5.Items.IndexOf("")   ''''clear godown number combo selection
+            ComboBox2.SelectedIndex = ComboBox2.Items.IndexOf("")   ''''clear tenant name combo selection
+            ShowData()                                              ''''load data to data grid from advance table
             If (DataGridView2.RowCount > 0) Then
-                LodaDataToTextBox()
+                LodaDataToTextBox()        '''' load current datagrid row data to form
             End If
 
             formloaded = True
@@ -82,13 +88,13 @@ Public Class FrmAdvance
                 cmdEdit.Enabled = False
                 cmdDelete.Enabled = False
             End If
-            '  TextBox1.Text = chkrs1.Fields(1).Value
         Catch ex As Exception
             MessageBox.Show("Error opening file-sr: " & ex.Message)
         End Try
     End Sub
 
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+        '''''''reset godown combobox and tenant name combo box as user change selection in group combo box
         fillgodowncombo()
         ComboBox5.SelectedIndex = ComboBox5.Items.IndexOf("")
         ComboBox5.Text = ""
@@ -97,6 +103,7 @@ Public Class FrmAdvance
 
     End Sub
     Public Function fillgodowncombo()
+        ''''''''fill godown number combobox using godown table
         Try
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
@@ -117,6 +124,7 @@ Public Class FrmAdvance
         End Try
     End Function
     Private Sub ComboBox5_SelectedValueChanged(sender As Object, e As EventArgs) Handles ComboBox5.SelectedValueChanged
+        ''''''''when user change selection in godown number combobox , get details for selected godown's p_code from party table and fill tenant name combobox
         Dim PCOD As String
         If ComboBox5.SelectedIndex >= 0 Then
             If xcon.State = ConnectionState.Open Then
@@ -126,10 +134,10 @@ Public Class FrmAdvance
 
             'chkrs1.Open("SELECT * FROM GODOWN WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox5.SelectedValue.ToString & "' AND [STATUS]='C'", xcon)
             Dim STR As String = "SELECT * FROM GODOWN WHERE [GROUP]='" & ComboBox1.Text & "' AND GODWN_NO='" & ComboBox5.Text & "' and STATUS='C'"
-            chkrs1.Open(Str, xcon)
+            chkrs1.Open(STR, xcon)
 
             Do While chkrs1.EOF = False
-                PCOD = chkrs1.Fields(1).Value
+                PCOD = chkrs1.Fields(1).Value   '''''''p_code  field from party table
                 TextBox10.Text = PCOD
                 hsn = chkrs1.Fields(37).Value
                 If chkrs1.EOF = False Then
@@ -142,12 +150,13 @@ Public Class FrmAdvance
             chkrs1.Close()
             xcon.Close()
             If GrpAddCorrect = "A" And ComboBox5.SelectedIndex >= 0 Then
-                fillpartyaddcombo(PCOD)
+                fillpartyaddcombo(PCOD)    '''''select tenant name for pcod from combobox 
             End If
         End If
     End Sub
 
     Public Function fillpartyaddcombo(pcod As String)
+        '''''function to select tenant name for pcod from tenant name combobox 
         Try
             If xcon.State = ConnectionState.Open Then
             Else
@@ -176,6 +185,9 @@ Public Class FrmAdvance
         DateTimePicker1.Value = Convert.ToDateTime(DateTimePicker1.Value.Day.ToString + "/" + DateTimePicker1.Value.Month.ToString + "/" + DateTimePicker1.Value.Year.ToString)
     End Sub
     Private Sub cmdAdd_Click(sender As Object, e As EventArgs) Handles cmdAdd.Click
+        '''''''''event associated with Add button
+        ''''made entry area, update button and cancel button enabled
+        ''''made grid view, navigation buttons , add button, search text box disabled so user can not again select data from grid or using navigation buttons
         Try
             GrpAddCorrect = "A"
             Label23.Text = "ADD"
@@ -208,6 +220,7 @@ Public Class FrmAdvance
     End Sub
 
     Private Sub textenable()
+        '''''''enable form elements
         Try
             ComboBox5.Enabled = True
             ComboBox1.Enabled = True
@@ -247,24 +260,16 @@ Public Class FrmAdvance
     End Sub
 
     Private Sub cmdUpdate_Click(sender As Object, e As EventArgs) Handles cmdUpdate.Click
+
         If ValidateChildren() Then
-            insertData()
+            insertData()            '''''insert / update data in clgdwn table and godown table
             DataGridView2.Enabled = True
-            If GrpAddCorrect = "C" Then
-                cmdUpdate.Enabled = False
-                cmdCancel.Enabled = False
+            cmdUpdate.Enabled = False
+            cmdCancel.Enabled = False
                 cmdAdd.Enabled = True
                 cmdEdit.Enabled = True
                 cmdDelete.Enabled = True
                 textdisable()
-            Else
-                cmdUpdate.Enabled = False
-                cmdCancel.Enabled = False
-                cmdAdd.Enabled = True
-                cmdEdit.Enabled = True
-                cmdDelete.Enabled = True
-                textdisable()
-            End If
             Label23.Text = "VIEW"
             GrpAddCorrect = ""
             navigateenable()
@@ -273,6 +278,7 @@ Public Class FrmAdvance
         Exit Sub
     End Sub
     Private Sub insertData()
+        ''''''''used to insert/update data in advances table
         Try
             Dim save As String
             Dim transaction As OleDbTransaction
@@ -372,13 +378,13 @@ Public Class FrmAdvance
             End If
             If TextBox1.Text <> "" Then
                 If GrpAddCorrect = "C" Then
-                save = "UPDATE [BILL] SET ADVANCE= False, REC_DATE=Null, REC_NO=Null  WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox5.Text & "' AND P_CODE='" & TextBox10.Text & "' AND BILL_DATE<= Format('" & Convert.ToDateTime(oldDate) & "','dd/mm/yyyy')"
+                    save = "UPDATE [BILL] SET ADVANCE= False, REC_DATE=Null, REC_NO=Null  WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox5.Text & "' AND P_CODE='" & TextBox10.Text & "' AND BILL_DATE<= Format('" & Convert.ToDateTime(oldDate) & "','dd/mm/yyyy')"
+                    objcmd.CommandText = save
+                    objcmd.ExecuteNonQuery()
+                End If
+                '''''''''''''''''''''update bill table with advance=true ,receipt date, receipt number for bill_date less than or equal to advance received up to date
+                save = "UPDATE [BILL] SET ADVANCE= True , REC_DATE ='" & DateTimePicker1.Value.ToShortDateString & "',REC_NO='" & TextBox1.Text & "'  WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox5.Text & "' AND P_CODE='" & TextBox10.Text & "' AND BILL_DATE<= Format('" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','dd/mm/yyyy')"
                 objcmd.CommandText = save
-                objcmd.ExecuteNonQuery()
-            End If
-
-            save = "UPDATE [BILL] SET ADVANCE= True , REC_DATE ='" & DateTimePicker1.Value.ToShortDateString & "',REC_NO='" & TextBox1.Text & "'  WHERE [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND GODWN_NO='" & ComboBox5.Text & "' AND P_CODE='" & TextBox10.Text & "' AND BILL_DATE<= Format('" & Convert.ToDateTime(DateTimePicker1.Value.ToString) & "','dd/mm/yyyy')"
-            objcmd.CommandText = save
                 objcmd.ExecuteNonQuery()
             End If
             transaction.Commit()
@@ -391,8 +397,7 @@ Public Class FrmAdvance
         End Try
     End Sub
     Private Sub cmdFirst_Click(sender As Object, e As EventArgs) Handles cmdFirst.Click
-
-        '  DataGridView1_DoubleClick(DataGridView1, New DataGridViewRowEventArgs(1))
+        ''''''go to 1st row of the data grid view
         DataGridView2.CurrentRow.Selected = False
         DataGridView2.Rows(0).Selected = True
         DataGridView2.CurrentCell = DataGridView2.Rows(0).Cells(0)
@@ -400,6 +405,7 @@ Public Class FrmAdvance
         LodaDataToTextBox()
     End Sub
     Private Sub cmdPrev_Click(sender As Object, e As EventArgs) Handles cmdPrev.Click
+        ''''''go to previous row of the data grid view
         Dim intRow As Integer = DataGridView2.CurrentRow.Index
         If intRow > 0 Then
             DataGridView2.CurrentRow.Selected = False
@@ -411,6 +417,7 @@ Public Class FrmAdvance
     End Sub
 
     Private Sub cmdNext_Click(sender As Object, e As EventArgs) Handles cmdNext.Click
+        ''''''go to next row of the data grid view
         Dim intRow As Integer = DataGridView2.CurrentRow.Index
         If intRow < DataGridView2.RowCount - 1 Then
             DataGridView2.CurrentRow.Selected = False
@@ -422,6 +429,7 @@ Public Class FrmAdvance
     End Sub
 
     Private Sub cmdLast_Click(sender As Object, e As EventArgs) Handles cmdLast.Click
+        ''''''go to last row of the data grid view
         DataGridView2.CurrentRow.Selected = False
         DataGridView2.Rows(DataGridView2.RowCount - 1).Selected = True
         DataGridView2.CurrentCell = DataGridView2.Rows(DataGridView2.RowCount - 1).Cells(0)
@@ -429,8 +437,9 @@ Public Class FrmAdvance
         LodaDataToTextBox()
     End Sub
     Private Sub TxtSrch_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtSrch.KeyUp
+        '''''this event will fire when user write anything in search text box
+        '''''It will filter data from gdtrans table and bind with datagrid view
         MyConn = New OleDbConnection(connString)
-        'If MyConn.State = ConnectionState.Closed Then
         MyConn.Open()
         da = New OleDb.OleDbDataAdapter("SELECT [ADVANCES].*,[PARTY].P_NAME from [ADVANCES] INNER JOIN [PARTY] on [ADVANCES].P_CODE=[PARTY].P_CODE where " & indexorder & " Like '%" & TxtSrch.Text & "%' ORDER BY [ADVANCES].GROUP+[ADVANCES].GODWN_NO", MyConn)
         ds.Clear()
@@ -442,6 +451,7 @@ Public Class FrmAdvance
 
     End Sub
     Private Sub DataGridView2_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGridView2.ColumnHeaderMouseClick
+        ''''''''set index order for searching and search textbox label according to datagrid column user clicked 
         If e.ColumnIndex = 0 Then
             indexorder = "[GROUP]"
             GroupBox5.Text = "Search by Group Type"
@@ -461,18 +471,13 @@ Public Class FrmAdvance
         LodaDataToTextBox()
     End Sub
 
-    Private Sub ComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox2.SelectedIndexChanged
-        'If ComboBox2.SelectedIndex <> -1 Then
-        '    TextBox10.Text = ComboBox2.SelectedValue.ToString
-        'End If
-    End Sub
-
     Private Sub ComboBox2_GotFocus(sender As Object, e As EventArgs) Handles ComboBox2.GotFocus
+        '''''''when tenant name combobox get focus, tenant name combo filled with tenant names from party table and tenant name for the p_cod in current row of 
+        '''''''data grid is selected
         fillpartycombo()
         If GrpAddCorrect = "C" Then
             If Not IsDBNull(DataGridView2.Item(2, DataGridView2.CurrentRow.Index).Value) Then
                 ComboBox2.Text = GetValue(DataGridView2.Item(6, DataGridView2.CurrentRow.Index).Value)
-                '   TextBox10.Text = GetValue(DataGridView2.Item(2, DataGridView2.CurrentRow.Index).Value)
             End If
         End If
     End Sub
@@ -490,13 +495,13 @@ Public Class FrmAdvance
         Try
             Dim i As Integer
 
-            TextBox10.Text = ""
-            ComboBox1.Text = ""
-            ComboBox2.Text = ""
-            ComboBox5.Text = ""
-            TextBox1.text=""
+            TextBox10.Text = ""   '''''tenant code
+            ComboBox1.Text = ""   '''''Godown group combo
+            ComboBox2.Text = ""   '''''tenant name combo
+            ComboBox5.Text = ""    ''''''godown number combo
+            TextBox1.Text = ""     ''''receipt number
             DataGridView2.ClearSelection()
-            DataGridView2.Rows(rownum).Selected = True
+            DataGridView2.Rows(rownum).Selected = True     '''''set 1st row as current row of data grid 
             DataGridView2.FirstDisplayedScrollingRowIndex = rownum
             DataGridView2.CurrentCell = DataGridView2.Rows(rownum).Cells(0)
             If frmload = True Then
@@ -507,25 +512,25 @@ Public Class FrmAdvance
             End If
 
             If Not IsDBNull(DataGridView2.Item(0, i).Value) Then
-                ComboBox1.Text = GetValue(DataGridView2.Item(0, i).Value)
+                ComboBox1.Text = GetValue(DataGridView2.Item(0, i).Value)      '''group from advances table
                 ComboBox1.SelectedIndex = ComboBox1.FindStringExact(ComboBox1.Text)
             End If
             If Not IsDBNull(DataGridView2.Item(1, i).Value) Then
-                ComboBox5.Text = GetValue(DataGridView2.Item(1, i).Value)
+                ComboBox5.Text = GetValue(DataGridView2.Item(1, i).Value)    ''''''godown_no from advances table
                 ComboBox5.SelectedIndex = ComboBox5.FindStringExact(ComboBox5.Text)
             End If
             If Not IsDBNull(DataGridView2.Item(6, i).Value) Then
-                ComboBox2.Text = GetValue(DataGridView2.Item(6, i).Value)
-                TextBox10.Text = GetValue(DataGridView2.Item(2, i).Value)
+                ComboBox2.Text = GetValue(DataGridView2.Item(6, i).Value)        ''''''tenant name from party table
+                TextBox10.Text = GetValue(DataGridView2.Item(2, i).Value)        '''''p_code from advances table
             End If
             If Not IsDBNull(DataGridView2.Item(5, i).Value) Then
-                TextBox1.Text = GetValue(DataGridView2.Item(5, i).Value)
+                TextBox1.Text = GetValue(DataGridView2.Item(5, i).Value)        '''''rec_no from advances table
             End If
             If Not IsDBNull(DataGridView2.Item(4, i).Value) Then
-                DateTimePicker2.Value = GetValue(DataGridView2.Item(4, i).Value)
+                DateTimePicker2.Value = GetValue(DataGridView2.Item(4, i).Value)   '''''''''advances_till_date from advance table
             End If
             If Not IsDBNull(DataGridView2.Item(3, i).Value) Then
-                DateTimePicker1.Value = GetValue(DataGridView2.Item(3, i).Value)
+                DateTimePicker1.Value = GetValue(DataGridView2.Item(3, i).Value)     '''''''rec_date from advances table
             End If
 
 
@@ -536,7 +541,7 @@ Public Class FrmAdvance
     End Sub
     Private Sub cmdClose_Click(sender As Object, e As EventArgs) Handles cmdClose.Click
         Try
-            Me.Close()
+            Me.Close()    ''''close form
 
             Exit Sub
         Catch ex As Exception
@@ -547,6 +552,7 @@ Public Class FrmAdvance
         If Value IsNot Nothing Then Return Value.ToString() Else Return ""
     End Function
     Public Function fillpartycombo()
+        ''''fill tenant name combo using party table
         Try
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
@@ -568,8 +574,8 @@ Public Class FrmAdvance
     End Function
 
     Public Function fillgroupcombo()
+        ''''fill godown group combo using group table
         Try
-            '  Dim authors As New AutoCompleteStringCollection
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
                 MyConn.Open()
@@ -590,12 +596,10 @@ Public Class FrmAdvance
         End Try
     End Function
     Private Sub ShowData()
-        '  konek() 'open our connection
+        '''''''show data from advances table to data grid view using advances and party table
         Try
             MyConn = New OleDbConnection(connString)
-            'If MyConn.State = ConnectionState.Closed Then
             MyConn.Open()
-            ' End If
             da = New OleDb.OleDbDataAdapter("SELECT [ADVANCES].*,[PARTY].P_NAME from [ADVANCES] INNER JOIN [PARTY] on [ADVANCES].P_CODE=[PARTY].P_CODE order by [ADVANCES].GROUP+[ADVANCES].GODWN_NO", MyConn)
             ds = New DataSet
             ds.Clear()
@@ -629,6 +633,7 @@ Public Class FrmAdvance
         End Try
     End Sub
     Private Sub navigatedisable()
+        ''''diable navigation buttons
         cmdPrev.Enabled = False
         cmdNext.Enabled = False
         cmdFirst.Enabled = False
@@ -637,6 +642,7 @@ Public Class FrmAdvance
     End Sub
 
     Private Sub navigateenable()
+        '''''''enable navigation buttons
         cmdPrev.Enabled = True
         cmdNext.Enabled = True
         cmdFirst.Enabled = True
@@ -659,6 +665,7 @@ Public Class FrmAdvance
         bValidaterent = True
     End Sub
     Private Sub textdisable()
+        ''''''disable form elements
         Try
             ComboBox5.Enabled = False
             ComboBox1.Enabled = False
@@ -673,6 +680,7 @@ Public Class FrmAdvance
     End Sub
 
     Private Sub FrmAdvance_Move(sender As Object, e As EventArgs) Handles Me.Move
+        ''''''''keep position of the form fix on mdi form
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height
@@ -681,11 +689,10 @@ Public Class FrmAdvance
             If (Top < 87) Then Top = 87
         End If
     End Sub
-
-    Private Sub TextBox10_TextChanged(sender As Object, e As EventArgs) Handles TextBox10.TextChanged
-
-    End Sub
     Private Sub cmdCancel_Click(sender As Object, e As EventArgs) Handles cmdCancel.Click
+        '''''''''event associated with cancel button
+        ''''made entry area, update button and cancel button disabled 
+        ''''made grid view, navigation buttons , add button enabled so user can again select data from grid or using navigation buttons
         Try
             GrpAddCorrect = ""
             DataGridView2.Enabled = True
@@ -710,16 +717,11 @@ Public Class FrmAdvance
 
     Private Sub DateTimePicker2_ValueChanged(sender As Object, e As EventArgs) Handles DateTimePicker2.ValueChanged
         Dim selectedDate As Date = DateTimePicker2.Value
-
         DateTimePicker2.Value = Convert.ToDateTime(DateTimePicker2.Value.Day.ToString + "/" + DateTimePicker2.Value.Month.ToString + "/" + DateTimePicker2.Value.Year.ToString)
-        ' End If
-    End Sub
-
-    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
-
     End Sub
 
     Private Sub DataGridView2_Click(sender As Object, e As EventArgs) Handles DataGridView2.Click
+        '''''''load data to form for current row when user click on data grid
         rownum = DataGridView2.CurrentRow.Index
         LodaDataToTextBox()
     End Sub

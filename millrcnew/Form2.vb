@@ -5,6 +5,10 @@ Imports System.Runtime.InteropServices
 Imports System.Security.Cryptography
 Imports System.Text
 Imports System.Data.OleDb
+''' <summary>
+''' tables used - group,godown
+''' this module is used to add / edit / delete/ search godown group (godown type) 
+''' </summary>
 Public Class FrmGodownType
     Dim chkrs As New ADODB.Recordset
     Dim chkrs1 As New ADODB.Recordset
@@ -19,34 +23,28 @@ Public Class FrmGodownType
     Dim ds As DataSet
     Dim tables As DataTableCollection
     Dim source1 As New BindingSource
-    Dim strReportFilePath As String
-    Dim GrpAddCorrect As String
+    Dim strReportFilePath As String   ''''''variable used to store report file name with path
+    Dim GrpAddCorrect As String       ''''''variable used to store crud status - C for Edit, A for Add & '' for View
     Dim blnTranStart As Boolean
-    Dim formloaded As Boolean = False
+    Dim formloaded As Boolean = False    '''' variable used to store form load event status
     Dim oldName As String
     Dim ok As Boolean
     Private bValidatepcode As Boolean = True
     Private bValidatepname As Boolean = True
-    Private indexorder As String = "G_CODE"
+    Private indexorder As String = "G_CODE"    ''''variable to store sorting order field for datagrid
 
 
 
     Private Sub FrmGodownType_Load(sender As Object, e As EventArgs) Handles Me.Load
         Try
+
+            '''''''Setting form position top left corner of mdi
             Me.MdiParent = MainMDIForm
             Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
             Me.Left = 0
             Me.MaximizeBox = False
-            ' Label4.Width = Me.Width
-            '  Label4.Top = 0
-            '  PictureBox1.Left = 0
-            '  PictureBox1.Top = 0
-            ' PictureBox2.Left = Me.Width - 50
-            '  PictureBox2.Top = 10
-            ' '  PictureBox3.Left = Me.Width - 100
-            '  PictureBox3.Top = 10
 
-            ' Frame1.Visible = False
+            '''''''enabled form components
             DataGridView1.Enabled = True
             cmdAdd.Enabled = True
             cmdClose.Enabled = True
@@ -54,22 +52,22 @@ Public Class FrmGodownType
             cmdDelete.Enabled = True
             cmdUpdate.Enabled = False
             cmdCancel.Enabled = False
-            textdisable()
+            textdisable()                       ''''diable text boxes
             GrpAddCorrect = ""
-            ShowData()
-            LodaDataToTextBox()
+            ShowData()                          '''''load data in datagrid from group table
+            LodaDataToTextBox()                 '''''load data to form text box
             formloaded = True
-            If muser.Equals("super") Then
+            If muser.Equals("super") Then       '''''' staff can not add,edit or delete a godown type
                 cmdAdd.Enabled = False
                 cmdEdit.Enabled = False
                 cmdDelete.Enabled = False
             End If
-            '  TextBox1.Text = chkrs1.Fields(1).Value
         Catch ex As Exception
             MessageBox.Show("Error opening file-sr: " & ex.Message)
         End Try
     End Sub
     Private Sub textenable()
+        '''''function to enable textbox
         Try
             TextBox1.Enabled = True
             TextBox2.Enabled = True
@@ -80,6 +78,7 @@ Public Class FrmGodownType
     End Sub
 
     Private Sub textdisable()
+        '''''function to disable textbox
         Try
             TextBox1.Enabled = False
             TextBox2.Enabled = False
@@ -92,20 +91,20 @@ Public Class FrmGodownType
 
     Private Sub cmdAdd_Click(sender As Object, e As EventArgs) Handles cmdAdd.Click
         Try
-            GrpAddCorrect = "A"
-            DataGridView1.Enabled = False
-            cmdUpdate.Enabled = True
+            GrpAddCorrect = "A"              '''''''store crud status variable 
+            DataGridView1.Enabled = False    '''''''DISABLED datagrid when user is adding a record 
+            cmdUpdate.Enabled = True         '''''''enabled buttons UPDATE and CANCEL 
             cmdCancel.Enabled = True
-            textenable()
-            TextBox1.Text = ""
+            textenable()                     '''''''enabled all form text boxes 
+            TextBox1.Text = ""               '''''''celared textboxes
             TextBox2.Text = ""
             TextBox2.Enabled = True
             TextBox2.Select()
-            navigatedisable()
-            cmdAdd.Enabled = False
+            navigatedisable()                '''''''disabled  navigation buttons 
+            cmdAdd.Enabled = False           ''''''disabled ADD,EDIT,DELETE button
             cmdEdit.Enabled = False
             cmdDelete.Enabled = False
-            Label22.Text = "ADD"
+            Label22.Text = "ADD"             ''''''updated status text with ADD to let the user know which crud operation is going on 
             Exit Sub
 
         Catch ex As Exception
@@ -113,6 +112,7 @@ Public Class FrmGodownType
         End Try
     End Sub
     Private Sub navigatedisable()
+        ''''''''DISABLED navigation buttons
         cmdPrev.Enabled = False
         cmdNext.Enabled = False
         cmdFirst.Enabled = False
@@ -121,6 +121,7 @@ Public Class FrmGodownType
     End Sub
 
     Private Sub navigateenable()
+        '''''''''enable navigation buttons
         cmdPrev.Enabled = True
         cmdNext.Enabled = True
         cmdFirst.Enabled = True
@@ -130,19 +131,17 @@ Public Class FrmGodownType
 
     Private Sub cmdEdit_Click(sender As Object, e As EventArgs) Handles cmdEdit.Click
         Try
-
-            GrpAddCorrect = "C"
-            Label22.Text = "EDIT"
+            GrpAddCorrect = "C"                     '''''''store crud status variable 
+            Label22.Text = "EDIT"                   ''''''updated status text with EDIT to let the user know which crud operation is going on 
             DataGridView1.Enabled = False
-            'Datprimaryrs.Recordset.Edit
             oldName = TextBox1.Text
-            cmdUpdate.Enabled = True
+            cmdUpdate.Enabled = True                '''''''enabled buttons UPDATE and CANCEL 
             cmdCancel.Enabled = True
             TextBox2.Enabled = False
             TextBox1.Enabled = True
             TextBox1.Select()
-            navigatedisable()
-            cmdAdd.Enabled = False
+            navigatedisable()                       '''''''disabled  navigation buttons 
+            cmdAdd.Enabled = False                  ''''''disabled ADD,EDIT,DELETE button
             cmdEdit.Enabled = False
             cmdDelete.Enabled = False
             Exit Sub
@@ -153,11 +152,13 @@ Public Class FrmGodownType
     End Sub
 
     Private Sub cmdDelete_Click(sender As Object, e As EventArgs) Handles cmdDelete.Click
-        DataGridView1.Enabled = False
+        DataGridView1.Enabled = False                ''''''''disabled datagrid
         MyConn = New OleDbConnection(connString)
         If MyConn.State = ConnectionState.Closed Then
             MyConn.Open()
         End If
+
+        ''''''''check the selected group for deletion in godown table, if any godown is created for this group type then prompt the user to delete the godown first
         da = New OleDb.OleDbDataAdapter("SELECT * from [GODOWN] where [GROUP]='" & Trim(TextBox2.Text) & "'", MyConn)
         ds = New DataSet
         ds.Clear()
@@ -174,14 +175,15 @@ Public Class FrmGodownType
 
 
         Try
-            Dim kk As Integer = MsgBox("[" & Trim(TextBox1.Text) & "]  Delete Record ?", vbYesNo + vbDefaultButton2)
-            If kk = 6 Then  'i assume yes
+            Dim kk As Integer = MsgBox("[" & Trim(TextBox1.Text) & "]  Delete Record ?", vbYesNo + vbDefaultButton2)    '''''VB yes/no messagebox to get confirmation from ghe user  
+            If kk = 6 Then  ''''''if user click yes
                 MyConn = New OleDbConnection(connString)
                 If MyConn.State = ConnectionState.Closed Then
                     MyConn.Open()
                 End If
                 Dim objcmd As New OleDb.OleDbCommand
                 Try
+                    '''''''''''''''delete current record from group table
                     objcmd.Connection = MyConn
                     objcmd.CommandType = CommandType.Text
                     objcmd.CommandText = "delete from [GROUP] where G_CODE='" & Trim(TextBox2.Text) & "'"
@@ -192,7 +194,9 @@ Public Class FrmGodownType
                     If MyConn.State = ConnectionState.Closed Then
                         MyConn.Open()
                     End If
-                    DataGridView1.Enabled = True
+                    '''''''''''''''delete current record from group table
+
+                    DataGridView1.Enabled = True    ''''''''''''enabled and update datagrid so uer can play with other godown type data
                     da = New OleDb.OleDbDataAdapter("SELECT * from [GROUP] order by " & indexorder, MyConn)
                     ds = New DataSet
                     ds.Clear()
@@ -202,7 +206,7 @@ Public Class FrmGodownType
                     da.Dispose()
                     ds.Dispose()
                     MyConn.Close() ' close connection
-                    LodaDataToTextBox()
+                    LodaDataToTextBox()               ''''''''''''''load selected datagrid record to text box
                 Catch ex As Exception
                     MsgBox("Exception: Data Delete module " & ex.Message)
                 End Try
@@ -213,12 +217,10 @@ Public Class FrmGodownType
         End Try
     End Sub
     Private Sub ShowData()
-        '  konek() 'open our connection
+        '''''''''''load data from group table to datagrid
         Try
             MyConn = New OleDbConnection(connString)
-            'If MyConn.State = ConnectionState.Closed Then
             MyConn.Open()
-            ' End If
             da = New OleDb.OleDbDataAdapter("SELECT * from [GROUP] order by " & indexorder, MyConn)
             ds = New DataSet
             ds.Clear()
@@ -228,6 +230,8 @@ Public Class FrmGodownType
             da.Dispose()
             ds.Dispose()
             MyConn.Close() ' close connection
+
+            '''''''''''''showing only two columns Group code and group description and change it's width
             DataGridView1.Columns(0).HeaderText = "Godown Type"
             DataGridView1.Columns(0).Width = 98
             DataGridView1.Columns(1).Width = 313
@@ -241,22 +245,21 @@ Public Class FrmGodownType
         End Try
     End Sub
     Private Sub DataGridView1_DoubleClick(sender As Object, e As EventArgs) Handles DataGridView1.DoubleClick
-        LodaDataToTextBox()
-
+        LodaDataToTextBox()   ''''load data to textboxes from the row where user double clicked
     End Sub
     Private Sub LodaDataToTextBox()
-
+        '''''''''''''''''load selected datagrid row's data to text boxes
         Try
             Dim i As Integer
             i = DataGridView1.CurrentRow.Index
             If Not IsDBNull(DataGridView1.Item(0, i).Value) Then
-                TextBox2.Text = DataGridView1.Item(0, i).Value
+                TextBox2.Text = DataGridView1.Item(0, i).Value    ''''''''g_code from group table
             End If
             If Not IsDBNull(DataGridView1.Item(1, i).Value) Then
-                TextBox1.Text = DataGridView1.Item(1, i).Value
+                TextBox1.Text = DataGridView1.Item(1, i).Value     '''''''''''g_name from group table
             End If
 
-            Label2.Text = "Total : " & DataGridView1.RowCount
+            Label2.Text = "Total : " & DataGridView1.RowCount        '''''number of records in group table
         Catch ex As Exception
             MessageBox.Show("Error loading data: " & ex.Message)
         End Try
@@ -264,7 +267,7 @@ Public Class FrmGodownType
 
     Private Sub cmdClose_Click(sender As Object, e As EventArgs) Handles cmdClose.Click
         Try
-            Me.Close()
+            Me.Close()    ''''''''''close the form
             Exit Sub
         Catch ex As Exception
             MessageBox.Show("Error Cancel Module: " & ex.Message)
@@ -273,6 +276,9 @@ Public Class FrmGodownType
 
     Private Sub cmdCancel_Click(sender As Object, e As EventArgs) Handles cmdCancel.Click
         Try
+            '''''''''''''replace the text ADD/EDIT with VIEW , DISABLED update,cancel button and enabled ADD,EDIT,DELETE buttons 
+
+
             Label22.Text = "VIEW"
             DataGridView1.Enabled = True
             GrpAddCorrect = ""
@@ -281,10 +287,10 @@ Public Class FrmGodownType
             cmdAdd.Enabled = True
             cmdEdit.Enabled = True
             cmdDelete.Enabled = True
-            textdisable()
-            navigateenable()
-            ShowData()
-            LodaDataToTextBox()
+            textdisable()      '''''''''''''''disabled textboxes
+            navigateenable()   '''''''''''''''enabled navigation buttons
+            ShowData()         '''''''''''''''update datagrid 
+            LodaDataToTextBox()   '''''''''''load selected datagrid view row's data to textboxes
             Me.ErrorProvider1.Clear()
             Exit Sub
 
@@ -294,16 +300,17 @@ Public Class FrmGodownType
 
     End Sub
     Private Sub insertData()
-        Dim save As String
+        Dim save As String     '''''''''variable to store query string accoarding to ADD or Edit button pressed
         If GrpAddCorrect = "C" Then
             save = "UPDATE [GROUP] SET G_CODE='" & TextBox2.Text & "',G_NAME='" & TextBox1.Text & "' WHERE G_CODE='" & TextBox2.Text & "'" ' sorry about that
         Else
             save = "INSERT INTO [GROUP](G_CODE,G_NAME) VALUES('" & TextBox2.Text & "','" & TextBox1.Text & "')"
         End If
-        doSQL(save)
-        ShowData()
+        doSQL(save)    ''''''''update group table
+        ShowData()     '''''''show updated data from group table to datagrid
     End Sub
     Private Sub doSQL(ByVal sql As String)
+        ''''''method to insert/update data in database table
         MyConn = New OleDbConnection(connString)
         If MyConn.State = ConnectionState.Closed Then
             MyConn.Open()
@@ -322,26 +329,20 @@ Public Class FrmGodownType
     End Sub
     Private Sub cmdUpdate_Click(sender As Object, e As EventArgs) Handles cmdUpdate.Click
         If ValidateChildren() Then
-            insertData()
-            DataGridView1.Enabled = True
-            If GrpAddCorrect = "C" Then
-                cmdUpdate.Enabled = False
-                cmdCancel.Enabled = False
-                cmdAdd.Enabled = True
-                cmdEdit.Enabled = True
-                cmdDelete.Enabled = True
-                textdisable()
-            Else
-                cmdUpdate.Enabled = False
-                cmdCancel.Enabled = False
-                cmdAdd.Enabled = True
-                cmdEdit.Enabled = True
-                cmdDelete.Enabled = True
-                textdisable()
-            End If
-            Label22.Text = "VIEW"
-            navigateenable()
-            LodaDataToTextBox()
+            insertData()                     '''''''insert/update data in group table
+            DataGridView1.Enabled = True     '''''''enabled datagrid
+
+            ''''''''' disabled UPDATE,CANCEL buttons and enabled ADD,EDIT,DELETE buttons.
+            cmdUpdate.Enabled = False
+            cmdCancel.Enabled = False
+            cmdAdd.Enabled = True
+            cmdEdit.Enabled = True
+            cmdDelete.Enabled = True
+            textdisable()               '''''''''''disabled textboxes
+
+            Label22.Text = "VIEW"       ''''''''' replaced crud status label with text VIEW
+            navigateenable()            ''''''''' enabled navigation buttons
+            LodaDataToTextBox()         ''''''''' load data from selected datagrid row to text boxes
         End If
         Exit Sub
     End Sub
@@ -402,13 +403,14 @@ Public Class FrmGodownType
     End Sub
 
     Private Sub cmdFirst_Click(sender As Object, e As EventArgs) Handles cmdFirst.Click
-        '  DataGridView1_DoubleClick(DataGridView1, New DataGridViewRowEventArgs(1))
+        ''''''''set selection pointer to 1st row of datagrid and load that record data to text boxes
         DataGridView1.CurrentRow.Selected = False
         DataGridView1.Rows(0).Selected = True
         DataGridView1.CurrentCell = DataGridView1.Rows(0).Cells(0)
         LodaDataToTextBox()
     End Sub
     Private Sub cmdPrev_Click(sender As Object, e As EventArgs) Handles cmdPrev.Click
+        ''''''''set selection pointer to previous row of datagrid and load that record data to text boxes
         Dim intRow As Integer = DataGridView1.CurrentRow.Index
         If intRow > 0 Then
             DataGridView1.CurrentRow.Selected = False
@@ -419,6 +421,7 @@ Public Class FrmGodownType
     End Sub
 
     Private Sub cmdNext_Click(sender As Object, e As EventArgs) Handles cmdNext.Click
+        ''''''''set selection pointer to next row of datagrid and load that record data to text boxes
         Dim intRow As Integer = DataGridView1.CurrentRow.Index
         If intRow < DataGridView1.RowCount - 1 Then
             DataGridView1.CurrentRow.Selected = False
@@ -429,12 +432,14 @@ Public Class FrmGodownType
     End Sub
 
     Private Sub cmdLast_Click(sender As Object, e As EventArgs) Handles cmdLast.Click
+        ''''''''set selection pointer to last row of datagrid and load that record data to text boxes
         DataGridView1.CurrentRow.Selected = False
         DataGridView1.Rows(DataGridView1.RowCount - 1).Selected = True
         DataGridView1.CurrentCell = DataGridView1.Rows(DataGridView1.RowCount - 1).Cells(0)
         LodaDataToTextBox()
     End Sub
     Private Sub TxtSrch_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtSrch.KeyUp
+        '''''''''search datagrid for the text user type in search text box
         MyConn = New OleDbConnection(connString)
         'If MyConn.State = ConnectionState.Closed Then
         MyConn.Open()
@@ -450,13 +455,8 @@ Public Class FrmGodownType
 
     End Sub
 
-    Private Sub DataGridView1_RowsAdded(sender As Object, e As DataGridViewRowsAddedEventArgs) Handles DataGridView1.RowsAdded
-        ' If DataGridView1.RowCount > 0 Then
-        'Label2.Text = DataGridView1.CurrentRow.ToString & " / " & DataGridView1.RowCount
-        '  End If
-    End Sub
-
     Private Sub DataGridView1_SizeChanged(sender As Object, e As EventArgs) Handles DataGridView1.SizeChanged
+        ''''''''''''''''update record count label when datagrid is updated
         If DataGridView1.RowCount > 0 Then
             Label2.Text = DataGridView1.CurrentRow.ToString & " / " & DataGridView1.RowCount
         End If
@@ -497,20 +497,23 @@ Public Class FrmGodownType
     End Sub
 
     Private Sub DataGridView1_KeyDown(sender As Object, e As KeyEventArgs) Handles DataGridView1.KeyDown
+        ''''''''load the datagrid row data to textboxes when user select record by pressing enter key
         If e.KeyCode.Equals(Keys.Enter) Then
+            e.SuppressKeyPress = True
             LodaDataToTextBox()
         End If
     End Sub
 
     Private Sub DataGridView1_KeyUp(sender As Object, e As KeyEventArgs) Handles DataGridView1.KeyUp
-        If e.KeyCode.Equals(Keys.Enter) Then
-            LodaDataToTextBox()
-        End If
+        ''If e.KeyCode.Equals(Keys.Enter) Then
+
+        ''    LodaDataToTextBox()
+        ''End If
     End Sub
 
     Private Sub DataGridView1_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGridView1.ColumnHeaderMouseClick
 
-
+        ''''''''set index order for searching and search textbox label accoarding to datagrid column user clicked 
         If e.ColumnIndex = 0 Then
             indexorder = "G_CODE"
             GroupBox1.Text = "Search by godown type"
@@ -525,6 +528,7 @@ Public Class FrmGodownType
     End Sub
 
     Private Sub DataGridView1_ColumnHeaderMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGridView1.ColumnHeaderMouseDoubleClick
+        ''''''''set index order for searching and search textbox label accoarding to datagrid column user clicked 
         If e.ColumnIndex = 0 Then
             indexorder = "G_CODE"
             GroupBox1.Text = "Search by godown type"
@@ -539,6 +543,7 @@ Public Class FrmGodownType
     End Sub
 
     Private Sub FrmGodownType_Move(sender As Object, e As EventArgs) Handles Me.Move
+        ''''''''''''''''code to make group form's position fix
         If formloaded Then
             If (Me.Right > Parent.ClientSize.Width) Then Me.Left = Parent.ClientSize.Width - Me.Width
             If (Me.Bottom > Parent.ClientSize.Height) Then Me.Top = Parent.ClientSize.Height - Me.Height
@@ -549,19 +554,6 @@ Public Class FrmGodownType
         End If
     End Sub
 
-    Private Sub FrmGodownType_SizeChanged(sender As Object, e As EventArgs) Handles Me.SizeChanged
-        'If Me.WindowState = FormWindowState.Minimized Or Me.WindowState = FormWindowState.Normal Then
-        '    If formloaded Then
-        '        If (Me.Right > Parent.ClientSize.Width) Then Me.Left = Parent.ClientSize.Width - Me.Width
-        '        If (Me.Bottom > Parent.ClientSize.Height) Then Me.Top = Parent.ClientSize.Height - Me.Height
-        '        If (Me.Left < 0) Then Me.Left = 0
-        '        If (Me.Top < 0) Then Me.Top = 0
-        '        If (Me.Top < 90) Then Me.Top = 90
-        '    End If
-        'End If
-
-
-    End Sub
     Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
 
         Select Case ((m.WParam.ToInt64() And &HFFFF) And &HFFF0)
@@ -573,31 +565,4 @@ Public Class FrmGodownType
         MyBase.WndProc(m)
     End Sub
 
-    Private Sub Label3_Click(sender As Object, e As EventArgs) Handles Label3.Click
-
-    End Sub
-
-    Private Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click
-
-    End Sub
-
-    Private Sub TextBox2_TextChanged(sender As Object, e As EventArgs) Handles TextBox2.TextChanged
-
-    End Sub
-
-    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
-
-    End Sub
-
-    Private Sub GroupBox1_Enter(sender As Object, e As EventArgs) Handles GroupBox1.Enter
-
-    End Sub
-
-    Private Sub GroupBox2_Enter(sender As Object, e As EventArgs) Handles GroupBox2.Enter
-
-    End Sub
-
-    Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
-
-    End Sub
 End Class

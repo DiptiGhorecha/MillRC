@@ -5,6 +5,10 @@ Imports System.IO
 Imports PdfSharp.Drawing
 Imports PdfSharp.Pdf
 Imports PdfSharp.Pdf.IO
+''' <summary>
+''' tables used - party,godown,bill,receipt,reciptbill,bill_tr,rent,gst,advances
+''' In this module we update invoice adjustment details in bill table, receipt table, clear and insert data in reciptbill table
+''' </summary>
 Public Class FrmReupdate
     Dim chkrs As New ADODB.Recordset
     Dim chkrs11 As New ADODB.Recordset
@@ -31,6 +35,7 @@ Public Class FrmReupdate
     Dim pdfpath As String
     Dim strReportFilePath As String
     Private Sub FrmReupdate_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        '''''''set position of the form
         Try
             Me.MdiParent = MainMDIForm
             Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
@@ -45,13 +50,14 @@ Public Class FrmReupdate
 
     Private Sub cmdClose_Click(sender As Object, e As EventArgs) Handles cmdClose.Click
         Try
-            Me.Close()
+            Me.Close()    '''''close form
             Exit Sub
         Catch ex As Exception
             MessageBox.Show("Error Cancel Module: " & ex.Message)
         End Try
     End Sub
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+        ''''''''reupdate database
         With Me
             .Cursor = Cursors.WaitCursor
             .Refresh()
@@ -67,6 +73,9 @@ Public Class FrmReupdate
             Dim objcmd As New OleDb.OleDbCommand
             Dim objcmdd As New OleDb.OleDbCommand
 
+            ''''''reset value of rec_no,rec_date and advance - bill table
+            '''''reset adj_amt with amount - receipt table
+            '''''delete all records from reciptbill table
             objcmd.Connection = MyConn
             objcmd.Transaction = transaction
             objcmd.CommandType = CommandType.Text
@@ -109,11 +118,15 @@ Public Class FrmReupdate
             Dim fdate As Date
             Dim radate As Date
             Dim rano As Integer
+
+            ''''''progressbar start
             chkrs2.Open("Select Count(invoice_no) As NumberOfInvoice FROM BILL", xcon)
             ProgressBar1.Minimum = 0
             ProgressBar1.Maximum = chkrs2.Fields(0).Value
             chkrs2.Close()
             ProgressBar1.Value = 0
+            ''''''progressbar end
+
             Dim counter As Integer = 0
             chkrs1.Open("SELECT * FROM BILL ORDER BY BILL_DATE,INVOICE_NO", xcon)
             Do While chkrs1.EOF = False
@@ -134,7 +147,7 @@ Public Class FrmReupdate
                 radate = Nothing
                 rano = 0
                 ADV = False
-                ''''''''''''''''''''''''''opening advance
+                ''''''''''''''''''''''''''opening advance start
                 chkrs22.Open("SELECT [ADVANCES].* from [ADVANCES] WHERE [GROUP]='" & GRP & "' AND [GODWN_NO]='" & GDN & "' AND [ADVANCES].P_CODE='" & PCD & "' order by [advances].[GROUP],[advances].GODWN_NO", xcon)
                 While Not chkrs22.EOF
                     If (chkrs22.Fields(0).Value = GRP And chkrs22.Fields(1).Value = GDN) Then
@@ -155,8 +168,8 @@ Public Class FrmReupdate
                 If (fdate <> Nothing) Then
                     tstdt = fdate
                 End If
-                '''''''''''''''''''''''''opening 
-                If (BLDT <= tstdt) Then
+                '''''''''''''''''''''''''opening  advance end
+                If (BLDT <= tstdt) Then                        '''''''''if advance receipt date greater than invoice date update bill table with advance receipt and number
                     MyConn = New OleDbConnection(connString)
                     If MyConn.State = ConnectionState.Closed Then
                         MyConn.Open()
@@ -172,14 +185,14 @@ Public Class FrmReupdate
                     transaction.Commit()
                     objcmd1.Dispose()
                     MyConn.Close()
-                Else
-                    Dim str As String = "SELECT * FROM RECEIPT WHERE GROUP='" & GRP & "' AND GODWN_NO='" & GDN & "' AND ADJ_AMT>0 ORDER BY [GROUP],GODWN_NO,REC_DATE,REC_NO"
+                Else     '''''''''if advance receipt date less than invoice date update bill table with regular receipt and number
+                    Dim str As String = "SELECT top 1 * FROM RECEIPT WHERE GROUP='" & GRP & "' AND GODWN_NO='" & GDN & "' AND ADJ_AMT>0 ORDER BY [GROUP],GODWN_NO,REC_DATE,REC_NO"
                     chkrs2.Open("SELECT TOP 1 * FROM RECEIPT WHERE [GROUP]='" & GRP & "' AND GODWN_NO='" & GDN & "' AND ADJ_AMT>0 ORDER BY [GROUP],GODWN_NO,REC_DATE,REC_NO", xcon)
                     If chkrs2.EOF = False Then
-                        ' chkrs2.MoveFirst()
                         RCDT = chkrs2.Fields(3).Value
                         RCNO = chkrs2.Fields(4).Value
                         REMAINING = chkrs2.Fields(13).Value - BLAMT
+                        Console.WriteLine(str & "----- " & REMAINING & "rc no -->" & RCNO)
                         If (RCDT < BLDT) Then
                             ADV = True
                         Else
@@ -201,20 +214,19 @@ Public Class FrmReupdate
                         save = "UPDATE [BILL] SET REC_NO=" & RCNO & ", REC_DATE=format('" & Convert.ToDateTime(RCDT) & "','dd/mm/yyyy'),ADVANCE=" & ADV & " WHERE INVOICE_NO='" & INVNO & "' AND [GROUP]='" & GRP & "' AND GODWN_NO='" & GDN & "' AND BILL_DATE=format('" & Convert.ToDateTime(BLDT) & "','dd/mm/yyyy')"  ''' sorry about that
                         objcmd1.CommandText = save
                         objcmd1.ExecuteNonQuery()
-                        ' str = "UPDATE [RECEIPT] SET ADJ_AMT=" & REMAINING & " WHERE REC_DATE=format('" & Convert.ToDateTime(RCDT) & "','dd/mm/yyyy') AND REC_NO=" & RCNO
+
                         objcmd1.CommandText = "UPDATE [RECEIPT] SET ADJ_AMT=" & REMAINING & " WHERE REC_DATE=format('" & Convert.ToDateTime(RCDT) & "','dd/mm/yyyy') AND REC_NO=" & RCNO  ' sorry about that
                         objcmd1.ExecuteNonQuery()
                         transaction.Commit()
                         objcmd1.Dispose()
                         MyConn.Close()
-                        '''''' System.Threading.Thread.Sleep(500)
+                        If (GRP = "CHALI" And GDN = "014") Then
+                            System.Threading.Thread.Sleep(5000)
+                        End If
+
                     End If
                     chkrs2.Close()
                 End If
-                'Dim i As Integer
-                'For i = 1 To 5000
-
-                'Next
 
                 ''''''''''''''''''''''''''''''''invoice reprint start
                 fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
@@ -354,10 +366,6 @@ Public Class FrmReupdate
                 End If
                 Print(fnum, GetStringToPrint(28, " Rental Or Leasing Services ", "S"))
                 Print(fnum, GetStringToPrint(41, " Rent for property from " & "1st " & MonthName(BLDT.Month) & "," & BLDT.Year.ToString, "S"))
-                '  ComboBox1.Text = DateTimePicker1.Value.Month
-                '   ComboBox2.Text = DateTimePicker1.Value.Year
-
-                ' AMT = TextBox4.Text
                 Print(fnum, GetStringToPrint(9, Format(gamt, "#####0.00"), "N") & vbNewLine)
                 Dim ENDDAY As String
                 ENDDAY = DateTime.DaysInMonth(BLDT.Year, BLDT.Month).ToString
@@ -372,10 +380,8 @@ Public Class FrmReupdate
                 Print(fnum, GetStringToPrint(7, "", "S"))
                 If IsDBNull(hsn) Or hsn.Equals("997211") Then
                     Print(fnum, GetStringToPrint(29, " Residential Property ", "S"))
-                    '    Label18.Text = "Rental Or Leasing Services Involving Own Or Leased Residential Property"
                 Else
                     Print(fnum, GetStringToPrint(29, " Non-residential Property ", "S"))
-                    '   Label18.Text = "Rental Or Leasing Services Involving Own Or Leased Non-residential Property"
                 End If
 
                 Print(fnum, GetStringToPrint(7, "", "S") & vbNewLine)
@@ -388,11 +394,6 @@ Public Class FrmReupdate
                 Print(fnum, StrDup(85, "-") & vbNewLine)
                 Print(fnum, Space(58) & GetStringToPrint(17, "TAXABLE AMOUNT :", "S") & GetStringToPrint(10, Format(gamt, "#####0.00"), "N") & vbNewLine)
                 Print(fnum, StrDup(85, "-") & vbNewLine)
-
-                'CGST_TAXAMT = amt * CGST_RATE / 100
-                'CGST_TAXAMT = Math.Round(CGST_TAXAMT, 2, MidpointRounding.AwayFromZero)
-                'SGST_TAXAMT = amt * SGST_RATE / 100
-                'SGST_TAXAMT = Math.Round(SGST_TAXAMT, 2, MidpointRounding.AwayFromZero)
                 Dim net As Double
                 Dim rnd As Integer
 
@@ -421,7 +422,6 @@ Public Class FrmReupdate
                 Else
                     inword = inwordd.Substring(0, inwordd.Length)
                     Print(fnum, GetStringToPrint(35, "Amount Chargeable (In Words): INR ", "S") & GetStringToPrint(50, inword, "S") & vbNewLine)
-                    'Print(fnum, Space(23) & GetStringToPrint(61, inword1, "S") & vbNewLine)
                 End If
 
                 Print(fnum, StrDup(85, "-") & vbNewLine)
@@ -457,7 +457,7 @@ Public Class FrmReupdate
             xcon.Close()
 
         Catch ex As Exception
-            MessageBox.Show("Error opening file-sr: " & ex.Message)
+            MessageBox.Show("Error Reupdate : " & ex.Message)
         End Try
 
         With Me
@@ -467,6 +467,7 @@ Public Class FrmReupdate
         MsgBox("Reupdate process completed")
     End Sub
     Private Function CreatePDFNEW(strReportFilePath As String, invoice_no As String)
+        '''''convert .dat file to pdf file
         Try
             Dim line As String
             Dim readFile As System.IO.TextReader = New System.IO.StreamReader(strReportFilePath)
@@ -500,7 +501,6 @@ Public Class FrmReupdate
             pdf.Save(pdfFilename)
             readFile.Close()
             readFile = Nothing
-            ' Process.Start(pdfFilename)
             pdf.Close()
 
         Catch ex As Exception
@@ -509,6 +509,7 @@ Public Class FrmReupdate
     End Function
 
     Private Sub FrmReupdate_Move(sender As Object, e As EventArgs) Handles Me.Move
+        '''''''keep the position of form fix
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height

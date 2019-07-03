@@ -1,8 +1,13 @@
-﻿Public Class FrmGdCloseView
+﻿''' <summary>
+''' report view form - godown close list
+''' In this module we are displaying .dat file in reachtextbox
+''' </summary>
+Public Class FrmGdCloseView
     Dim formloaded As Boolean = False
     Private checkPrint As Integer
 
     Private Sub FrmGdCloseView_Load(sender As Object, e As EventArgs) Handles Me.Load
+        ''''''''display next invoice.dat file in richtextbox
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
         Me.Left = 0
@@ -14,6 +19,7 @@
     End Sub
 
     Private Sub FrmGdCloseView_Move(sender As Object, e As EventArgs) Handles Me.Move
+        '''''set position,size of form and richtextbox
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height

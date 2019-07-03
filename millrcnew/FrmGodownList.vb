@@ -7,7 +7,12 @@ Imports System.Text
 Imports System.Data.OleDb
 Imports PdfSharp.Pdf
 Imports PdfSharp.Drawing
-
+''' <summary>
+''' tables used - godown,party,rent,gst
+''' this is form to accept inputs from user to view/print godown master
+''' Only report view is complete. For report print not checked alignments and font size
+''' FrmGodownListView.vb is used to hold report view 
+''' </summary>
 Public Class FrmGodownList
     Dim chkrs As New ADODB.Recordset
     Dim chkrs1 As New ADODB.Recordset
@@ -56,33 +61,37 @@ Public Class FrmGodownList
 
     Private Sub FrmGodownList_Load(sender As Object, e As EventArgs) Handles Me.Load
         Try
+            '''''''set position and size of the form
             Me.MdiParent = MainMDIForm
             Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
             Me.Left = 0
             Me.MaximizeBox = False
 
-            fillgroupcombo()
-            ShowData()
+            fillgroupcombo()   ''''''fill godown group combo with g_code from group table
+            ShowData()     ''''''show godown data in datagrid using godown table
 
             formloaded = True
+
+            ''''set 1st row as current row of datagrid
             If DataGridView2.RowCount > 1 Then
                 TextBox1.Text = DataGridView2.Item(3, 0).Value
                 TextBox2.Text = DataGridView2.Item(3, DataGridView2.RowCount - 1).Value
             End If
             ComboBox2.Text = "Current"
             ststatus = "C"
-            '  TextBox1.Text = chkrs1.Fields(1).Value
         Catch ex As Exception
             MessageBox.Show("Error loading form godown master list " & ex.Message)
         End Try
     End Sub
     Private Sub ComboBox1_TextUpdate(sender As Object, e As EventArgs) Handles ComboBox1.TextUpdate
+        ''''''change selection in godown group combo box as user type character in group combobox
         If ComboBox1.FindString(ComboBox1.Text) < 0 Then
             ComboBox1.Text = ComboBox1.Text.Remove(ComboBox1.Text.Length - 1)
             ComboBox1.SelectionStart = ComboBox1.Text.Length
         End If
     End Sub
     Private Sub TextBox2_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox2.KeyPress
+        '''''''only numerics are allowed for from godown number textbox
         If Not IsNumeric(e.KeyChar) And Not e.KeyChar = ChrW(Keys.Back) Then
             e.Handled = True
         End If
@@ -94,12 +103,10 @@ Public Class FrmGodownList
         ctrlname = "TextBox2"
     End Sub
     Private Sub ShowData()
-        '  konek() 'open our connection
+        ''''''''show godown data in godown datagrid using godown table
         Try
             MyConn = New OleDbConnection(connString)
-            'If MyConn.State = ConnectionState.Closed Then
             MyConn.Open()
-            ' End If
             If ComboBox1.Text.Equals("") Then
                 da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE order by [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
             Else
@@ -114,9 +121,6 @@ Public Class FrmGodownList
             da.Dispose()
             ds.Dispose()
             MyConn.Close() ' close connection
-            'For i As Integer = 0 To DataGridView2.Columns.Count - 1
-            '    DataGridView2.Columns(i).Visible = False
-            'Next
             DataGridView2.Columns(1).Visible = False
             DataGridView2.Columns(2).Visible = False
             DataGridView2.Columns(4).Visible = False
@@ -154,7 +158,6 @@ Public Class FrmGodownList
             DataGridView2.Columns(36).Visible = False
             DataGridView2.Columns(37).Visible = False
             DataGridView2.Columns(0).Visible = True
-            'DataGridView2.Columns(0).HeaderCell.
             DataGridView2.Columns(3).Visible = True
             DataGridView2.Columns(38).Visible = True
             DataGridView2.Columns(0).HeaderText = "Group"
@@ -164,18 +167,15 @@ Public Class FrmGodownList
             DataGridView2.Columns(3).HeaderText = "Godown"
             DataGridView2.Columns(38).HeaderText = "Tenant"
             DataGridView2.Columns(21).HeaderText = "Outstanding"
-            ' DataGridView2.Columns(21).Visible = True
             DataGridView2.Columns(21).Width = 105
-
-            'DataGridView2.Rows(1).Selected = True
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
     End Sub
 
     Public Function fillgroupcombo()
+        ''''fill godown group combo box using group table
         Try
-            '  Dim authors As New AutoCompleteStringCollection
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
                 MyConn.Open()
@@ -190,12 +190,6 @@ Public Class FrmGodownList
             dag.Dispose()
             dsg.Dispose()
             MyConn.Close() ' close connection
-            For i = 0 To ComboBox1.Items.Count - 1
-                '      authors.Add(ComboBox1.Items(i).ToString)
-            Next i
-            '    ComboBox1.AutoCompleteMode = AutoCompleteMode.Suggest
-            'ComboBox1.AutoCompleteSource = AutoCompleteSource.CustomSource
-            '        ComboBox1.AutoCompleteCustomSource = authors
         Catch ex As Exception
             MessageBox.Show("Group combo fill :" & ex.Message)
         End Try
@@ -204,15 +198,12 @@ Public Class FrmGodownList
         If Value IsNot Nothing Then Return Value.ToString() Else Return ""
     End Function
     Private Sub DataGridView2_Click(sender As Object, e As EventArgs) Handles DataGridView2.Click
+        ''''assign value of godwn_no from current datagrid row to textbox1 or textbox2 (text box having focus) when user click datagrid
         Dim i As Integer = DataGridView2.CurrentRow.Index
         CType(Me.Controls.Find(ctrlname, False)(0), TextBox).Text = GetValue(DataGridView2.Item(3, i).Value)
         If (TextBox2.Text = "") Then
             TextBox2.Text = GetValue(DataGridView2.Item(3, i).Value)
         End If
-        '  GroupBox5.Visible = False
-        '  DataGridView2.Visible = False
-        ' ' Me.Width = Me.Width - DataGridView2.Width + 15
-        '  Me.Height = Me.Height - 145
         If ctrlname = "TextBox1" Then
             TextBox2.Focus()
         Else
@@ -225,19 +216,19 @@ Public Class FrmGodownList
     End Sub
 
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+        ''''''''show godown data for selected godown group to godown datagrid
         ShowData()
         If DataGridView2.RowCount > 1 Then
-            TextBox1.Text = DataGridView2.Item(3, 0).Value
-            TextBox2.Text = DataGridView2.Item(3, DataGridView2.RowCount - 1).Value
+            TextBox1.Text = DataGridView2.Item(3, 0).Value     '''''assign 1st row godown_no of datagrid to start godown number
+            TextBox2.Text = DataGridView2.Item(3, DataGridView2.RowCount - 1).Value   '''''assign last row godown_no of datagrid to end godown number
         End If
     End Sub
 
     Private Sub TxtSrch_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtSrch.KeyUp
+        '''''''''search tenant datagrid for the text user type in search text box
         MyConn = New OleDbConnection(connString)
-        'If MyConn.State = ConnectionState.Closed Then
         MyConn.Open()
         da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where " & indexorder & " Like '%" & TxtSrch.Text & "%' and [GODOWN].[GROUP]='" & ComboBox1.Text & "' ORDER BY [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
-        'da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where [GODOWN].GROUP Like '%" & TxtSrch.Text & "%' ORDER BY [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
         ds = New DataSet
         ds.Clear()
         da.Fill(ds, "GODOWN")
@@ -249,6 +240,7 @@ Public Class FrmGodownList
     End Sub
 
     Private Sub FrmGodownList_Move(sender As Object, e As EventArgs) Handles Me.Move
+        '''''keep position of the form fix
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height
@@ -259,6 +251,7 @@ Public Class FrmGodownList
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        ''''''report view
         If (TextBox1.Text = "") Then
             MsgBox("Please enter from godown no.")
             TextBox1.Focus()
@@ -270,8 +263,8 @@ Public Class FrmGodownList
             Exit Sub
         End If
 
-        Dim strrec As String = TextBox1.Text
-        Dim edrec As String = TextBox2.Text
+        Dim strrec As String = TextBox1.Text     '''''start godown number
+        Dim edrec As String = TextBox2.Text      '''''end godown number
 
         If edrec < strrec Then
             MsgBox("From godown no. must be less than To godown no.")
@@ -287,6 +280,7 @@ Public Class FrmGodownList
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
+        ''''select data from godown,party table for selected criteria by user
         Dim str As String = "SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where [godown].[group]='" & ComboBox1.Text & "' and [GODOWN].[GODWN_NO]>='" & strrec & "' AND [GODOWN].[GODWN_NO]<='" & edrec & "' AND [GODOWN].[STATUS]='" & ststatus & "' order by [GODOWN].GROUP+[GODOWN].GODWN_NO"
         chkrs1.Open(str, xcon)
         If chkrs1.BOF = False Then
@@ -295,11 +289,10 @@ Public Class FrmGodownList
         Dim first As Boolean = True
         Dim counter As Integer = 1
         Dim ADDPHONE, ADD1, ADD2, ADD3, ACT, HPHONE, HADD1, HADD2, HADD3, HCT, CPERSON, EMAIL, GST, REMARK As String
-        Do While chkrs1.EOF = False
+        Do While chkrs1.EOF = False    '''''godown loop start
 
-
+            ''''''godown master headers for new page
             If first Then
-                'globalHeader("Godown Master List", fnum, fnumm)
                 Print(fnum, GetStringToPrint(57, ComboBox2.Text & " Godown Master List for type - " & chkrs1.Fields(0).Value, "S") & vbNewLine)
                 Print(fnum, StrDup(14, " ") & vbNewLine)
                 Print(fnum, GetStringToPrint(7, "Sr. No.", "S") & " " & GetStringToPrint(10, "Godown Code", "S") & " " & GetStringToPrint(50, "Tenant Name", "S") & " " & GetStringToPrint(15, "Using From", "S") & " " & GetStringToPrint(12, "Survey No.", "S") & " " & GetStringToPrint(20, "Godown Size", "S") & " " & GetStringToPrint(10, "HSN", "S") & " " & GetStringToPrint(9, "Rent", "N") & " " & GetStringToPrint(9, "Remarks", "N") & vbNewLine)
@@ -396,17 +389,19 @@ Public Class FrmGodownList
                 chkrs1.MoveNext()
             End If
 
-        Loop
+        Loop    '''''godown loop end
         chkrs1.Close()
         MyConn.Close()
         FileClose(fnum)
         FileClose(fnumm)
+        '''''load crated .dat file in richtextbox of report view form
         FrmGodownListView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Godownmasterlist.dat", RichTextBoxStreamType.PlainText)
-        FrmGodownListView.Show()
-        CreatePDF(Application.StartupPath & "\Reports\Godownmasterlist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
+        FrmGodownListView.Show()    ''''show report
+        CreatePDF(Application.StartupPath & "\Reports\Godownmasterlist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)     '''''create pdf file from .dat file
 
     End Sub
     Private Function CreatePDF(strReportFilePath As String, invoice_no As String)
+        '''''create pdf file from .dat file
         Try
             Dim line As String
             Dim readFile As System.IO.TextReader = New StreamReader(strReportFilePath)
@@ -460,6 +455,7 @@ Public Class FrmGodownList
     End Function
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        ''''''''report printing
         If (TextBox1.Text = "") Then
             MsgBox("Please enter from godown no.")
             TextBox1.Focus()
@@ -592,28 +588,29 @@ Public Class FrmGodownList
         FrmGodownListView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Godownmasterlist.dat", RichTextBoxStreamType.PlainText)
         FrmGodownListView.Show()
         CreatePDF(Application.StartupPath & "\Reports\Godownmasterlist.dat", Application.StartupPath & "\Reports\" & TextBox5.Text)
+
+        '''''send pdf file to default printer
         Dim PrintPDFFile As New ProcessStartInfo
         PrintPDFFile.UseShellExecute = True
-
         PrintPDFFile.Verb = "print"
         PrintPDFFile.WindowStyle = ProcessWindowStyle.Normal
-        '.Hidden
         PrintPDFFile.FileName = Application.StartupPath & "\Reports\" & TextBox5.Text & ".pdf"
         Process.Start(PrintPDFFile)
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        Me.Close()
+        Me.Close()   ''''close the form
     End Sub
 
     Private Sub ComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox2.SelectedIndexChanged
+        ''''''''change value of variable ststatus when userchange selection from godown status combobox
         If ComboBox2.Text.Equals("Current") Then
             ststatus = "C"
         Else
             If ComboBox2.Text.Equals("Closed") Then
                 ststatus = "D"
             Else
-                ststatus = "S"
+                ststatus = "S"    '''''suspened
             End If
         End If
     End Sub

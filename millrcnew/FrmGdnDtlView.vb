@@ -1,8 +1,12 @@
-﻿
+﻿''' <summary>
+''' report view form - Godown detail
+''' In this module we are displaying .dat file in reachtextbox
+''' </summary>
 Public Class FrmGdnDtlView
     Dim formloaded As Boolean = False
     Private checkPrint As Integer
     Private Sub FrmGdnDtlView_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        '''''set position,size of form and richtextbox
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
         Me.Left = 0
@@ -14,6 +18,7 @@ Public Class FrmGdnDtlView
     End Sub
 
     Private Sub FrmGdnDtlView_Move(sender As Object, e As EventArgs) Handles Me.Move
+        ''''keep position of the form fix
         If formloaded Then
             If (Right > Parent.ClientSize.Width) Then Left = Parent.ClientSize.Width - Width
             If (Bottom > Parent.ClientSize.Height) Then Top = Parent.ClientSize.Height - Height

@@ -8,6 +8,11 @@ Imports System.Data.OleDb
 Imports System.Text.RegularExpressions
 Imports PdfSharp.Drawing
 Imports PdfSharp.Pdf
+''' <summary>
+''' tables used - godown,party,bill,gst,rent,group,gdtrans,clgdwn
+''' this is form to accept inputs from user to view/print godown detail
+''' FrmGdnDtlView.vb is used to hold report view 
+''' </summary>
 Public Class FrmGodwnDtl
     Dim da As OleDbDataAdapter
     Dim ds As DataSet
@@ -51,41 +56,53 @@ Public Class FrmGodwnDtl
     Dim chkrs66 As New ADODB.Recordset
     Dim chkrs77 As New ADODB.Recordset
     Private Sub FrmGodwnDtl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ''''''set position of the form
         Me.MdiParent = MainMDIForm
         Me.Top = MainMDIForm.Label1.Height + MainMDIForm.MainMenuStrip.Height
         Me.Left = 0
         Me.KeyPreview = True
-        ' GroupBox5.Visible = False
-        '  DataGridView2.Enabled = False
         For Each column As DataGridViewColumn In DataGridView2.Columns
             column.SortMode = DataGridViewColumnSortMode.NotSortable
         Next
-        fillgroupcombo()
-        ShowData(ComboBox1.Text, TextBox1.Text)
+        fillgroupcombo()       ''''''fill godown group combobox with group using group table
+        ShowData(ComboBox1.Text, TextBox1.Text)     '''''show data in godown datagrid for selected group
         If DataGridView2.RowCount > 1 Then
-            TextBox1.Text = DataGridView2.Item(3, 0).Value
-            ComboBox1.Text = GetValue(DataGridView2.Item(0, 0).Value)
+            TextBox1.Text = DataGridView2.Item(3, 0).Value          '''''''assign value of godwn_no from 1st row of datagrid to godown textbox
+            ComboBox1.Text = GetValue(DataGridView2.Item(0, 0).Value)     '''''''assign value of group from 1st row of datagrid to group combobox
             ComboBox1.SelectedIndex = ComboBox1.FindStringExact(ComboBox1.Text)
+        End If
+        Dim iDate As String
+        Dim fDate As DateTime
+        Dim oDate As String
+        Dim foDate As DateTime
+        If (Month(Convert.ToDateTime(Date.Now)) >= 4) Then
+            iDate = "01/04/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))     ''''''finnce year start date
+            fDate = Convert.ToDateTime(iDate)
+            oDate = "31/03/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) + 1))    '''''''''''''finnce year end date
+            foDate = Convert.ToDateTime(oDate)
+            DateTimePicker3.Value = foDate          ''''' to invoice number
+            DateTimePicker2.Value = fDate           '''''from invoice number
+            DateTimePicker4.Value = foDate          ''''to receipt number
+            DateTimePicker5.Value = fDate            '''''' from receipt number
+        Else
+            iDate = "01/04/" + Convert.ToString((Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)) - 1))     ''''''finnce year start date
+            fDate = Convert.ToDateTime(iDate)
+            oDate = "31/03/" + Convert.ToString(Year(Convert.ToDateTime(DateTimePicker1.Value.ToString)))     '''''''''''''finnce year end date
+            foDate = Convert.ToDateTime(oDate)
+            DateTimePicker3.Value = foDate
+            DateTimePicker2.Value = fDate
+            DateTimePicker4.Value = foDate
+            DateTimePicker5.Value = fDate
         End If
         ComboBox1.Focus()
         formloaded = True
     End Sub
     Private Sub ShowData(grp As String, frGdn As String)
-        '  konek() 'open our connection
+        ''''''''show godown details in data grid view uing godown,party table
         Try
-
             MyConn = New OleDbConnection(connString)
-            'If MyConn.State = ConnectionState.Closed Then
             MyConn.Open()
-            ' End If
-            'da = New OleDb.OleDbDataAdapter("SELECT [BILL].*,[PARTY].P_NAME from [BILL] INNER JOIN [PARTY] on [BILL].P_CODE=[PARTY].P_CODE where MONTH([BILL].bill_date)='" & mnth & "' AND YEAR([BILL].BILL_DATE)='" & yr & "' order by [BILL].BILL_DATE,[BILL].GROUP,[BILL].GODWN_NO", MyConn)
-            '  If (frGdn.Equals("") And toGdn.Equals("")) Then
             da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE WHERE [GODOWN].[STATUS]='C' order by [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
-            '  Else
-            '   da = New OleDb.OleDbDataAdapter("SELECT [BILL].INVOICE_NO,[BILL].GROUP,[BILL].GODWN_NO,[BILL].P_CODE,[BILL].BILL_DATE,[BILL].BILL_AMOUNT,[BILL].CGST_RATE,[BILL].CGST_AMT,[BILL].SGST_RATE,[BILL].SGST_AMT,[BILL].NET_AMOUNT,[BILL].HSN,SRNO,[BILL].REC_NO,[BILL].REC_DATE,[PARTY].P_NAME from [BILL] INNER JOIN [PARTY] on [BILL].P_CODE=[PARTY].P_CODE where [BILL].[GROUP]='" & ComboBox1.Text & "' AND [BILL].GODWN_NO>='" & TextBox3.Text & "' AND [BILL].GODWN_NO<='" & TextBox4.Text & "' order by [BILL].[GROUP],[BILL].GODWN_NO,[BILL].BILL_DATE,[BILL].INVOICE_NO", MyConn)
-            '   End If
-
-
             ds = New DataSet
             ds.Clear()
             da.Fill(ds)
@@ -149,8 +166,8 @@ Public Class FrmGodwnDtl
         End Try
     End Sub
     Public Function fillgroupcombo()
+        '''''fill godown group combo box with g_code using group table
         Try
-            '  Dim authors As New AutoCompleteStringCollection
             MyConn = New OleDbConnection(connString)
             If MyConn.State = ConnectionState.Closed Then
                 MyConn.Open()
@@ -165,22 +182,20 @@ Public Class FrmGodwnDtl
             dag.Dispose()
             dsg.Dispose()
             MyConn.Close() ' close connection
-            For i = 0 To ComboBox1.Items.Count - 1
-                '      authors.Add(ComboBox1.Items(i).ToString)
-            Next i
         Catch ex As Exception
             MessageBox.Show("Group combo fill :" & ex.Message)
         End Try
     End Function
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        '''''''report view
         If (TextBox1.Text = "") Then
             MsgBox("Please enter Tenant code .......")
             TextBox1.Focus()
             Exit Sub
         End If
         fnum = FreeFile() '''''''''Get FreeFile No.'''''''''''
-        fnumm = 2 '''''''''Get FreeFile No.'''''''''''
+        fnumm = 2 '''''''''Get FreeFile No. to write .csv file '''''''''''
         Dim numRec As Integer = 0
         Dim xline As Integer = 0
         If (Not System.IO.Directory.Exists(Application.StartupPath & "\Reports")) Then
@@ -191,8 +206,8 @@ Public Class FrmGodwnDtl
         Else
             xcon.Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & Application.StartupPath & "\millrc.accdb;")
         End If
+        ''''''get data for selected group and godown number from godown table
         chkrs222.Open("SELECT [GODOWN].* from [GODOWN] where [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND [GODOWN].GODWN_NO='" & TextBox1.Text & "' AND [GODOWN].[STATUS]='C' AND [GODOWN].[FROM_D]<=FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') order by [GODOWN].[GROUP],[GODOWN].GODWN_NO,[GODOWN].FROM_D", xcon)
-
         If chkrs222.BOF = False Then
             chkrs222.MoveFirst()
         End If
@@ -202,6 +217,7 @@ Public Class FrmGodwnDtl
             Exit Do
         Loop
         chkrs222.Close()
+        ''''''get data for tenant code of godown table from party table
         chkrs1.Open("SELECT [PARTY].* from [PARTY] where [PARTY].P_CODE='" & pcdd & "' order by [PARTY].P_CODE", xcon)
         If chkrs1.BOF = False Then
             chkrs1.MoveFirst()
@@ -222,6 +238,8 @@ Public Class FrmGodwnDtl
             Dim netInvoiceAmt As Double
             Dim recntAMT As Double
             Dim SURVEY, CENSUS, ADDPHONE, ADD1, ADD2, ADD3, ACT, HPHONE, HADD1, HADD2, HADD3, HCT, CPERSON, EMAIL, GSTt, REMARK As String
+
+            ''''''''''''''''''tenant detail start
             If IsDBNull(chkrs1.Fields(13).Value) Then   'Contact Person
                 CPERSON = ""
             Else
@@ -293,7 +311,7 @@ Public Class FrmGodwnDtl
             If IsDBNull(chkrs1.Fields(6).Value) Then
                 HADD1 = ""
             Else
-                HADD1 = chkrs1.Fields(6).Value     '.Replace(vbCr, "").Replace(vbLf, "") ' chkrs1.Fields(6).Value
+                HADD1 = chkrs1.Fields(6).Value
 
             End If
             If IsDBNull(chkrs1.Fields(7).Value) Then
@@ -322,38 +340,41 @@ Public Class FrmGodwnDtl
                     HADD3 = addHrr(2)
                 End If
             End If
-            Print(fnum, GetStringToPrint(20, "Tenant Code ", "S") & GetStringToPrint(20, chkrs1.Fields(0).Value, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Tenant Code ", "S") & "," & GetStringToPrint(20, chkrs1.Fields(0).Value, "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Tenant Name ", "S") & GetStringToPrint(55, chkrs1.Fields(1).Value, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Tenant Name ", "S") & "," & GetStringToPrint(55, chkrs1.Fields(1).Value, "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Office Address ", "S") & GetStringToPrint(55, ADD1, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Office Address ", "S") & "," & GetStringToPrint(55, ADD1.Replace(",", " "), "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Tenant Code       : ", "S") & GetStringToPrint(20, chkrs1.Fields(0).Value, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Tenant Code       :", "S") & "," & GetStringToPrint(20, chkrs1.Fields(0).Value, "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Tenant Name       : ", "S") & GetStringToPrint(55, chkrs1.Fields(1).Value, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Tenant Name       : ", "S") & "," & GetStringToPrint(55, chkrs1.Fields(1).Value, "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Office Address    : ", "S") & GetStringToPrint(55, ADD1, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Office Address    : ", "S") & "," & GetStringToPrint(55, ADD1.Replace(",", " "), "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "", "S") & GetStringToPrint(55, ADD2, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "", "S") & "," & GetStringToPrint(55, ADD2.Replace(",", " "), "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "", "S") & GetStringToPrint(55, ADD3, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "", "S") & "," & GetStringToPrint(55, ADD3.Replace(",", " "), "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "", "S") & GetStringToPrint(55, ACT, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "", "S") & "," & GetStringToPrint(55, ACT, "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Office Phone ", "S") & GetStringToPrint(55, ADDPHONE, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Office Phone ", "S") & "," & GetStringToPrint(55, ADDPHONE.Replace(",", " "), "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Residence Address ", "S") & GetStringToPrint(55, HADD1, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Residence Address ", "S") & "," & GetStringToPrint(55, HADD1.Replace(",", " "), "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Office Phone      : ", "S") & GetStringToPrint(55, ADDPHONE, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Office Phone      :", "S") & "," & GetStringToPrint(55, ADDPHONE.Replace(",", " "), "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Residence Address : ", "S") & GetStringToPrint(55, HADD1, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Residence Address :", "S") & "," & GetStringToPrint(55, HADD1.Replace(",", " "), "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "", "S") & GetStringToPrint(55, HADD2, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "", "S") & "," & GetStringToPrint(55, HADD2.Replace(",", " "), "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "", "S") & GetStringToPrint(55, HADD3, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "", "S") & "," & GetStringToPrint(55, HADD3.Replace(",", " "), "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "", "S") & GetStringToPrint(55, HCT, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "", "S") & "," & GetStringToPrint(55, HCT.Replace(",", " "), "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Residence Phone ", "S") & GetStringToPrint(55, HPHONE, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Residence Phone ", "S") & "," & GetStringToPrint(55, HPHONE.Replace(",", " "), "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Contact Person ", "S") & GetStringToPrint(55, CPERSON, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Contact Person ", "S") & "," & GetStringToPrint(55, CPERSON.Replace(",", " "), "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Email Id ", "S") & GetStringToPrint(55, EMAIL, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Email Id ", "S") & "," & GetStringToPrint(55, EMAIL, "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "GSTIN", "S") & GetStringToPrint(55, GSTt, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "GSTIN", "S") & "," & GetStringToPrint(55, GSTt, "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Residence Phone   : ", "S") & GetStringToPrint(55, HPHONE, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Residence Phone   : ", "S") & "," & GetStringToPrint(55, HPHONE.Replace(",", " "), "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Contact Person    : ", "S") & GetStringToPrint(55, CPERSON, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Contact Person    : ", "S") & "," & GetStringToPrint(55, CPERSON.Replace(",", " "), "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Email Id          : ", "S") & GetStringToPrint(55, EMAIL, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Email Id          :", "S") & "," & GetStringToPrint(55, EMAIL, "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "GSTIN             : ", "S") & GetStringToPrint(55, GSTt, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "GSTIN             : ", "S") & "," & GetStringToPrint(55, GSTt, "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "  ", "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "  ", "S") & "," & vbNewLine)
+            ''''''''''''''''''tenant detail end
+
+            ''''''''''''''godown detail start
             Dim srs As String = "SELECT [GODOWN].* from [GODOWN] where [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND [GODOWN].GODWN_NO='" & TextBox1.Text & "' and [GODOWN].P_CODE='" & pcdd & "' AND [GODOWN].[FROM_D]<=FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') order by [GODOWN].[GROUP],[GODOWN].GODWN_NO,[GODOWN].FROM_D"
 
             chkrs2.Open("SELECT [GODOWN].* from [GODOWN] where [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND [GODOWN].GODWN_NO='" & TextBox1.Text & "' and [GODOWN].P_CODE='" & pcdd & "' AND [GODOWN].[FROM_D]<=FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') order by [GODOWN].[GROUP],[GODOWN].GODWN_NO,[GODOWN].FROM_D", xcon)
@@ -380,11 +401,11 @@ Public Class FrmGodwnDtl
                     Else
                         CENSUS = chkrs2.Fields(5).Value
                     End If
-                    Print(fnum, GetStringToPrint(13, "Survey No. : ", "S") & GetStringToPrint(20, SURVEY, "S") & GetStringToPrint(12, "Census No.: ", "S") & GetStringToPrint(20, CENSUS, "S") & vbNewLine)
-                    Print(fnumm, GetStringToPrint(13, "Survey No. : ", "S") & "," & GetStringToPrint(20, SURVEY.Replace(",", " "), "S") & "," & GetStringToPrint(12, "Census No.: ", "S") & "," & GetStringToPrint(20, CENSUS.Replace(",", " "), "S") & vbNewLine)
-                    Print(fnum, GetStringToPrint(13, "Size       : ", "S") & GetStringToPrint(19, "Length : " & Trim(Format(chkrs2.Fields(19).Value, "##0.00")), "S") & GetStringToPrint(5, " X   ", "S") & GetStringToPrint(15, "Width : " & Trim(Format(chkrs2.Fields(18).Value, "##0.00")), "S") & GetStringToPrint(3, " = ", "S") & GetStringToPrint(25, Trim(Format(chkrs2.Fields(20).Value, "#####0.00")), "S") & vbNewLine)
-                    Print(fnumm, GetStringToPrint(13, "Size       : ", "S") & "," & GetStringToPrint(19, "Length : " & Trim(Format(chkrs2.Fields(19).Value, "##0.00")), "S") & GetStringToPrint(5, " X   ", "S") & GetStringToPrint(15, "Width : " & Trim(Format(chkrs2.Fields(18).Value, "##0.00")), "S") & GetStringToPrint(3, " = ", "S") & GetStringToPrint(25, Trim(Format(chkrs2.Fields(20).Value, "#####0.00")), "S") & vbNewLine)
-                    chkrs3.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs2.Fields(0).Value & "' and GODWN_NO='" & chkrs2.Fields(3).Value & "' and P_CODE ='" & TextBox1.Text & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
+                    Print(fnum, GetStringToPrint(18, "Survey No.      : ", "S") & GetStringToPrint(20, SURVEY, "S") & GetStringToPrint(12, "Census No.: ", "S") & GetStringToPrint(20, CENSUS, "S") & vbNewLine)
+                    Print(fnumm, GetStringToPrint(18, "Survey No.      : ", "S") & "," & GetStringToPrint(20, SURVEY.Replace(",", " "), "S") & "," & GetStringToPrint(12, "Census No.: ", "S") & "," & GetStringToPrint(20, CENSUS.Replace(",", " "), "S") & vbNewLine)
+                    Print(fnum, GetStringToPrint(18, "Size            : ", "S") & GetStringToPrint(19, "Length : " & Trim(Format(chkrs2.Fields(19).Value, "##0.00")), "S") & GetStringToPrint(5, " X   ", "S") & GetStringToPrint(15, "Width : " & Trim(Format(chkrs2.Fields(18).Value, "##0.00")), "S") & GetStringToPrint(3, " = ", "S") & GetStringToPrint(25, Trim(Format(chkrs2.Fields(20).Value, "#####0.00")), "S") & vbNewLine)
+                    Print(fnumm, GetStringToPrint(18, "Size            : ", "S") & "," & GetStringToPrint(19, "Length : " & Trim(Format(chkrs2.Fields(19).Value, "##0.00")), "S") & GetStringToPrint(5, " X   ", "S") & GetStringToPrint(15, "Width : " & Trim(Format(chkrs2.Fields(18).Value, "##0.00")), "S") & GetStringToPrint(3, " = ", "S") & GetStringToPrint(25, Trim(Format(chkrs2.Fields(20).Value, "#####0.00")), "S") & vbNewLine)
+                    chkrs3.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs2.Fields(0).Value & "' and GODWN_NO='" & chkrs2.Fields(3).Value & "' and P_CODE ='" & pcdd & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
                     Dim amt, pamt As Double
                     amt = 0
                     pamt = 0
@@ -398,57 +419,59 @@ Public Class FrmGodwnDtl
                         End If
                     End If
                     chkrs3.Close()
-                    Print(fnum, GetStringToPrint(13, "Rent       : ", "S") & GetStringToPrint(12, Format(amt, "#####0.00"), "S") & GetStringToPrint(8, "Prent : ", "S") & GetStringToPrint(12, Format(pamt, "#####0.00"), "S") & GetStringToPrint(8, "Total : ", "S") & GetStringToPrint(15, Format(amt + pamt, "#####0.00"), "S") & vbNewLine)
-                    Print(fnumm, GetStringToPrint(13, "Rent       : ", "S") & "," & GetStringToPrint(12, Format(amt, "#####0.00"), "S") & "," & GetStringToPrint(8, "Prent : ", "S") & "," & GetStringToPrint(12, Format(pamt, "#####0.00"), "S") & "," & GetStringToPrint(8, "Total : ", "S") & "," & GetStringToPrint(15, Format(amt + pamt, "#####0.00"), "S") & vbNewLine)
-                    If IsDBNull(chkrs2.Fields(21).Value) Or chkrs2.Fields(21).Value.Equals("") Then
-                        Print(fnum, GetStringToPrint(13, "Opening    : ", "S") & GetStringToPrint(12, "", "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(13, "Opening    : ", "S") & "," & GetStringToPrint(12, "", "S") & vbNewLine)
-                    Else
-                        Print(fnum, GetStringToPrint(13, "Opening    : ", "S") & GetStringToPrint(12, Format(chkrs2.Fields(21).Value, "#####0.00"), "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(13, "Opening    : ", "S") & "," & GetStringToPrint(12, Format(chkrs2.Fields(21).Value, "#####0.00"), "S") & vbNewLine)
-                    End If
+                    Print(fnum, GetStringToPrint(18, "Rent            : ", "S") & GetStringToPrint(12, Format(amt, "#####0.00"), "S") & GetStringToPrint(8, "Prent : ", "S") & GetStringToPrint(12, Format(pamt, "#####0.00"), "S") & GetStringToPrint(8, "Total : ", "S") & GetStringToPrint(15, Format(amt + pamt, "#####0.00"), "S") & vbNewLine)
+                    Print(fnumm, GetStringToPrint(18, "Rent            : ", "S") & "," & GetStringToPrint(12, Format(amt, "#####0.00"), "S") & "," & GetStringToPrint(8, "Prent : ", "S") & "," & GetStringToPrint(12, Format(pamt, "#####0.00"), "S") & "," & GetStringToPrint(8, "Total : ", "S") & "," & GetStringToPrint(15, Format(amt + pamt, "#####0.00"), "S") & vbNewLine)
 
-                    If IsDBNull(chkrs2.Fields(21).Value) Or chkrs2.Fields(21).Value.Equals("") Then
-                        Print(fnum, GetStringToPrint(13, "Closing    : ", "S") & GetStringToPrint(12, "", "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(13, "Closing    : ", "S") & "," & GetStringToPrint(12, "", "S") & vbNewLine)
-                    Else
-                        Print(fnum, GetStringToPrint(13, "Closing    : ", "S") & GetStringToPrint(12, Format(chkrs2.Fields(21).Value, "#####0.00"), "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(13, "Closing    : ", "S") & "," & GetStringToPrint(12, Format(chkrs2.Fields(21).Value, "#####0.00"), "S") & vbNewLine)
-                    End If
+
                     If (chkrs2.Fields(10).Value.Equals("C")) Then
-                        Print(fnum, GetStringToPrint(13, "Status     : ", "S") & GetStringToPrint(55, "In Use", "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(13, "Status     : ", "S") & "," & GetStringToPrint(55, "In Use", "S") & vbNewLine)
-                        Print(fnum, GetStringToPrint(13, "Using From : ", "S") & GetStringToPrint(55, chkrs2.Fields(11).Value, "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(13, "Using From : ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(11).Value, "S") & vbNewLine)
+                        Print(fnum, GetStringToPrint(18, "Status          : ", "S") & GetStringToPrint(55, "In Use", "S") & vbNewLine)
+                        Print(fnumm, GetStringToPrint(18, "Status          : ", "S") & "," & GetStringToPrint(55, "In Use", "S") & vbNewLine)
+                        '''''''''''''''''''''''godown transfer detail if any data exist in gdtrans table
+
+                        chkrs4.Open("SELECT [GDTRANS].*,[PARTY].P_NAME FROM GDTRANS INNER JOIN PARTY ON [PARTY].P_CODE=[GDTRANS].NP_CODE WHERE [GROUP]='" & chkrs2.Fields(0).Value & "' and GODWN_NO='" & chkrs2.Fields(3).Value & "' and NP_CODE ='" & pcdd & "' order by  [GROUP],[GODWN_NO],OP_CODE DESC", xcon)
+                        If chkrs4.BOF = False Then
+                            chkrs4.MoveFirst()
+                        End If
+                        If chkrs4.EOF = False Then
+                            Print(fnum, GetStringToPrint(18, "Previous Tenant : ", "S") & GetStringToPrint(55, chkrs4.Fields(3).Value, "S") & GetStringToPrint(25, "Tenant Code : " & chkrs4.Fields(2).Value, "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, "Previous Tenant : ", "S") & "," & GetStringToPrint(55, chkrs4.Fields(3).Value, "S") & "," & GetStringToPrint(25, "Tenant Code : " & chkrs4.Fields(2).Value, "S") & vbNewLine)
+                            'Print(fnum, GetStringToPrint(13, "Transfer Date : ", "S") & GetStringToPrint(55, chkrs4.Fields(6).Value, "S") & vbNewLine)
+                            'Print(fnumm, GetStringToPrint(13, "Transfer Date : ", "S") & "," & GetStringToPrint(55, chkrs4.Fields(6).Value, "S") & vbNewLine)
+                        End If
+
+                        chkrs4.Close()
+
+                        ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                        Print(fnum, GetStringToPrint(18, "Using From      : ", "S") & GetStringToPrint(55, chkrs2.Fields(11).Value, "S") & vbNewLine)
+                        Print(fnumm, GetStringToPrint(18, "Using From      : ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(11).Value, "S") & vbNewLine)
                         If IsDBNull(chkrs2.Fields(22).Value) Or chkrs2.Fields(22).Value.Equals("") Then
-                            Print(fnum, GetStringToPrint(13, "Remarks    : ", "S") & GetStringToPrint(55, " ", "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(13, "Remarks    : ", "S") & "," & GetStringToPrint(55, " ", "S") & vbNewLine)
+                            Print(fnum, GetStringToPrint(18, "Remarks         : ", "S") & GetStringToPrint(55, " ", "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, "Remarks         : ", "S") & "," & GetStringToPrint(55, " ", "S") & vbNewLine)
                         Else
-                            Print(fnum, GetStringToPrint(13, "Remarks    : ", "S") & GetStringToPrint(55, chkrs2.Fields(22).Value, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(13, "Remarks    : ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(22).Value.Replace(",", " "), "S") & vbNewLine)
+                            Print(fnum, GetStringToPrint(18, "Remarks         : ", "S") & GetStringToPrint(55, chkrs2.Fields(22).Value, "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, "Remarks         : ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(22).Value.Replace(",", " "), "S") & vbNewLine)
                         End If
                         If IsDBNull(chkrs2.Fields(23).Value) Or chkrs2.Fields(23).Value.Equals("") Then
-                            Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(55, " ", "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(55, " ", "S") & vbNewLine)
+                            Print(fnum, GetStringToPrint(18, " ", "S") & GetStringToPrint(55, " ", "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, " ", "S") & "," & GetStringToPrint(55, " ", "S") & vbNewLine)
                         Else
-                            Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(55, chkrs2.Fields(23).Value, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(23).Value.Replace(",", " "), "S") & vbNewLine)
+                            Print(fnum, GetStringToPrint(18, " ", "S") & GetStringToPrint(55, chkrs2.Fields(23).Value, "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, " ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(23).Value.Replace(",", " "), "S") & vbNewLine)
                         End If
                         If IsDBNull(chkrs2.Fields(24).Value) Or chkrs2.Fields(24).Value.Equals("") Then
                         Else
-                            Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(55, chkrs2.Fields(24).Value, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(24).Value.Replace(",", " "), "S") & vbNewLine)
+                            Print(fnum, GetStringToPrint(18, " ", "S") & GetStringToPrint(55, chkrs2.Fields(24).Value, "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, " ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(24).Value.Replace(",", " "), "S") & vbNewLine)
                         End If
                         If IsDBNull(chkrs2.Fields(25).Value) Or chkrs2.Fields(25).Value.Equals("") Then
                         Else
-                            Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(55, chkrs2.Fields(25).Value, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(25).Value.Replace(",", " "), "S") & vbNewLine)
+                            Print(fnum, GetStringToPrint(18, " ", "S") & GetStringToPrint(55, chkrs2.Fields(25).Value, "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, " ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(25).Value.Replace(",", " "), "S") & vbNewLine)
                         End If
+                        ''''''''''''''godown detail end
 
-
-                        ''''''''''''''advance detail
-                        '''''''''''''''''''' invoice details
-                        chkrs77.Open("SELECT * from Advances where P_CODE ='" & TextBox1.Text & "' AND GODWN_NO='" & chkrs2.Fields(3).Value & "' AND [Advances].[GROUP]='" & chkrs2.Fields(0).Value & "'", xcon)
+                        ''''''''''''''advance detail start
+                        chkrs77.Open("SELECT * from Advances where P_CODE ='" & pcdd & "' AND GODWN_NO='" & chkrs2.Fields(3).Value & "' AND [Advances].[GROUP]='" & chkrs2.Fields(0).Value & "'", xcon)
                         If chkrs77.BOF = False Then
                             chkrs77.MoveFirst()
                         End If
@@ -471,9 +494,12 @@ Public Class FrmGodwnDtl
                             End If
                         Loop
                         chkrs77.Close()
+                        ''''''''''''''advance detail end
+
                         Print(fnum, GetStringToPrint(20, "  ", "S") & vbNewLine)
                         Print(fnumm, GetStringToPrint(20, "  ", "S") & vbNewLine)
-                        '''''''''''''''''''' invoice details
+
+                        '''''''''''''''''''' invoice details start
                         chkrs66.Open("SELECT [BILL].* from [BILL] where [BILL].BILL_DATE >= FORMAT('" & chkrs2.Fields(11).Value & "','DD/MM/YYYY') and [BILL].BILL_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE ='" & pcdd & "' AND [BILL].GODWN_NO='" & chkrs2.Fields(3).Value & "' AND [BILL].[GROUP]='" & chkrs2.Fields(0).Value & "' order by [BILL].BILL_DATE,[BILL].INVOICE_NO", xcon)
                         If chkrs66.BOF = False Then
                             chkrs66.MoveFirst()
@@ -484,42 +510,54 @@ Public Class FrmGodwnDtl
                         Dim totsgst As Double = 0
                         Dim totnet As Double = 0
                         Dim advRec As Double = 0
+
+
                         Do While chkrs66.EOF = False
                             If firstInv Then
 
-                                Print(fnum, GetStringToPrint(17, "Invoice Date", "S") & GetStringToPrint(13, "Invoice No.", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(7, "  GST", "N") & GetStringToPrint(12, " CGST Amt", "N") & GetStringToPrint(12, " SGST Amt", "N") & GetStringToPrint(12, " Net Amt", "N") & GetStringToPrint(20, "  Against Advance", "S") & GetStringToPrint(20, "  paid/due", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "Invoice Date", "S") & "," & GetStringToPrint(13, "Invoice No.", "S") & "," & GetStringToPrint(13, "Amount", "N") & "," & GetStringToPrint(7, "  GST", "N") & "," & GetStringToPrint(12, " CGST Amt", "N") & "," & GetStringToPrint(12, " SGST Amt", "N") & "," & GetStringToPrint(12, " Net Amt", "N") & "," & GetStringToPrint(20, "  Against Advance", "S") & "," & GetStringToPrint(20, "  paid/due", "S") & vbNewLine)
-                                Print(fnum, StrDup(180, "=") & vbNewLine)
-                                Print(fnumm, StrDup(180, "=") & vbNewLine)
+                                Print(fnum, GetStringToPrint(11, "Invoice ", "S") & GetStringToPrint(10, "Invoice", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(7, "  GST", "N") & GetStringToPrint(12, " CGST Amt", "N") & GetStringToPrint(12, " SGST Amt", "N") & GetStringToPrint(12, " Net Amt", "N") & GetStringToPrint(10, "  Against", "S") & GetStringToPrint(10, "  paid/due", "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(11, "Invoice ", "S") & "," & GetStringToPrint(10, "Invoice", "S") & "," & GetStringToPrint(13, "Amount", "N") & "," & GetStringToPrint(7, "  GST", "N") & "," & GetStringToPrint(12, " CGST Amt", "N") & "," & GetStringToPrint(12, " SGST Amt", "N") & "," & GetStringToPrint(12, " Net Amt", "N") & "," & GetStringToPrint(10, "  Against", "S") & "," & GetStringToPrint(10, "  paid/due", "S") & vbNewLine)
+
+                                Print(fnum, GetStringToPrint(11, "Date", "S") & GetStringToPrint(10, "No.", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(7, " ", "N") & GetStringToPrint(12, " ", "N") & GetStringToPrint(12, " ", "N") & GetStringToPrint(12, " ", "N") & GetStringToPrint(10, "  Advance", "S") & GetStringToPrint(10, " ", "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(11, "Date", "S") & "," & GetStringToPrint(10, "No.", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(7, " ", "N") & "," & GetStringToPrint(12, " ", "N") & "," & GetStringToPrint(12, " ", "N") & "," & GetStringToPrint(12, " ", "N") & "," & GetStringToPrint(10, "  Advance", "S") & "," & GetStringToPrint(10, " ", "S") & vbNewLine)
+
+                                Print(fnum, StrDup(100, "=") & vbNewLine)
+                                Print(fnumm, StrDup(100, "=") & vbNewLine)
                                 firstInv = False
                                 xline = xline + 3
                             End If
-                            Print(fnum, GetStringToPrint(17, chkrs66.Fields(4).Value, "S") & GetStringToPrint(13, chkrs66.Fields(0).Value, "S") & GetStringToPrint(13, chkrs66.Fields(5).Value, "N") & GetStringToPrint(7, "   18.0 %", "S") & GetStringToPrint(12, chkrs66.Fields(7).Value, "N") & GetStringToPrint(12, chkrs66.Fields(9).Value, "N") & GetStringToPrint(12, chkrs66.Fields(10).Value, "N") & GetStringToPrint(20, IIf(chkrs66.Fields(15).Value = True, "     Yes", "     No"), "S") & GetStringToPrint(20, IIf(IsDBNull(chkrs66.Fields(13).Value), "     Due", "     Paid"), "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(17, chkrs66.Fields(4).Value, "S") & "," & GetStringToPrint(13, chkrs66.Fields(0).Value, "S") & "," & GetStringToPrint(13, chkrs66.Fields(5).Value, "N") & "," & GetStringToPrint(7, "   18.0 %", "S") & "," & GetStringToPrint(12, chkrs66.Fields(7).Value, "N") & "," & GetStringToPrint(12, chkrs66.Fields(9).Value, "N") & "," & GetStringToPrint(12, chkrs66.Fields(10).Value, "N") & "," & GetStringToPrint(20, IIf(chkrs66.Fields(15).Value = True, "     Yes", "     No"), "S") & "," & GetStringToPrint(20, IIf(IsDBNull(chkrs66.Fields(13).Value), "     Due", "     Paid"), "S") & vbNewLine)
-                            totamtt = totamtt + chkrs66.Fields(5).Value
-                            totcgst = totcgst + chkrs66.Fields(7).Value
-                            totsgst = totsgst + chkrs66.Fields(9).Value
-                            totnet = totnet + chkrs66.Fields(10).Value
+
+
+                            If (chkrs66.Fields(4).Value >= Format(DateTimePicker2.Value.Date, "dd/MM/yyyy") And chkrs66.Fields(4).Value <= Format(DateTimePicker3.Value.Date, "dd/MM/yyyy")) Then
+                                Print(fnum, GetStringToPrint(11, chkrs66.Fields(4).Value, "S") & GetStringToPrint(10, "  " & chkrs66.Fields(0).Value, "S") & GetStringToPrint(13, chkrs66.Fields(5).Value, "N") & GetStringToPrint(7, "   18.0 %", "S") & GetStringToPrint(12, chkrs66.Fields(7).Value, "N") & GetStringToPrint(12, chkrs66.Fields(9).Value, "N") & GetStringToPrint(12, chkrs66.Fields(10).Value, "N") & GetStringToPrint(10, IIf(chkrs66.Fields(15).Value = True, "     Yes", "     No"), "S") & GetStringToPrint(10, IIf(IsDBNull(chkrs66.Fields(13).Value), "     Due", "     Paid"), "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(11, chkrs66.Fields(4).Value, "S") & "," & GetStringToPrint(10, "  " & chkrs66.Fields(0).Value, "S") & "," & GetStringToPrint(13, chkrs66.Fields(5).Value, "N") & "," & GetStringToPrint(7, "   18.0 %", "S") & "," & GetStringToPrint(12, chkrs66.Fields(7).Value, "N") & "," & GetStringToPrint(12, chkrs66.Fields(9).Value, "N") & "," & GetStringToPrint(12, chkrs66.Fields(10).Value, "N") & "," & GetStringToPrint(10, IIf(chkrs66.Fields(15).Value = True, "     Yes", "     No"), "S") & "," & GetStringToPrint(10, IIf(IsDBNull(chkrs66.Fields(13).Value), "     Due", "     Paid"), "S") & vbNewLine)
+
+                                totamtt = totamtt + chkrs66.Fields(5).Value
+                                totcgst = totcgst + chkrs66.Fields(7).Value
+                                totsgst = totsgst + chkrs66.Fields(9).Value
+                                totnet = totnet + chkrs66.Fields(10).Value
+                                If chkrs66.Fields(4).Value <= ED Then
+                                    advRec = advRec + chkrs66.Fields(10).Value
+                                End If
+                            End If
+                            netInvoiceAmt = netInvoiceAmt + chkrs66.Fields(10).Value
                             If chkrs66.Fields(4).Value <= ED Then
-                                advRec = advRec + chkrs66.Fields(10).Value
+                                advreceived = advreceived + chkrs66.Fields(10).Value
                             End If
                             If chkrs66.EOF = False Then
                                 chkrs66.MoveNext()
                             End If
                         Loop
-                        advreceived = advRec
-                        netInvoiceAmt = totnet
+
                         chkrs66.Close()
-                        Print(fnum, StrDup(180, "=") & vbNewLine)
-                        Print(fnumm, StrDup(180, "=") & vbNewLine)
-                        Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(13, totamtt, "N") & GetStringToPrint(7, " ", "S") & GetStringToPrint(12, totcgst, "N") & GetStringToPrint(12, totsgst, "N") & GetStringToPrint(12, totnet, "N") & GetStringToPrint(20, "", "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, "", "S") & "," & GetStringToPrint(13, totamtt, "N") & "," & GetStringToPrint(7, " ", "S") & "," & GetStringToPrint(12, totcgst, "N") & "," & GetStringToPrint(12, totsgst, "N") & "," & GetStringToPrint(12, totnet, "N") & "," & GetStringToPrint(20, "", "S") & vbNewLine)
-                        '''''''''''''''''''' invoice details
+                        Print(fnum, StrDup(100, "=") & vbNewLine)
+                        Print(fnumm, StrDup(100, "=") & vbNewLine)
+                        Print(fnum, GetStringToPrint(11, "", "S") & GetStringToPrint(10, "", "S") & GetStringToPrint(13, totamtt, "N") & GetStringToPrint(7, " ", "S") & GetStringToPrint(12, totcgst, "N") & GetStringToPrint(12, totsgst, "N") & GetStringToPrint(12, totnet, "N") & GetStringToPrint(20, "", "S") & vbNewLine)
+                        Print(fnumm, GetStringToPrint(11, "", "S") & "," & GetStringToPrint(10, "", "S") & "," & GetStringToPrint(13, totamtt, "N") & "," & GetStringToPrint(7, " ", "S") & "," & GetStringToPrint(12, totcgst, "N") & "," & GetStringToPrint(12, totsgst, "N") & "," & GetStringToPrint(12, totnet, "N") & "," & GetStringToPrint(20, "", "S") & vbNewLine)
+                        '''''''''''''''''''' invoice details end
 
 
-                        ''''''''''''''''''''payment details
-
-                        ' Dim str As String = "SELECT DISTINCT [receipt].*,[bill].[P_CODE],[BILL].[REC_DATE],[BILL].[REC_NO] from [receipt] INNER JOIN [bill] on [receipt].[rec_no]=int([bill].[rec_no]) and [receipt].[rec_date]=[bill].[rec_date] WHERE [receipt].[GROUP]='" & chkrs2.Fields(0).Value & "' AND [receipt].[GODWN_NO]='" & chkrs2.Fields(3).Value & "' and [RECEIPT].REC_DATE >= FORMAT('" & chkrs2.Fields(11).Value & "','DD/MM/YYYY') AND [receipt].REC_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE='" & pcd & "' order by [receipt].[GROUP],[receipt].GODWN_NO,[receipt].REC_DATE,[receipt].REC_NO"
+                        ''''''''''''''''''''payment details start
                         Dim str As String = "SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].REC_DATE >= FORMAT('" & chkrs2.Fields(11).Value & "','DD/MM/YYYY') and [RECEIPT].[GROUP]='" & chkrs2.Fields(0).Value & "' AND [RECEIPT].GODWN_NO='" & chkrs2.Fields(3).Value & "' order by [RECEIPT].REC_DATE+[RECEIPT].REC_NO"
                         chkrs11.Open("SELECT DISTINCT [receipt].*,[bill].[P_CODE],[BILL].[REC_DATE],[BILL].[REC_NO] from [receipt] INNER JOIN [bill] on [receipt].[rec_no]=int([bill].[rec_no]) and [receipt].[rec_date]=[bill].[rec_date] WHERE [receipt].[GROUP]='" & chkrs2.Fields(0).Value & "' AND [receipt].[GODWN_NO]='" & chkrs2.Fields(3).Value & "' and [RECEIPT].REC_DATE >= FORMAT('" & chkrs2.Fields(11).Value & "','DD/MM/YYYY') AND [receipt].REC_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE='" & chkrs2.Fields(1).Value & "' order by [receipt].[GROUP],[receipt].GODWN_NO,[receipt].REC_DATE,[receipt].REC_NO", xcon)
                         If chkrs11.BOF = False Then
@@ -529,25 +567,6 @@ Public Class FrmGodwnDtl
                         Dim totamt As Double = 0
                         Dim totadv As Double = 0
                         Do While chkrs11.EOF = False
-
-                            If first Then
-                                Print(fnum, GetStringToPrint(20, "  ", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(20, "  ", "S") & vbNewLine)
-                                Print(fnum, GetStringToPrint(30, "Payment Details  ", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(30, "Payment Details  ", "S") & vbNewLine)
-                                Print(fnum, GetStringToPrint(30, "===============  ", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(30, "===============  ", "S") & vbNewLine)
-                                Print(fnum, GetStringToPrint(17, "Receipt Date", "S") & GetStringToPrint(17, "Receipt No.", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(13, "  Advance", "S") & GetStringToPrint(12, "Cash/Cheque", "S") & GetStringToPrint(7, "Group", "S") & GetStringToPrint(13, "Godown No.", "S") & GetStringToPrint(50, "Tenant Name", "S") & GetStringToPrint(33, "Bank A/C Detail", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "Receipt Date", "S") & "," & GetStringToPrint(17, "Receipt No.", "S") & "," & GetStringToPrint(13, "Amount", "N") & "," & GetStringToPrint(13, "  Advance", "S") & "," & GetStringToPrint(12, "Cash/Cheque", "S") & "," & GetStringToPrint(7, "Group", "S") & "," & GetStringToPrint(13, "Godown No.", "S") & "," & GetStringToPrint(50, "Tenant Name", "S") & "," & GetStringToPrint(33, "Bank A/C Detail", "S") & vbNewLine)
-                                Print(fnum, GetStringToPrint(17, "Cheque No.", "S") & GetStringToPrint(17, "Cheque Date", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(50, "Bank Name", "S") & GetStringToPrint(33, "Branch", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "Cheque No.", "S") & "," & GetStringToPrint(17, "Cheque Date", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(50, "Bank Name", "S") & "," & GetStringToPrint(33, "Branch", "S") & vbNewLine)
-                                Print(fnum, GetStringToPrint(17, "From Month-Year", "S") & GetStringToPrint(17, "To Month-Year", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, "Adjusted Bill No.", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "From Month-Year", "S") & "," & GetStringToPrint(17, "To Month-Year", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, "Adjusted Bill No.", "S") & vbNewLine)
-                                Print(fnum, StrDup(180, "=") & vbNewLine)
-                                Print(fnumm, StrDup(180, "=") & vbNewLine)
-                                first = False
-                                xline = xline + 3
-                            End If
 
                             ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
                             chkrs44.Open("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE WHERE [GROUP]='" & chkrs11.Fields(1).Value & "' AND GODWN_NO='" & chkrs11.Fields(2).Value & "' AND [STATUS]='C'", xcon)
@@ -614,10 +633,7 @@ Public Class FrmGodwnDtl
                                 net = amtt + gst_amt
                                 CGST_TAXAMT = gst_amt / 2
 
-
-                                'CGST_TAXAMT = amt * CGST_RATE / 100
                                 CGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
-                                'SGST_TAXAMT = amt * SGST_RATE / 100
                                 SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
                             End If
                             chkrs44.Close()
@@ -636,19 +652,10 @@ Public Class FrmGodwnDtl
                             Dim agcount As Integer = 0
                             Dim adjusted_amt As Double = 0
                             Dim last_bldate As DateTime
-                            '  If chkrs1.Fields(6).Value = True Then
-
-                            '  Else
-                            '  grp = chkrs1.Fields(1).Value
-                            '   gdn = chkrs1.Fields(2).Value
                             Dim RS As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                             chkrs22.Open("SELECT t2.*,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=FORMAT('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=FORMAT('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO", xcon)
 
                             Do While chkrs22.EOF = False
-                                'sgsrate = chkrs2.Fields(8).Value
-                                'cgsrate = chkrs2.Fields(6).Value
-                                'sgamt = chkrs2.Fields(9).Value
-                                'cgamt = chkrs2.Fields(7).Value
                                 If chkrs22.Fields(13).Value >= inv And chkrs22.Fields(14).Value <= invdt And chkrs11.Fields(3).Value >= chkrs22.Fields(4).Value Then
                                     If FIRSTREC Then
                                         chkrs6.Open("Select FROM_DATE,TO_DATE FROM BILL_TR WHERE [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND INVOICE_NO='" & chkrs22.Fields(0).Value & "' and  BILL_DATE=format('" & Convert.ToDateTime(chkrs22.Fields(4).Value) & "','dd/mm/yyyy') ", xcon)
@@ -697,7 +704,6 @@ Public Class FrmGodwnDtl
 
                             Loop
                             chkrs22.Close()
-                            '   End If
                             If against.Length > 2 Then
                                 against = against.Substring(0, against.Length - 2)
                             End If
@@ -714,20 +720,17 @@ Public Class FrmGodwnDtl
                                 against3 = against3.Substring(0, against3.Length - 2)
                             End If
                             '''''''''''''''''''against bill and period end''''''''''''
-                            '    Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
 
                             ''''''''''''''find out if any advance is left after adjustment start
                             Dim advanceamt As Double = 0
                             Dim advanceamtprint As Double = 0
                             Dim lastbilladjusted As Integer
-                            ' Dim last_bldate As DateTime
                             advanceamt = chkrs11.Fields(5).Value - adjusted_amt
                             advanceamtprint = advanceamt
                             If advanceamt > 0 Then
                                 Dim Rss As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[GODOWN].FROM_D From [BILL] As t2 inner join GODOWN on t2.[GROUP]=[GODOWN].[GROUP] AND t2.[GODWN_NO]=[GODOWN].GODWN_NO Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND T2.P_CODE='" & pcode1 & "' AND ((t2.REC_NO IS NOT NULL AND t2.REC_DATE IS NOT NULL)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                                 chkrs55.Open(Rss, xcon)
                                 Do While chkrs55.EOF = False
-                                    '  chkrs5.MoveLast()
                                     If chkrs11.Fields(3).Value >= chkrs55.Fields(4).Value Then
                                         lastbilladjusted = chkrs55.Fields(0).Value
                                         last_bldate = chkrs55.Fields(4).Value
@@ -741,8 +744,6 @@ Public Class FrmGodwnDtl
                                     Rss = "SELECT FROM_D From GODOWN Where [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND P_CODE='" & pcode1 & "' and [STATUS]='C' order by [GROUP]+GODWN_NO"
                                     chkrs55.Open(Rss, xcon)
                                     If chkrs55.EOF = False Then
-                                        ' chkrs5.MoveLast()
-                                        'lastbilladjusted = chkrs5.Fields(13).Value
                                         last_bldate = chkrs55.Fields(0).Value
                                     End If
                                     chkrs55.Close()
@@ -764,54 +765,85 @@ Public Class FrmGodwnDtl
                                             advanceamt = advanceamt - net
                                             TONO = FROMNO
                                             FIRSTREC = False
-                                            'last_bldate = chkrs5.Fields(0).Value
                                         End If
                                     Else
-                                        '  TONO = MonthName(sdt.AddMonths(dtcounter).Month, False) & "-" & sdt.AddMonths(dtcounter).Year
                                         TONO = MonthName(last_bldate.AddMonths(dtcounter).Month, False) & "-" & last_bldate.AddMonths(dtcounter).Year
                                         advanceamt = advanceamt - net
                                         dtcounter = dtcounter + 1
                                     End If
                                 Loop
                             End If
-
+                            recntAMT = recntAMT + chkrs11.Fields(5).Value
                             ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-                            totamt = totamt + chkrs11.Fields(5).Value
-                            totadv = totadv + advanceamtprint
-                            Print(fnum, GetStringToPrint(17, chkrs11.Fields(3).Value, "S") & GetStringToPrint(17, "GST-" + chkrs11.Fields(4).Value.ToString, "S") & GetStringToPrint(13, Format(chkrs11.Fields(5).Value, "######0.00"), "N") & GetStringToPrint(13, Format(advanceamtprint, "######0.00"), "N") & GetStringToPrint(12, "  " & chkrs11.Fields(7).Value, "S") & GetStringToPrint(7, chkrs11.Fields(1).Value, "S") & GetStringToPrint(13, chkrs11.Fields(2).Value, "S") & GetStringToPrint(50, pname, "S") & GetStringToPrint(33, IIf(IsDBNull(chkrs11.Fields(12).Value), "", chkrs11.Fields(12).Value), "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(17, chkrs11.Fields(3).Value, "S") & "," & GetStringToPrint(17, "GST-" + chkrs11.Fields(4).Value.ToString, "S") & "," & GetStringToPrint(13, Format(chkrs11.Fields(5).Value, "######0.00"), "N") & "," & GetStringToPrint(13, Format(advanceamtprint, "######0.00"), "N") & "," & GetStringToPrint(12, "  " & chkrs11.Fields(7).Value, "S") & "," & GetStringToPrint(7, chkrs11.Fields(1).Value, "S") & "," & GetStringToPrint(13, chkrs11.Fields(2).Value, "S") & "," & GetStringToPrint(50, pname, "S") & "," & GetStringToPrint(33, IIf(IsDBNull(chkrs11.Fields(12).Value), "", chkrs11.Fields(12).Value), "S") & vbNewLine)
-                            xline = xline + 1
-                            Print(fnum, GetStringToPrint(17, chkrs11.Fields(10).Value, "S") & GetStringToPrint(17, IIf(chkrs11.Fields(7).Value.Equals("C"), "", "  " & chkrs11.Fields(11).Value), "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(50, chkrs11.Fields(8).Value, "S") & GetStringToPrint(33, chkrs11.Fields(9).Value, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(17, chkrs11.Fields(10).Value, "S") & "," & GetStringToPrint(17, IIf(chkrs11.Fields(7).Value.Equals("C"), "", "  " & chkrs11.Fields(11).Value), "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(50, chkrs11.Fields(8).Value, "S") & "," & GetStringToPrint(33, chkrs11.Fields(9).Value, "S") & vbNewLine)
-                            xline = xline + 1
-                            Print(fnum, GetStringToPrint(17, FROMNO, "S") & GetStringToPrint(17, TONO, "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(17, FROMNO, "S") & "," & GetStringToPrint(17, TONO, "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against, "S") & vbNewLine)
-                            xline = xline + 1
-                            If Trim(against1).Equals("") Then
-                            Else
-                                '    against1 = against1.Substring(0, against1.Length - 2)
-                                Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against1, "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against1, "S") & vbNewLine)
-                                xline = xline + 1
-                            End If
-                            If Trim(against2).Equals("") Then
-                            Else
-                                '   against2 = against2.Substring(0, against2.Length - 2)
-                                Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against2, "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against2, "S") & vbNewLine)
-                                xline = xline + 1
-                            End If
-                            If Trim(against3).Equals("") Then
-                            Else
-                                '  against3 = against3.Substring(0, against3.Length - 2)
-                                Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against3, "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against3, "S") & vbNewLine)
-                                xline = xline + 1
-                            End If
-                            '  Print(fnum, StrDup(180, "-") & vbNewLine)
-                            '  Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(7, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(50, "", "S") & GetStringToPrint(33, "", "S") & vbNewLine)
+                            If (chkrs11.Fields(3).Value >= Format(DateTimePicker5.Value.Date, "dd/MM/yyyy") And chkrs11.Fields(3).Value <= Format(DateTimePicker4.Value.Date, "dd/MM/yyyy")) Then
+                                If first Then
+                                    Print(fnum, GetStringToPrint(20, "  ", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(20, "  ", "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(30, "Payment Details  ", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(30, "Payment Details  ", "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(30, "===============  ", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(30, "===============  ", "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(17, "Receipt Date", "S") & GetStringToPrint(17, "Receipt No.", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(13, "  Advance", "S") & GetStringToPrint(12, "Cash/Cheque", "S") & GetStringToPrint(50, "Tenant Name", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "Receipt Date", "S") & "," & GetStringToPrint(17, "Receipt No.", "S") & "," & GetStringToPrint(13, "Amount", "N") & "," & GetStringToPrint(13, "  Advance", "S") & "," & GetStringToPrint(12, "Cash/Cheque", "S") & "," & GetStringToPrint(50, "Tenant Name", "S") & vbNewLine)
 
-                            xline = xline + 2
+                                    Print(fnum, GetStringToPrint(17, "Godown Type", "S") & GetStringToPrint(17, "Godown No.", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "  ", "S") & GetStringToPrint(12, " ", "S") & GetStringToPrint(50, "Bank A/C Detail", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "Godown Type", "S") & "," & GetStringToPrint(17, "Godown No.", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(50, "Bank A/C Detail", "S") & vbNewLine)
+
+
+
+                                    Print(fnum, GetStringToPrint(17, "Cheque No.", "S") & GetStringToPrint(17, "Cheque Date", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(63, "Bank Name & Branch", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "Cheque No.", "S") & "," & GetStringToPrint(17, "Cheque Date", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, "Bank Name & Branch", "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(17, "From Month-Year", "S") & GetStringToPrint(17, "To Month-Year", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(63, "Adjusted Bill No.", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "From Month-Year", "S") & "," & GetStringToPrint(17, "To Month-Year", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, "Adjusted Bill No.", "S") & vbNewLine)
+                                    Print(fnum, StrDup(133, "=") & vbNewLine)
+                                    Print(fnumm, StrDup(133, "=") & vbNewLine)
+                                    first = False
+                                    xline = xline + 3
+                                Else
+                                    Print(fnum, StrDup(30, ">") & vbNewLine)
+                                End If
+
+
+                                totamt = totamt + chkrs11.Fields(5).Value
+                                totadv = totadv + advanceamtprint
+                                Print(fnum, GetStringToPrint(17, chkrs11.Fields(3).Value, "S") & GetStringToPrint(17, "GST-" + chkrs11.Fields(4).Value.ToString, "S") & GetStringToPrint(13, Format(chkrs11.Fields(5).Value, "######0.00"), "N") & GetStringToPrint(13, Format(advanceamtprint, "######0.00"), "N") & GetStringToPrint(12, "  " & chkrs11.Fields(7).Value, "S") & GetStringToPrint(50, pname, "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(17, chkrs11.Fields(3).Value, "S") & "," & GetStringToPrint(17, "GST-" + chkrs11.Fields(4).Value.ToString, "S") & "," & GetStringToPrint(13, Format(chkrs11.Fields(5).Value, "######0.00"), "N") & "," & GetStringToPrint(13, Format(advanceamtprint, "######0.00"), "N") & "," & GetStringToPrint(12, "  " & chkrs11.Fields(7).Value, "S") & "," & GetStringToPrint(50, pname, "S") & vbNewLine)
+                                xline = xline + 1
+                                Print(fnum, GetStringToPrint(17, chkrs11.Fields(1).Value, "S") & GetStringToPrint(17, chkrs11.Fields(2).Value.ToString, "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(33, IIf(IsDBNull(chkrs11.Fields(12).Value), "", chkrs11.Fields(12).Value), "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(17, chkrs11.Fields(1).Value, "S") & "," & GetStringToPrint(17, chkrs11.Fields(2).Value.ToString, "S") & "," & GetStringToPrint(13, "", "S") & "," & GetStringToPrint(13, "", "S") & "," & GetStringToPrint(12, "  ", "S") & "," & GetStringToPrint(33, IIf(IsDBNull(chkrs11.Fields(12).Value), "", chkrs11.Fields(12).Value), "S") & vbNewLine)
+                                xline = xline + 1
+                                If chkrs11.Fields(7).Value.Equals("C") Then
+                                Else
+                                    Print(fnum, GetStringToPrint(17, chkrs11.Fields(10).Value, "S") & GetStringToPrint(17, IIf(chkrs11.Fields(7).Value.Equals("C"), "", chkrs11.Fields(11).Value), "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(50, chkrs11.Fields(8).Value & " " & chkrs11.Fields(9).Value, "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, chkrs11.Fields(10).Value, "S") & "," & GetStringToPrint(17, IIf(chkrs11.Fields(7).Value.Equals("C"), "", chkrs11.Fields(11).Value), "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, chkrs11.Fields(8).Value & " " & chkrs11.Fields(9).Value, "S") & vbNewLine)
+                                    xline = xline + 1
+                                End If
+
+                                Print(fnum, GetStringToPrint(17, FROMNO, "S") & GetStringToPrint(17, TONO, "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(63, against, "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(17, FROMNO, "S") & "," & GetStringToPrint(17, TONO, "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, against, "S") & vbNewLine)
+                                xline = xline + 1
+                                If Trim(against1).Equals("") Then
+                                Else
+                                    Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(63, against1, "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, against1, "S") & vbNewLine)
+                                    xline = xline + 1
+                                End If
+                                If Trim(against2).Equals("") Then
+                                Else
+                                    Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(63, against2, "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, against2, "S") & vbNewLine)
+                                    xline = xline + 1
+                                End If
+                                If Trim(against3).Equals("") Then
+                                Else
+                                    Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(63, against3, "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, against3, "S") & vbNewLine)
+                                    xline = xline + 1
+                                End If
+                                xline = xline + 2
+
+                            End If
+
                             If chkrs11.EOF = False Then
                                 chkrs11.MoveNext()
                             End If
@@ -821,14 +853,14 @@ Public Class FrmGodwnDtl
 
                         Loop
                         If totamt > 0 Then
-                            Print(fnum, StrDup(180, "-") & vbNewLine)
-                            Print(fnumm, StrDup(180, "-") & vbNewLine)
-                            Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(7, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(50, "", "S") & GetStringToPrint(33, "", "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(17, "Total-->", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & "," & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & "," & GetStringToPrint(12, "  ", "S") & "," & GetStringToPrint(7, "", "S") & "," & GetStringToPrint(13, "", "S") & "," & GetStringToPrint(50, "", "S") & "," & GetStringToPrint(33, "", "S") & vbNewLine)
+                            Print(fnum, StrDup(133, "-") & vbNewLine)
+                            Print(fnumm, StrDup(133, "-") & vbNewLine)
+                            Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(50, "", "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(17, "Total-->", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & "," & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & "," & GetStringToPrint(12, "  ", "S") & "," & GetStringToPrint(50, "", "S") & vbNewLine)
                         End If
                         chkrs11.Close()
-                        recntAMT = totamt
-                        ''''''''''''''''''''payment details
+
+                        ''''''''''''''''''''payment details end
                     Else
                         ''''''''''''''''checking in godown transfer table
                         chkrs4.Open("SELECT [GDTRANS].*,[PARTY].P_NAME FROM GDTRANS INNER JOIN PARTY ON [PARTY].P_CODE=[GDTRANS].NP_CODE WHERE [GROUP]='" & chkrs2.Fields(0).Value & "' and GODWN_NO='" & chkrs2.Fields(3).Value & "' and OP_CODE ='" & TextBox1.Text & "' order by  [GROUP],[GODWN_NO],OP_CODE DESC", xcon)
@@ -894,11 +926,7 @@ Public Class FrmGodwnDtl
                                     first = False
                                     xline = xline + 3
                                 End If
-
-                                ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-                                'chkrs44.Open("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE WHERE [GROUP]='" & chkrs1.Fields(1).Value & "' AND GODWN_NO='" & chkrs1.Fields(2).Value & "' AND [STATUS]='C'", xcon)
                                 Dim srn As String = "SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE WHERE P_CODE='" & TextBox1.Text & "' AND [GROUP]='" & chkrs2.Fields(0).Value & "' AND GODWN_NO='" & chkrs2.Fields(3).Value & "'"
-
                                 chkrs44.Open("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE WHERE [GODOWN].P_CODE='" & TextBox1.Text & "' AND [GROUP]='" & chkrs2.Fields(0).Value & "' AND GODWN_NO='" & chkrs2.Fields(3).Value & "'", xcon)
 
                                 Dim pname As String = ""
@@ -923,7 +951,7 @@ Public Class FrmGodwnDtl
                                         SURVEY = chkrs44.Fields(4).Value
                                     End If
                                     pname = chkrs44.Fields(38).Value
-                                    pcode1 = TextBox1.Text    'chkrs44.Fields(1).Value
+                                    pcode1 = TextBox1.Text
 
                                     chkrs22.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs11.Fields(1).Value & "' and GODWN_NO='" & chkrs11.Fields(2).Value & "' and P_CODE ='" & chkrs44.Fields(1).Value & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
                                     Dim amtt As Double = 0
@@ -962,11 +990,7 @@ Public Class FrmGodwnDtl
 
                                     net = amtt + gst_amt
                                     CGST_TAXAMT = gst_amt / 2
-
-
-                                    'CGST_TAXAMT = amt * CGST_RATE / 100
                                     CGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
-                                    'SGST_TAXAMT = amt * SGST_RATE / 100
                                     SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
                                 End If
                                 chkrs44.Close()
@@ -985,19 +1009,10 @@ Public Class FrmGodwnDtl
                                 Dim agcount As Integer = 0
                                 Dim adjusted_amt As Double = 0
                                 Dim last_bldate As DateTime
-                                '  If chkrs1.Fields(6).Value = True Then
-
-                                '  Else
-                                '  grp = chkrs1.Fields(1).Value
-                                '   gdn = chkrs1.Fields(2).Value
                                 Dim RS As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                                 chkrs22.Open("SELECT t2.*,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=FORMAT('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=FORMAT('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO", xcon)
 
                                 Do While chkrs22.EOF = False
-                                    'sgsrate = chkrs2.Fields(8).Value
-                                    'cgsrate = chkrs2.Fields(6).Value
-                                    'sgamt = chkrs2.Fields(9).Value
-                                    'cgamt = chkrs2.Fields(7).Value
                                     If chkrs22.Fields(13).Value >= inv And chkrs22.Fields(14).Value <= invdt And chkrs11.Fields(3).Value >= chkrs22.Fields(4).Value Then
                                         If FIRSTREC Then
                                             chkrs6.Open("Select FROM_DATE,TO_DATE FROM BILL_TR WHERE [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND INVOICE_NO='" & chkrs22.Fields(0).Value & "' and  BILL_DATE=format('" & Convert.ToDateTime(chkrs22.Fields(4).Value) & "','dd/mm/yyyy') ", xcon)
@@ -1046,7 +1061,6 @@ Public Class FrmGodwnDtl
 
                                 Loop
                                 chkrs22.Close()
-                                '   End If
                                 If against.Length > 2 Then
                                     against = against.Substring(0, against.Length - 2)
                                 End If
@@ -1063,20 +1077,17 @@ Public Class FrmGodwnDtl
                                     against3 = against3.Substring(0, against3.Length - 2)
                                 End If
                                 '''''''''''''''''''against bill and period end''''''''''''
-                                '    Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
 
                                 ''''''''''''''find out if any advance is left after adjustment start
                                 Dim advanceamt As Double = 0
                                 Dim advanceamtprint As Double = 0
                                 Dim lastbilladjusted As Integer
-                                '  Dim last_bldate As DateTime
                                 advanceamt = chkrs11.Fields(5).Value - adjusted_amt
                                 advanceamtprint = advanceamt
                                 If advanceamt > 0 Then
                                     Dim Rss As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[GODOWN].FROM_D From [BILL] As t2 inner join GODOWN on t2.[GROUP]=[GODOWN].[GROUP] AND t2.[GODWN_NO]=[GODOWN].GODWN_NO Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND T2.P_CODE='" & pcode1 & "' AND ((t2.REC_NO IS NOT NULL AND t2.REC_DATE IS NOT NULL)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                                     chkrs55.Open(Rss, xcon)
                                     Do While chkrs55.EOF = False
-                                        '  chkrs5.MoveLast()
                                         If chkrs11.Fields(3).Value >= chkrs55.Fields(4).Value Then
                                             lastbilladjusted = chkrs55.Fields(0).Value
                                             last_bldate = chkrs55.Fields(4).Value
@@ -1087,12 +1098,9 @@ Public Class FrmGodwnDtl
                                     Loop
                                     chkrs55.Close()
                                     If lastbilladjusted = 0 Then
-                                        'Rss = "SELECT FROM_D From GODOWN Where [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND [STATUS]='C' AND P_CODE='" & pcode1 & "' order by [GROUP]+GODWN_NO"
                                         Rss = "SELECT FROM_D From GODOWN Where [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' and  P_CODE='" & pcode1 & "' order by [GROUP]+GODWN_NO"
                                         chkrs55.Open(Rss, xcon)
                                         If chkrs55.EOF = False Then
-                                            ' chkrs5.MoveLast()
-                                            'lastbilladjusted = chkrs5.Fields(13).Value
                                             last_bldate = chkrs55.Fields(0).Value
                                         End If
                                         chkrs55.Close()
@@ -1114,10 +1122,8 @@ Public Class FrmGodwnDtl
                                                 advanceamt = advanceamt - net
                                                 TONO = FROMNO
                                                 FIRSTREC = False
-                                                'last_bldate = chkrs5.Fields(0).Value
                                             End If
                                         Else
-                                            '  TONO = MonthName(sdt.AddMonths(dtcounter).Month, False) & "-" & sdt.AddMonths(dtcounter).Year
                                             TONO = MonthName(last_bldate.AddMonths(dtcounter).Month, False) & "-" & last_bldate.AddMonths(dtcounter).Year
                                             advanceamt = advanceamt - net
                                             dtcounter = dtcounter + 1
@@ -1139,21 +1145,18 @@ Public Class FrmGodwnDtl
                                 xline = xline + 1
                                 If Trim(against1).Equals("") Then
                                 Else
-                                    '    against1 = against1.Substring(0, against1.Length - 2)
                                     Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against1, "S") & vbNewLine)
                                     Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against1, "S") & vbNewLine)
                                     xline = xline + 1
                                 End If
                                 If Trim(against2).Equals("") Then
                                 Else
-                                    '   against2 = against2.Substring(0, against2.Length - 2)
                                     Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against2, "S") & vbNewLine)
                                     Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against2, "S") & vbNewLine)
                                     xline = xline + 1
                                 End If
                                 If Trim(against3).Equals("") Then
                                 Else
-                                    '  against3 = against3.Substring(0, against3.Length - 2)
                                     Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against3, "S") & vbNewLine)
                                     Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against3, "S") & vbNewLine)
                                     xline = xline + 1
@@ -1174,18 +1177,12 @@ Public Class FrmGodwnDtl
                             Print(fnumm, StrDup(180, "-") & vbNewLine)
                             Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(7, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(50, "", "S") & GetStringToPrint(33, "", "S") & vbNewLine)
                             Print(fnumm, GetStringToPrint(17, "Total-->", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & "," & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & "," & GetStringToPrint(12, "  ", "S") & "," & GetStringToPrint(7, "", "S") & "," & GetStringToPrint(13, "", "S") & "," & GetStringToPrint(50, "", "S") & "," & GetStringToPrint(33, "", "S") & vbNewLine)
-                            '   Print(fnum, StrDup(180, "-") & vbNewLine)
-                            '   Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(7, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(50, "", "S") & GetStringToPrint(33, "", "S") & vbNewLine)
-
                             ''''''''''''''''''''payment details
-
-                            '  End If
                             If chkrs4.BOF = False Then
                                 chkrs4.MoveNext()
                             End If
                         Loop
                         chkrs4.Close()
-                        '   chkrs6.Close()
                         ''''''''''''''''''''details of payment for godown
 
 
@@ -1293,7 +1290,7 @@ Public Class FrmGodwnDtl
                                         SURVEY = chkrs44.Fields(4).Value
                                     End If
                                     pname = chkrs44.Fields(38).Value
-                                    pcode1 = TextBox1.Text    'chkrs44.Fields(1).Value
+                                    pcode1 = TextBox1.Text
 
                                     chkrs22.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs11.Fields(1).Value & "' and GODWN_NO='" & chkrs11.Fields(2).Value & "' and P_CODE ='" & chkrs44.Fields(1).Value & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
                                     Dim amtt As Double = 0
@@ -1332,11 +1329,7 @@ Public Class FrmGodwnDtl
 
                                     net = amtt + gst_amt
                                     CGST_TAXAMT = gst_amt / 2
-
-
-                                    'CGST_TAXAMT = amt * CGST_RATE / 100
                                     CGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
-                                    'SGST_TAXAMT = amt * SGST_RATE / 100
                                     SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
                                 End If
                                 chkrs44.Close()
@@ -1355,19 +1348,10 @@ Public Class FrmGodwnDtl
                                 Dim agcount As Integer = 0
                                 Dim adjusted_amt As Double = 0
                                 Dim last_bldate As DateTime
-                                '  If chkrs1.Fields(6).Value = True Then
-
-                                '  Else
-                                '  grp = chkrs1.Fields(1).Value
-                                '   gdn = chkrs1.Fields(2).Value
                                 Dim RS As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                                 chkrs22.Open("SELECT t2.*,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=format('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=format('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO", xcon)
 
                                 Do While chkrs22.EOF = False
-                                    'sgsrate = chkrs2.Fields(8).Value
-                                    'cgsrate = chkrs2.Fields(6).Value
-                                    'sgamt = chkrs2.Fields(9).Value
-                                    'cgamt = chkrs2.Fields(7).Value
                                     If chkrs22.Fields(13).Value >= inv And chkrs22.Fields(14).Value <= invdt And chkrs11.Fields(3).Value >= chkrs22.Fields(4).Value Then
                                         If FIRSTREC Then
                                             chkrs6.Open("Select FROM_DATE,TO_DATE FROM BILL_TR WHERE [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND INVOICE_NO='" & chkrs22.Fields(0).Value & "' and  BILL_DATE=format('" & Convert.ToDateTime(chkrs22.Fields(4).Value) & "','dd/mm/yyyy') ", xcon)
@@ -1433,7 +1417,6 @@ Public Class FrmGodwnDtl
                                     against3 = against3.Substring(0, against3.Length - 2)
                                 End If
                                 '''''''''''''''''''against bill and period end''''''''''''
-                                '    Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
 
                                 ''''''''''''''find out if any advance is left after adjustment start
                                 Dim advanceamt As Double = 0
@@ -1446,7 +1429,6 @@ Public Class FrmGodwnDtl
                                     Dim Rss As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[GODOWN].FROM_D From [BILL] As t2 inner join GODOWN on t2.[GROUP]=[GODOWN].[GROUP] AND t2.[GODWN_NO]=[GODOWN].GODWN_NO Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND T2.P_CODE='" & pcode1 & "' AND ((t2.REC_NO IS NOT NULL AND t2.REC_DATE IS NOT NULL)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                                     chkrs55.Open(Rss, xcon)
                                     Do While chkrs55.EOF = False
-                                        '  chkrs5.MoveLast()
                                         If chkrs11.Fields(3).Value >= chkrs55.Fields(4).Value Then
                                             lastbilladjusted = chkrs55.Fields(0).Value
                                             last_bldate = chkrs55.Fields(4).Value
@@ -1460,8 +1442,6 @@ Public Class FrmGodwnDtl
                                         Rss = "SELECT FROM_D From GODOWN Where [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND [STATUS]='C' AND P_CODE='" & pcode1 & "' order by [GROUP]+GODWN_NO"
                                         chkrs55.Open(Rss, xcon)
                                         If chkrs55.EOF = False Then
-                                            ' chkrs5.MoveLast()
-                                            'lastbilladjusted = chkrs5.Fields(13).Value
                                             last_bldate = chkrs55.Fields(0).Value
                                         End If
                                         chkrs55.Close()
@@ -1483,10 +1463,8 @@ Public Class FrmGodwnDtl
                                                 advanceamt = advanceamt - net
                                                 TONO = FROMNO
                                                 FIRSTREC = False
-                                                'last_bldate = chkrs5.Fields(0).Value
                                             End If
                                         Else
-                                            '  TONO = MonthName(sdt.AddMonths(dtcounter).Month, False) & "-" & sdt.AddMonths(dtcounter).Year
                                             TONO = MonthName(last_bldate.AddMonths(dtcounter).Month, False) & "-" & last_bldate.AddMonths(dtcounter).Year
                                             advanceamt = advanceamt - net
                                             dtcounter = dtcounter + 1
@@ -1508,21 +1486,18 @@ Public Class FrmGodwnDtl
                                 xline = xline + 1
                                 If Trim(against1).Equals("") Then
                                 Else
-                                    '    against1 = against1.Substring(0, against1.Length - 2)
                                     Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against1, "S") & vbNewLine)
                                     Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against1, "S") & vbNewLine)
                                     xline = xline + 1
                                 End If
                                 If Trim(against2).Equals("") Then
                                 Else
-                                    '   against2 = against2.Substring(0, against2.Length - 2)
                                     Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against2, "S") & vbNewLine)
                                     Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against2, "S") & vbNewLine)
                                     xline = xline + 1
                                 End If
                                 If Trim(against3).Equals("") Then
                                 Else
-                                    '  against3 = against3.Substring(0, against3.Length - 2)
                                     Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against3, "S") & vbNewLine)
                                     Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against3, "S") & vbNewLine)
                                     xline = xline + 1
@@ -1556,7 +1531,7 @@ Public Class FrmGodwnDtl
                 End If
                 Dim otst As Double = 0
                 Dim prvdt As String = ""
-                If IsDBNull(chkrs2.Fields(21).Value) Then   'Contact Person
+                If IsDBNull(chkrs2.Fields(21).Value) Then   '''''outst from godown table  - due amount
                 Else
                     otst = chkrs2.Fields(21).Value
                 End If
@@ -1565,8 +1540,6 @@ Public Class FrmGodwnDtl
                 If chkrs2.BOF = False Then
                     chkrs2.MoveNext()
                 End If
-                '  Print(fnum, StrDup(180, "-") & vbNewLine)
-                ' Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(7, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(50, "", "S") & GetStringToPrint(33, "", "S") & vbNewLine)
                 Print(fnum, GetStringToPrint(20, "  ", "S") & vbNewLine)
                 Print(fnumm, GetStringToPrint(20, "  ", "S") & vbNewLine)
                 If (otst > 0) Then
@@ -1604,6 +1577,7 @@ Public Class FrmGodwnDtl
         End If
     End Sub
     Private Function CreatePDF(strReportFilePath As String, invoice_no As String)
+        ''''''''create pdf from .bat file
         Try
             Dim line As String
             Dim readFile As System.IO.TextReader = New StreamReader(strReportFilePath)
@@ -1613,16 +1587,12 @@ Public Class FrmGodwnDtl
             pdf.Info.Title = "Text File to PDF"
 
             Dim pdfPage As PdfPage = pdf.AddPage
-
-            ' pdfPage.Orientation = PdfSharp.PageOrientation.Landscape
             pdfPage.TrimMargins.Left = 15
 
             pdfPage.Width = 842
             pdfPage.Height = 595
-
-            '  pdf.Pages.RemoveAt(0)
             Dim graph As XGraphics = XGraphics.FromPdfPage(pdfPage)
-            Dim font As XFont = New XFont("COURIER New", 7, XFontStyle.Regular)
+            Dim font As XFont = New XFont("COURIER New", 9, XFontStyle.Regular)
 
             Dim counter As Integer
             While True
@@ -1637,7 +1607,7 @@ Public Class FrmGodwnDtl
                         counter = 1
                         pdfPage = pdf.AddPage()
                         graph = XGraphics.FromPdfPage(pdfPage)
-                        font = New XFont("COURIER New", 7, XFontStyle.Regular)
+                        font = New XFont("COURIER New", 9, XFontStyle.Regular)
 
                         pdfPage.TrimMargins.Left = 15
 
@@ -1645,11 +1615,6 @@ Public Class FrmGodwnDtl
                         pdfPage.Height = 595
                         yPoint = 10
                     End If
-                    'If counter = 1 Or counter = 31 Then
-                    '    font = New XFont("COURIER New", 14, XFontStyle.Bold)
-                    'Else
-                    '    font = New XFont("COURIER New", 10, XFontStyle.Regular)
-                    'End If
                     graph.DrawString(line, font, XBrushes.Black,
                     New XRect(30, yPoint, pdfPage.Width.Point, pdfPage.Height.Point), XStringFormats.TopLeft)
                     yPoint = yPoint + 12
@@ -1659,7 +1624,6 @@ Public Class FrmGodwnDtl
             pdf.Save(pdfFilename)
             readFile.Close()
             readFile = Nothing
-            ' Process.Start(pdfFilename)
             pdf.Close()
 
         Catch ex As Exception
@@ -1689,16 +1653,18 @@ Public Class FrmGodwnDtl
     End Function
 
     Private Sub DataGridView2_DoubleClick(sender As Object, e As EventArgs) Handles DataGridView2.DoubleClick
+        ''''''assign godwn_no value from current datagrid row to godown number text box and group to godown group combobox when double click the datagrid
         TextBox1.Text = GetValue(DataGridView2.Item(3, DataGridView2.CurrentRow.Index).Value)
         ComboBox1.Text = GetValue(DataGridView2.Item(0, DataGridView2.CurrentRow.Index).Value)
         ComboBox1.SelectedIndex = ComboBox1.FindStringExact(ComboBox1.Text)
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        Me.Close()
+        Me.Close()     ''''''close form
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        '''''''''print report , same logic as button1_click
         If (TextBox1.Text = "") Then
             MsgBox("Please enter Tenant code .......")
             TextBox1.Focus()
@@ -1818,7 +1784,7 @@ Public Class FrmGodwnDtl
             If IsDBNull(chkrs1.Fields(6).Value) Then
                 HADD1 = ""
             Else
-                HADD1 = chkrs1.Fields(6).Value     '.Replace(vbCr, "").Replace(vbLf, "") ' chkrs1.Fields(6).Value
+                HADD1 = chkrs1.Fields(6).Value
 
             End If
             If IsDBNull(chkrs1.Fields(7).Value) Then
@@ -1847,36 +1813,36 @@ Public Class FrmGodwnDtl
                     HADD3 = addHrr(2)
                 End If
             End If
-            Print(fnum, GetStringToPrint(20, "Tenant Code ", "S") & GetStringToPrint(20, chkrs1.Fields(0).Value, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Tenant Code ", "S") & "," & GetStringToPrint(20, chkrs1.Fields(0).Value, "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Tenant Name ", "S") & GetStringToPrint(55, chkrs1.Fields(1).Value, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Tenant Name ", "S") & "," & GetStringToPrint(55, chkrs1.Fields(1).Value, "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Office Address ", "S") & GetStringToPrint(55, ADD1, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Office Address ", "S") & "," & GetStringToPrint(55, ADD1.Replace(",", " "), "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Tenant Code       : ", "S") & GetStringToPrint(20, chkrs1.Fields(0).Value, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Tenant Code       :", "S") & "," & GetStringToPrint(20, chkrs1.Fields(0).Value, "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Tenant Name       : ", "S") & GetStringToPrint(55, chkrs1.Fields(1).Value, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Tenant Name       : ", "S") & "," & GetStringToPrint(55, chkrs1.Fields(1).Value, "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Office Address    : ", "S") & GetStringToPrint(55, ADD1, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Office Address    : ", "S") & "," & GetStringToPrint(55, ADD1.Replace(",", " "), "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "", "S") & GetStringToPrint(55, ADD2, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "", "S") & "," & GetStringToPrint(55, ADD2.Replace(",", " "), "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "", "S") & GetStringToPrint(55, ADD3, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "", "S") & "," & GetStringToPrint(55, ADD3.Replace(",", " "), "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "", "S") & GetStringToPrint(55, ACT, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "", "S") & "," & GetStringToPrint(55, ACT, "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Office Phone ", "S") & GetStringToPrint(55, ADDPHONE, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Office Phone ", "S") & "," & GetStringToPrint(55, ADDPHONE.Replace(",", " "), "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Residence Address ", "S") & GetStringToPrint(55, HADD1, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Residence Address ", "S") & "," & GetStringToPrint(55, HADD1.Replace(",", " "), "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Office Phone      : ", "S") & GetStringToPrint(55, ADDPHONE, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Office Phone      :", "S") & "," & GetStringToPrint(55, ADDPHONE.Replace(",", " "), "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Residence Address : ", "S") & GetStringToPrint(55, HADD1, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Residence Address :", "S") & "," & GetStringToPrint(55, HADD1.Replace(",", " "), "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "", "S") & GetStringToPrint(55, HADD2, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "", "S") & "," & GetStringToPrint(55, HADD2.Replace(",", " "), "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "", "S") & GetStringToPrint(55, HADD3, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "", "S") & "," & GetStringToPrint(55, HADD3.Replace(",", " "), "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "", "S") & GetStringToPrint(55, HCT, "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "", "S") & "," & GetStringToPrint(55, HCT.Replace(",", " "), "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Residence Phone ", "S") & GetStringToPrint(55, HPHONE, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Residence Phone ", "S") & "," & GetStringToPrint(55, HPHONE.Replace(",", " "), "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Contact Person ", "S") & GetStringToPrint(55, CPERSON, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Contact Person ", "S") & "," & GetStringToPrint(55, CPERSON.Replace(",", " "), "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "Email Id ", "S") & GetStringToPrint(55, EMAIL, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "Email Id ", "S") & "," & GetStringToPrint(55, EMAIL, "S") & vbNewLine)
-            Print(fnum, GetStringToPrint(20, "GSTIN", "S") & GetStringToPrint(55, GSTt, "S") & vbNewLine)
-            Print(fnumm, GetStringToPrint(20, "GSTIN", "S") & "," & GetStringToPrint(55, GSTt, "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Residence Phone   : ", "S") & GetStringToPrint(55, HPHONE, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Residence Phone   : ", "S") & "," & GetStringToPrint(55, HPHONE.Replace(",", " "), "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Contact Person    : ", "S") & GetStringToPrint(55, CPERSON, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Contact Person    : ", "S") & "," & GetStringToPrint(55, CPERSON.Replace(",", " "), "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "Email Id          : ", "S") & GetStringToPrint(55, EMAIL, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "Email Id          :", "S") & "," & GetStringToPrint(55, EMAIL, "S") & vbNewLine)
+            Print(fnum, GetStringToPrint(20, "GSTIN             : ", "S") & GetStringToPrint(55, GSTt, "S") & vbNewLine)
+            Print(fnumm, GetStringToPrint(20, "GSTIN             : ", "S") & "," & GetStringToPrint(55, GSTt, "S") & vbNewLine)
             Print(fnum, GetStringToPrint(20, "  ", "S") & vbNewLine)
             Print(fnumm, GetStringToPrint(20, "  ", "S") & "," & vbNewLine)
             Dim srs As String = "SELECT [GODOWN].* from [GODOWN] where [GROUP]='" & ComboBox1.SelectedValue.ToString & "' AND [GODOWN].GODWN_NO='" & TextBox1.Text & "' and [GODOWN].P_CODE='" & pcdd & "' AND [GODOWN].[FROM_D]<=FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') order by [GODOWN].[GROUP],[GODOWN].GODWN_NO,[GODOWN].FROM_D"
@@ -1905,11 +1871,11 @@ Public Class FrmGodwnDtl
                     Else
                         CENSUS = chkrs2.Fields(5).Value
                     End If
-                    Print(fnum, GetStringToPrint(13, "Survey No. : ", "S") & GetStringToPrint(20, SURVEY, "S") & GetStringToPrint(12, "Census No.: ", "S") & GetStringToPrint(20, CENSUS, "S") & vbNewLine)
-                    Print(fnumm, GetStringToPrint(13, "Survey No. : ", "S") & "," & GetStringToPrint(20, SURVEY.Replace(",", " "), "S") & "," & GetStringToPrint(12, "Census No.: ", "S") & "," & GetStringToPrint(20, CENSUS.Replace(",", " "), "S") & vbNewLine)
-                    Print(fnum, GetStringToPrint(13, "Size       : ", "S") & GetStringToPrint(19, "Length : " & Trim(Format(chkrs2.Fields(19).Value, "##0.00")), "S") & GetStringToPrint(5, " X   ", "S") & GetStringToPrint(15, "Width : " & Trim(Format(chkrs2.Fields(18).Value, "##0.00")), "S") & GetStringToPrint(3, " = ", "S") & GetStringToPrint(25, Trim(Format(chkrs2.Fields(20).Value, "#####0.00")), "S") & vbNewLine)
-                    Print(fnumm, GetStringToPrint(13, "Size       : ", "S") & "," & GetStringToPrint(19, "Length : " & Trim(Format(chkrs2.Fields(19).Value, "##0.00")), "S") & GetStringToPrint(5, " X   ", "S") & GetStringToPrint(15, "Width : " & Trim(Format(chkrs2.Fields(18).Value, "##0.00")), "S") & GetStringToPrint(3, " = ", "S") & GetStringToPrint(25, Trim(Format(chkrs2.Fields(20).Value, "#####0.00")), "S") & vbNewLine)
-                    chkrs3.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs2.Fields(0).Value & "' and GODWN_NO='" & chkrs2.Fields(3).Value & "' and P_CODE ='" & TextBox1.Text & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
+                    Print(fnum, GetStringToPrint(18, "Survey No.      : ", "S") & GetStringToPrint(20, SURVEY, "S") & GetStringToPrint(12, "Census No.: ", "S") & GetStringToPrint(20, CENSUS, "S") & vbNewLine)
+                    Print(fnumm, GetStringToPrint(18, "Survey No.      : ", "S") & "," & GetStringToPrint(20, SURVEY.Replace(",", " "), "S") & "," & GetStringToPrint(12, "Census No.: ", "S") & "," & GetStringToPrint(20, CENSUS.Replace(",", " "), "S") & vbNewLine)
+                    Print(fnum, GetStringToPrint(18, "Size            : ", "S") & GetStringToPrint(19, "Length : " & Trim(Format(chkrs2.Fields(19).Value, "##0.00")), "S") & GetStringToPrint(5, " X   ", "S") & GetStringToPrint(15, "Width : " & Trim(Format(chkrs2.Fields(18).Value, "##0.00")), "S") & GetStringToPrint(3, " = ", "S") & GetStringToPrint(25, Trim(Format(chkrs2.Fields(20).Value, "#####0.00")), "S") & vbNewLine)
+                    Print(fnumm, GetStringToPrint(18, "Size            : ", "S") & "," & GetStringToPrint(19, "Length : " & Trim(Format(chkrs2.Fields(19).Value, "##0.00")), "S") & GetStringToPrint(5, " X   ", "S") & GetStringToPrint(15, "Width : " & Trim(Format(chkrs2.Fields(18).Value, "##0.00")), "S") & GetStringToPrint(3, " = ", "S") & GetStringToPrint(25, Trim(Format(chkrs2.Fields(20).Value, "#####0.00")), "S") & vbNewLine)
+                    chkrs3.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs2.Fields(0).Value & "' and GODWN_NO='" & chkrs2.Fields(3).Value & "' and P_CODE ='" & pcdd & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
                     Dim amt, pamt As Double
                     amt = 0
                     pamt = 0
@@ -1923,57 +1889,57 @@ Public Class FrmGodwnDtl
                         End If
                     End If
                     chkrs3.Close()
-                    Print(fnum, GetStringToPrint(13, "Rent       : ", "S") & GetStringToPrint(12, Format(amt, "#####0.00"), "S") & GetStringToPrint(8, "Prent : ", "S") & GetStringToPrint(12, Format(pamt, "#####0.00"), "S") & GetStringToPrint(8, "Total : ", "S") & GetStringToPrint(15, Format(amt + pamt, "#####0.00"), "S") & vbNewLine)
-                    Print(fnumm, GetStringToPrint(13, "Rent       : ", "S") & "," & GetStringToPrint(12, Format(amt, "#####0.00"), "S") & "," & GetStringToPrint(8, "Prent : ", "S") & "," & GetStringToPrint(12, Format(pamt, "#####0.00"), "S") & "," & GetStringToPrint(8, "Total : ", "S") & "," & GetStringToPrint(15, Format(amt + pamt, "#####0.00"), "S") & vbNewLine)
-                    If IsDBNull(chkrs2.Fields(21).Value) Or chkrs2.Fields(21).Value.Equals("") Then
-                        Print(fnum, GetStringToPrint(13, "Opening    : ", "S") & GetStringToPrint(12, "", "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(13, "Opening    : ", "S") & "," & GetStringToPrint(12, "", "S") & vbNewLine)
-                    Else
-                        Print(fnum, GetStringToPrint(13, "Opening    : ", "S") & GetStringToPrint(12, Format(chkrs2.Fields(21).Value, "#####0.00"), "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(13, "Opening    : ", "S") & "," & GetStringToPrint(12, Format(chkrs2.Fields(21).Value, "#####0.00"), "S") & vbNewLine)
-                    End If
+                    Print(fnum, GetStringToPrint(18, "Rent            : ", "S") & GetStringToPrint(12, Format(amt, "#####0.00"), "S") & GetStringToPrint(8, "Prent : ", "S") & GetStringToPrint(12, Format(pamt, "#####0.00"), "S") & GetStringToPrint(8, "Total : ", "S") & GetStringToPrint(15, Format(amt + pamt, "#####0.00"), "S") & vbNewLine)
+                    Print(fnumm, GetStringToPrint(18, "Rent            : ", "S") & "," & GetStringToPrint(12, Format(amt, "#####0.00"), "S") & "," & GetStringToPrint(8, "Prent : ", "S") & "," & GetStringToPrint(12, Format(pamt, "#####0.00"), "S") & "," & GetStringToPrint(8, "Total : ", "S") & "," & GetStringToPrint(15, Format(amt + pamt, "#####0.00"), "S") & vbNewLine)
 
-                    If IsDBNull(chkrs2.Fields(21).Value) Or chkrs2.Fields(21).Value.Equals("") Then
-                        Print(fnum, GetStringToPrint(13, "Closing    : ", "S") & GetStringToPrint(12, "", "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(13, "Closing    : ", "S") & "," & GetStringToPrint(12, "", "S") & vbNewLine)
-                    Else
-                        Print(fnum, GetStringToPrint(13, "Closing    : ", "S") & GetStringToPrint(12, Format(chkrs2.Fields(21).Value, "#####0.00"), "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(13, "Closing    : ", "S") & "," & GetStringToPrint(12, Format(chkrs2.Fields(21).Value, "#####0.00"), "S") & vbNewLine)
-                    End If
                     If (chkrs2.Fields(10).Value.Equals("C")) Then
-                        Print(fnum, GetStringToPrint(13, "Status     : ", "S") & GetStringToPrint(55, "In Use", "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(13, "Status     : ", "S") & "," & GetStringToPrint(55, "In Use", "S") & vbNewLine)
-                        Print(fnum, GetStringToPrint(13, "Using From : ", "S") & GetStringToPrint(55, chkrs2.Fields(11).Value, "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(13, "Using From : ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(11).Value, "S") & vbNewLine)
+                        Print(fnum, GetStringToPrint(18, "Status          : ", "S") & GetStringToPrint(55, "In Use", "S") & vbNewLine)
+                        Print(fnumm, GetStringToPrint(18, "Status          : ", "S") & "," & GetStringToPrint(55, "In Use", "S") & vbNewLine)
+                        '''''''''''''''''''''''godown transfer detail if any data exist in gdtrans table
+
+                        chkrs4.Open("SELECT [GDTRANS].*,[PARTY].P_NAME FROM GDTRANS INNER JOIN PARTY ON [PARTY].P_CODE=[GDTRANS].NP_CODE WHERE [GROUP]='" & chkrs2.Fields(0).Value & "' and GODWN_NO='" & chkrs2.Fields(3).Value & "' and NP_CODE ='" & pcdd & "' order by  [GROUP],[GODWN_NO],OP_CODE DESC", xcon)
+                        If chkrs4.BOF = False Then
+                            chkrs4.MoveFirst()
+                        End If
+                        If chkrs4.EOF = False Then
+                            Print(fnum, GetStringToPrint(18, "Previous Tenant : ", "S") & GetStringToPrint(55, chkrs4.Fields(3).Value, "S") & GetStringToPrint(25, "Tenant Code : " & chkrs4.Fields(2).Value, "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, "Previous Tenant : ", "S") & "," & GetStringToPrint(55, chkrs4.Fields(3).Value, "S") & "," & GetStringToPrint(25, "Tenant Code : " & chkrs4.Fields(2).Value, "S") & vbNewLine)
+                        End If
+
+                        chkrs4.Close()
+
+                        ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                        Print(fnum, GetStringToPrint(18, "Using From      : ", "S") & GetStringToPrint(55, chkrs2.Fields(11).Value, "S") & vbNewLine)
+                        Print(fnumm, GetStringToPrint(18, "Using From      : ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(11).Value, "S") & vbNewLine)
                         If IsDBNull(chkrs2.Fields(22).Value) Or chkrs2.Fields(22).Value.Equals("") Then
-                            Print(fnum, GetStringToPrint(13, "Remarks    : ", "S") & GetStringToPrint(55, " ", "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(13, "Remarks    : ", "S") & "," & GetStringToPrint(55, " ", "S") & vbNewLine)
+                            Print(fnum, GetStringToPrint(18, "Remarks         : ", "S") & GetStringToPrint(55, " ", "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, "Remarks         : ", "S") & "," & GetStringToPrint(55, " ", "S") & vbNewLine)
                         Else
-                            Print(fnum, GetStringToPrint(13, "Remarks    : ", "S") & GetStringToPrint(55, chkrs2.Fields(22).Value, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(13, "Remarks    : ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(22).Value.Replace(",", " "), "S") & vbNewLine)
+                            Print(fnum, GetStringToPrint(18, "Remarks         : ", "S") & GetStringToPrint(55, chkrs2.Fields(22).Value, "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, "Remarks         : ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(22).Value.Replace(",", " "), "S") & vbNewLine)
                         End If
                         If IsDBNull(chkrs2.Fields(23).Value) Or chkrs2.Fields(23).Value.Equals("") Then
-                            Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(55, " ", "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(55, " ", "S") & vbNewLine)
+                            Print(fnum, GetStringToPrint(18, " ", "S") & GetStringToPrint(55, " ", "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, " ", "S") & "," & GetStringToPrint(55, " ", "S") & vbNewLine)
                         Else
-                            Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(55, chkrs2.Fields(23).Value, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(23).Value.Replace(",", " "), "S") & vbNewLine)
+                            Print(fnum, GetStringToPrint(18, " ", "S") & GetStringToPrint(55, chkrs2.Fields(23).Value, "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, " ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(23).Value.Replace(",", " "), "S") & vbNewLine)
                         End If
                         If IsDBNull(chkrs2.Fields(24).Value) Or chkrs2.Fields(24).Value.Equals("") Then
                         Else
-                            Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(55, chkrs2.Fields(24).Value, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(24).Value.Replace(",", " "), "S") & vbNewLine)
+                            Print(fnum, GetStringToPrint(18, " ", "S") & GetStringToPrint(55, chkrs2.Fields(24).Value, "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, " ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(24).Value.Replace(",", " "), "S") & vbNewLine)
                         End If
                         If IsDBNull(chkrs2.Fields(25).Value) Or chkrs2.Fields(25).Value.Equals("") Then
                         Else
-                            Print(fnum, GetStringToPrint(13, " ", "S") & GetStringToPrint(55, chkrs2.Fields(25).Value, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(25).Value.Replace(",", " "), "S") & vbNewLine)
+                            Print(fnum, GetStringToPrint(18, " ", "S") & GetStringToPrint(55, chkrs2.Fields(25).Value, "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(18, " ", "S") & "," & GetStringToPrint(55, chkrs2.Fields(25).Value.Replace(",", " "), "S") & vbNewLine)
                         End If
 
 
                         ''''''''''''''advance detail
                         '''''''''''''''''''' invoice details
-                        chkrs77.Open("SELECT * from Advances where P_CODE ='" & TextBox1.Text & "' AND GODWN_NO='" & chkrs2.Fields(3).Value & "' AND [Advances].[GROUP]='" & chkrs2.Fields(0).Value & "'", xcon)
+                        chkrs77.Open("SELECT * from Advances where P_CODE ='" & pcdd & "' AND GODWN_NO='" & chkrs2.Fields(3).Value & "' AND [Advances].[GROUP]='" & chkrs2.Fields(0).Value & "'", xcon)
                         If chkrs77.BOF = False Then
                             chkrs77.MoveFirst()
                         End If
@@ -2009,42 +1975,54 @@ Public Class FrmGodwnDtl
                         Dim totsgst As Double = 0
                         Dim totnet As Double = 0
                         Dim advRec As Double = 0
+
+
                         Do While chkrs66.EOF = False
                             If firstInv Then
 
-                                Print(fnum, GetStringToPrint(17, "Invoice Date", "S") & GetStringToPrint(13, "Invoice No.", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(7, "  GST", "N") & GetStringToPrint(12, " CGST Amt", "N") & GetStringToPrint(12, " SGST Amt", "N") & GetStringToPrint(12, " Net Amt", "N") & GetStringToPrint(20, "  Against Advance", "S") & GetStringToPrint(20, "  paid/due", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "Invoice Date", "S") & "," & GetStringToPrint(13, "Invoice No.", "S") & "," & GetStringToPrint(13, "Amount", "N") & "," & GetStringToPrint(7, "  GST", "N") & "," & GetStringToPrint(12, " CGST Amt", "N") & "," & GetStringToPrint(12, " SGST Amt", "N") & "," & GetStringToPrint(12, " Net Amt", "N") & "," & GetStringToPrint(20, "  Against Advance", "S") & "," & GetStringToPrint(20, "  paid/due", "S") & vbNewLine)
-                                Print(fnum, StrDup(180, "=") & vbNewLine)
-                                Print(fnumm, StrDup(180, "=") & vbNewLine)
+                                Print(fnum, GetStringToPrint(11, "Invoice ", "S") & GetStringToPrint(10, "Invoice", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(7, "  GST", "N") & GetStringToPrint(12, " CGST Amt", "N") & GetStringToPrint(12, " SGST Amt", "N") & GetStringToPrint(12, " Net Amt", "N") & GetStringToPrint(10, "  Against", "S") & GetStringToPrint(10, "  paid/due", "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(11, "Invoice ", "S") & "," & GetStringToPrint(10, "Invoice", "S") & "," & GetStringToPrint(13, "Amount", "N") & "," & GetStringToPrint(7, "  GST", "N") & "," & GetStringToPrint(12, " CGST Amt", "N") & "," & GetStringToPrint(12, " SGST Amt", "N") & "," & GetStringToPrint(12, " Net Amt", "N") & "," & GetStringToPrint(10, "  Against", "S") & "," & GetStringToPrint(10, "  paid/due", "S") & vbNewLine)
+
+                                Print(fnum, GetStringToPrint(11, "Date", "S") & GetStringToPrint(10, "No.", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(7, " ", "N") & GetStringToPrint(12, " ", "N") & GetStringToPrint(12, " ", "N") & GetStringToPrint(12, " ", "N") & GetStringToPrint(10, "  Advance", "S") & GetStringToPrint(10, " ", "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(11, "Date", "S") & "," & GetStringToPrint(10, "No.", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(7, " ", "N") & "," & GetStringToPrint(12, " ", "N") & "," & GetStringToPrint(12, " ", "N") & "," & GetStringToPrint(12, " ", "N") & "," & GetStringToPrint(10, "  Advance", "S") & "," & GetStringToPrint(10, " ", "S") & vbNewLine)
+
+                                Print(fnum, StrDup(100, "=") & vbNewLine)
+                                Print(fnumm, StrDup(100, "=") & vbNewLine)
                                 firstInv = False
                                 xline = xline + 3
                             End If
-                            Print(fnum, GetStringToPrint(17, chkrs66.Fields(4).Value, "S") & GetStringToPrint(13, chkrs66.Fields(0).Value, "S") & GetStringToPrint(13, chkrs66.Fields(5).Value, "N") & GetStringToPrint(7, "   18.0 %", "S") & GetStringToPrint(12, chkrs66.Fields(7).Value, "N") & GetStringToPrint(12, chkrs66.Fields(9).Value, "N") & GetStringToPrint(12, chkrs66.Fields(10).Value, "N") & GetStringToPrint(20, IIf(chkrs66.Fields(15).Value = True, "     Yes", "     No"), "S") & GetStringToPrint(20, IIf(IsDBNull(chkrs66.Fields(13).Value), "     Due", "     Paid"), "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(17, chkrs66.Fields(4).Value, "S") & "," & GetStringToPrint(13, chkrs66.Fields(0).Value, "S") & "," & GetStringToPrint(13, chkrs66.Fields(5).Value, "N") & "," & GetStringToPrint(7, "   18.0 %", "S") & "," & GetStringToPrint(12, chkrs66.Fields(7).Value, "N") & "," & GetStringToPrint(12, chkrs66.Fields(9).Value, "N") & "," & GetStringToPrint(12, chkrs66.Fields(10).Value, "N") & "," & GetStringToPrint(20, IIf(chkrs66.Fields(15).Value = True, "     Yes", "     No"), "S") & "," & GetStringToPrint(20, IIf(IsDBNull(chkrs66.Fields(13).Value), "     Due", "     Paid"), "S") & vbNewLine)
-                            totamtt = totamtt + chkrs66.Fields(5).Value
-                            totcgst = totcgst + chkrs66.Fields(7).Value
-                            totsgst = totsgst + chkrs66.Fields(9).Value
-                            totnet = totnet + chkrs66.Fields(10).Value
+
+
+                            If (chkrs66.Fields(4).Value >= Format(DateTimePicker2.Value.Date, "dd/MM/yyyy") And chkrs66.Fields(4).Value <= Format(DateTimePicker3.Value.Date, "dd/MM/yyyy")) Then
+                                Print(fnum, GetStringToPrint(11, chkrs66.Fields(4).Value, "S") & GetStringToPrint(10, "  " & chkrs66.Fields(0).Value, "S") & GetStringToPrint(13, chkrs66.Fields(5).Value, "N") & GetStringToPrint(7, "   18.0 %", "S") & GetStringToPrint(12, chkrs66.Fields(7).Value, "N") & GetStringToPrint(12, chkrs66.Fields(9).Value, "N") & GetStringToPrint(12, chkrs66.Fields(10).Value, "N") & GetStringToPrint(10, IIf(chkrs66.Fields(15).Value = True, "     Yes", "     No"), "S") & GetStringToPrint(10, IIf(IsDBNull(chkrs66.Fields(13).Value), "     Due", "     Paid"), "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(11, chkrs66.Fields(4).Value, "S") & "," & GetStringToPrint(10, "  " & chkrs66.Fields(0).Value, "S") & "," & GetStringToPrint(13, chkrs66.Fields(5).Value, "N") & "," & GetStringToPrint(7, "   18.0 %", "S") & "," & GetStringToPrint(12, chkrs66.Fields(7).Value, "N") & "," & GetStringToPrint(12, chkrs66.Fields(9).Value, "N") & "," & GetStringToPrint(12, chkrs66.Fields(10).Value, "N") & "," & GetStringToPrint(10, IIf(chkrs66.Fields(15).Value = True, "     Yes", "     No"), "S") & "," & GetStringToPrint(10, IIf(IsDBNull(chkrs66.Fields(13).Value), "     Due", "     Paid"), "S") & vbNewLine)
+
+                                totamtt = totamtt + chkrs66.Fields(5).Value
+                                totcgst = totcgst + chkrs66.Fields(7).Value
+                                totsgst = totsgst + chkrs66.Fields(9).Value
+                                totnet = totnet + chkrs66.Fields(10).Value
+                                If chkrs66.Fields(4).Value <= ED Then
+                                    advRec = advRec + chkrs66.Fields(10).Value
+                                End If
+                            End If
+                            netInvoiceAmt = netInvoiceAmt + chkrs66.Fields(10).Value
                             If chkrs66.Fields(4).Value <= ED Then
-                                advRec = advRec + chkrs66.Fields(10).Value
+                                advreceived = advreceived + chkrs66.Fields(10).Value
                             End If
                             If chkrs66.EOF = False Then
                                 chkrs66.MoveNext()
                             End If
                         Loop
-                        advreceived = advRec
-                        netInvoiceAmt = totnet
+
                         chkrs66.Close()
-                        Print(fnum, StrDup(180, "=") & vbNewLine)
-                        Print(fnumm, StrDup(180, "=") & vbNewLine)
-                        Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(13, totamtt, "N") & GetStringToPrint(7, " ", "S") & GetStringToPrint(12, totcgst, "N") & GetStringToPrint(12, totsgst, "N") & GetStringToPrint(12, totnet, "N") & GetStringToPrint(20, "", "S") & vbNewLine)
-                        Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, "", "S") & "," & GetStringToPrint(13, totamtt, "N") & "," & GetStringToPrint(7, " ", "S") & "," & GetStringToPrint(12, totcgst, "N") & "," & GetStringToPrint(12, totsgst, "N") & "," & GetStringToPrint(12, totnet, "N") & "," & GetStringToPrint(20, "", "S") & vbNewLine)
+                        Print(fnum, StrDup(100, "=") & vbNewLine)
+                        Print(fnumm, StrDup(100, "=") & vbNewLine)
+                        Print(fnum, GetStringToPrint(11, "", "S") & GetStringToPrint(10, "", "S") & GetStringToPrint(13, totamtt, "N") & GetStringToPrint(7, " ", "S") & GetStringToPrint(12, totcgst, "N") & GetStringToPrint(12, totsgst, "N") & GetStringToPrint(12, totnet, "N") & GetStringToPrint(20, "", "S") & vbNewLine)
+                        Print(fnumm, GetStringToPrint(11, "", "S") & "," & GetStringToPrint(10, "", "S") & "," & GetStringToPrint(13, totamtt, "N") & "," & GetStringToPrint(7, " ", "S") & "," & GetStringToPrint(12, totcgst, "N") & "," & GetStringToPrint(12, totsgst, "N") & "," & GetStringToPrint(12, totnet, "N") & "," & GetStringToPrint(20, "", "S") & vbNewLine)
                         '''''''''''''''''''' invoice details
 
 
                         ''''''''''''''''''''payment details
-
-                        ' Dim str As String = "SELECT DISTINCT [receipt].*,[bill].[P_CODE],[BILL].[REC_DATE],[BILL].[REC_NO] from [receipt] INNER JOIN [bill] on [receipt].[rec_no]=int([bill].[rec_no]) and [receipt].[rec_date]=[bill].[rec_date] WHERE [receipt].[GROUP]='" & chkrs2.Fields(0).Value & "' AND [receipt].[GODWN_NO]='" & chkrs2.Fields(3).Value & "' and [RECEIPT].REC_DATE >= FORMAT('" & chkrs2.Fields(11).Value & "','DD/MM/YYYY') AND [receipt].REC_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE='" & pcd & "' order by [receipt].[GROUP],[receipt].GODWN_NO,[receipt].REC_DATE,[receipt].REC_NO"
                         Dim str As String = "SELECT [RECEIPT].* from [RECEIPT] where [RECEIPT].REC_DATE >= FORMAT('" & chkrs2.Fields(11).Value & "','DD/MM/YYYY') and [RECEIPT].[GROUP]='" & chkrs2.Fields(0).Value & "' AND [RECEIPT].GODWN_NO='" & chkrs2.Fields(3).Value & "' order by [RECEIPT].REC_DATE+[RECEIPT].REC_NO"
                         chkrs11.Open("SELECT DISTINCT [receipt].*,[bill].[P_CODE],[BILL].[REC_DATE],[BILL].[REC_NO] from [receipt] INNER JOIN [bill] on [receipt].[rec_no]=int([bill].[rec_no]) and [receipt].[rec_date]=[bill].[rec_date] WHERE [receipt].[GROUP]='" & chkrs2.Fields(0).Value & "' AND [receipt].[GODWN_NO]='" & chkrs2.Fields(3).Value & "' and [RECEIPT].REC_DATE >= FORMAT('" & chkrs2.Fields(11).Value & "','DD/MM/YYYY') AND [receipt].REC_DATE <= FORMAT('" & DateTimePicker1.Value.ToString("dd/MM/yyyy") & "','DD/MM/YYYY') and [BILL].P_CODE='" & chkrs2.Fields(1).Value & "' order by [receipt].[GROUP],[receipt].GODWN_NO,[receipt].REC_DATE,[receipt].REC_NO", xcon)
                         If chkrs11.BOF = False Then
@@ -2054,26 +2032,6 @@ Public Class FrmGodwnDtl
                         Dim totamt As Double = 0
                         Dim totadv As Double = 0
                         Do While chkrs11.EOF = False
-
-                            If first Then
-                                Print(fnum, GetStringToPrint(20, "  ", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(20, "  ", "S") & vbNewLine)
-                                Print(fnum, GetStringToPrint(30, "Payment Details  ", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(30, "Payment Details  ", "S") & vbNewLine)
-                                Print(fnum, GetStringToPrint(30, "===============  ", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(30, "===============  ", "S") & vbNewLine)
-                                Print(fnum, GetStringToPrint(17, "Receipt Date", "S") & GetStringToPrint(17, "Receipt No.", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(13, "  Advance", "S") & GetStringToPrint(12, "Cash/Cheque", "S") & GetStringToPrint(7, "Group", "S") & GetStringToPrint(13, "Godown No.", "S") & GetStringToPrint(50, "Tenant Name", "S") & GetStringToPrint(33, "Bank A/C Detail", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "Receipt Date", "S") & "," & GetStringToPrint(17, "Receipt No.", "S") & "," & GetStringToPrint(13, "Amount", "N") & "," & GetStringToPrint(13, "  Advance", "S") & "," & GetStringToPrint(12, "Cash/Cheque", "S") & "," & GetStringToPrint(7, "Group", "S") & "," & GetStringToPrint(13, "Godown No.", "S") & "," & GetStringToPrint(50, "Tenant Name", "S") & "," & GetStringToPrint(33, "Bank A/C Detail", "S") & vbNewLine)
-                                Print(fnum, GetStringToPrint(17, "Cheque No.", "S") & GetStringToPrint(17, "Cheque Date", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(50, "Bank Name", "S") & GetStringToPrint(33, "Branch", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "Cheque No.", "S") & "," & GetStringToPrint(17, "Cheque Date", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(50, "Bank Name", "S") & "," & GetStringToPrint(33, "Branch", "S") & vbNewLine)
-                                Print(fnum, GetStringToPrint(17, "From Month-Year", "S") & GetStringToPrint(17, "To Month-Year", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, "Adjusted Bill No.", "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "From Month-Year", "S") & "," & GetStringToPrint(17, "To Month-Year", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, "Adjusted Bill No.", "S") & vbNewLine)
-                                Print(fnum, StrDup(180, "=") & vbNewLine)
-                                Print(fnumm, StrDup(180, "=") & vbNewLine)
-                                first = False
-                                xline = xline + 3
-                            End If
-
                             ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
                             chkrs44.Open("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE WHERE [GROUP]='" & chkrs11.Fields(1).Value & "' AND GODWN_NO='" & chkrs11.Fields(2).Value & "' AND [STATUS]='C'", xcon)
 
@@ -2138,11 +2096,7 @@ Public Class FrmGodwnDtl
 
                                 net = amtt + gst_amt
                                 CGST_TAXAMT = gst_amt / 2
-
-
-                                'CGST_TAXAMT = amt * CGST_RATE / 100
                                 CGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
-                                'SGST_TAXAMT = amt * SGST_RATE / 100
                                 SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
                             End If
                             chkrs44.Close()
@@ -2161,19 +2115,10 @@ Public Class FrmGodwnDtl
                             Dim agcount As Integer = 0
                             Dim adjusted_amt As Double = 0
                             Dim last_bldate As DateTime
-                            '  If chkrs1.Fields(6).Value = True Then
-
-                            '  Else
-                            '  grp = chkrs1.Fields(1).Value
-                            '   gdn = chkrs1.Fields(2).Value
                             Dim RS As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                             chkrs22.Open("SELECT t2.*,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=FORMAT('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=FORMAT('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO", xcon)
 
                             Do While chkrs22.EOF = False
-                                'sgsrate = chkrs2.Fields(8).Value
-                                'cgsrate = chkrs2.Fields(6).Value
-                                'sgamt = chkrs2.Fields(9).Value
-                                'cgamt = chkrs2.Fields(7).Value
                                 If chkrs22.Fields(13).Value >= inv And chkrs22.Fields(14).Value <= invdt And chkrs11.Fields(3).Value >= chkrs22.Fields(4).Value Then
                                     If FIRSTREC Then
                                         chkrs6.Open("Select FROM_DATE,TO_DATE FROM BILL_TR WHERE [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND INVOICE_NO='" & chkrs22.Fields(0).Value & "' and  BILL_DATE=format('" & Convert.ToDateTime(chkrs22.Fields(4).Value) & "','dd/mm/yyyy') ", xcon)
@@ -2239,20 +2184,17 @@ Public Class FrmGodwnDtl
                                 against3 = against3.Substring(0, against3.Length - 2)
                             End If
                             '''''''''''''''''''against bill and period end''''''''''''
-                            '    Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
 
                             ''''''''''''''find out if any advance is left after adjustment start
                             Dim advanceamt As Double = 0
                             Dim advanceamtprint As Double = 0
                             Dim lastbilladjusted As Integer
-                            ' Dim last_bldate As DateTime
                             advanceamt = chkrs11.Fields(5).Value - adjusted_amt
                             advanceamtprint = advanceamt
                             If advanceamt > 0 Then
                                 Dim Rss As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[GODOWN].FROM_D From [BILL] As t2 inner join GODOWN on t2.[GROUP]=[GODOWN].[GROUP] AND t2.[GODWN_NO]=[GODOWN].GODWN_NO Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND T2.P_CODE='" & pcode1 & "' AND ((t2.REC_NO IS NOT NULL AND t2.REC_DATE IS NOT NULL)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                                 chkrs55.Open(Rss, xcon)
                                 Do While chkrs55.EOF = False
-                                    '  chkrs5.MoveLast()
                                     If chkrs11.Fields(3).Value >= chkrs55.Fields(4).Value Then
                                         lastbilladjusted = chkrs55.Fields(0).Value
                                         last_bldate = chkrs55.Fields(4).Value
@@ -2266,8 +2208,6 @@ Public Class FrmGodwnDtl
                                     Rss = "SELECT FROM_D From GODOWN Where [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND P_CODE='" & pcode1 & "' and [STATUS]='C' order by [GROUP]+GODWN_NO"
                                     chkrs55.Open(Rss, xcon)
                                     If chkrs55.EOF = False Then
-                                        ' chkrs5.MoveLast()
-                                        'lastbilladjusted = chkrs5.Fields(13).Value
                                         last_bldate = chkrs55.Fields(0).Value
                                     End If
                                     chkrs55.Close()
@@ -2289,54 +2229,86 @@ Public Class FrmGodwnDtl
                                             advanceamt = advanceamt - net
                                             TONO = FROMNO
                                             FIRSTREC = False
-                                            'last_bldate = chkrs5.Fields(0).Value
                                         End If
                                     Else
-                                        '  TONO = MonthName(sdt.AddMonths(dtcounter).Month, False) & "-" & sdt.AddMonths(dtcounter).Year
                                         TONO = MonthName(last_bldate.AddMonths(dtcounter).Month, False) & "-" & last_bldate.AddMonths(dtcounter).Year
                                         advanceamt = advanceamt - net
                                         dtcounter = dtcounter + 1
                                     End If
                                 Loop
                             End If
-
+                            recntAMT = recntAMT + chkrs11.Fields(5).Value
                             ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-                            totamt = totamt + chkrs11.Fields(5).Value
-                            totadv = totadv + advanceamtprint
-                            Print(fnum, GetStringToPrint(17, chkrs11.Fields(3).Value, "S") & GetStringToPrint(17, "GST-" + chkrs11.Fields(4).Value.ToString, "S") & GetStringToPrint(13, Format(chkrs11.Fields(5).Value, "######0.00"), "N") & GetStringToPrint(13, Format(advanceamtprint, "######0.00"), "N") & GetStringToPrint(12, "  " & chkrs11.Fields(7).Value, "S") & GetStringToPrint(7, chkrs11.Fields(1).Value, "S") & GetStringToPrint(13, chkrs11.Fields(2).Value, "S") & GetStringToPrint(50, pname, "S") & GetStringToPrint(33, IIf(IsDBNull(chkrs11.Fields(12).Value), "", chkrs11.Fields(12).Value), "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(17, chkrs11.Fields(3).Value, "S") & "," & GetStringToPrint(17, "GST-" + chkrs11.Fields(4).Value.ToString, "S") & "," & GetStringToPrint(13, Format(chkrs11.Fields(5).Value, "######0.00"), "N") & "," & GetStringToPrint(13, Format(advanceamtprint, "######0.00"), "N") & "," & GetStringToPrint(12, "  " & chkrs11.Fields(7).Value, "S") & "," & GetStringToPrint(7, chkrs11.Fields(1).Value, "S") & "," & GetStringToPrint(13, chkrs11.Fields(2).Value, "S") & "," & GetStringToPrint(50, pname, "S") & "," & GetStringToPrint(33, IIf(IsDBNull(chkrs11.Fields(12).Value), "", chkrs11.Fields(12).Value), "S") & vbNewLine)
-                            xline = xline + 1
-                            Print(fnum, GetStringToPrint(17, chkrs11.Fields(10).Value, "S") & GetStringToPrint(17, IIf(chkrs11.Fields(7).Value.Equals("C"), "", "  " & chkrs11.Fields(11).Value), "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(50, chkrs11.Fields(8).Value, "S") & GetStringToPrint(33, chkrs11.Fields(9).Value, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(17, chkrs11.Fields(10).Value, "S") & "," & GetStringToPrint(17, IIf(chkrs11.Fields(7).Value.Equals("C"), "", "  " & chkrs11.Fields(11).Value), "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(50, chkrs11.Fields(8).Value, "S") & "," & GetStringToPrint(33, chkrs11.Fields(9).Value, "S") & vbNewLine)
-                            xline = xline + 1
-                            Print(fnum, GetStringToPrint(17, FROMNO, "S") & GetStringToPrint(17, TONO, "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against, "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(17, FROMNO, "S") & "," & GetStringToPrint(17, TONO, "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against, "S") & vbNewLine)
-                            xline = xline + 1
-                            If Trim(against1).Equals("") Then
-                            Else
-                                '    against1 = against1.Substring(0, against1.Length - 2)
-                                Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against1, "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against1, "S") & vbNewLine)
-                                xline = xline + 1
-                            End If
-                            If Trim(against2).Equals("") Then
-                            Else
-                                '   against2 = against2.Substring(0, against2.Length - 2)
-                                Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against2, "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against2, "S") & vbNewLine)
-                                xline = xline + 1
-                            End If
-                            If Trim(against3).Equals("") Then
-                            Else
-                                '  against3 = against3.Substring(0, against3.Length - 2)
-                                Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against3, "S") & vbNewLine)
-                                Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against3, "S") & vbNewLine)
-                                xline = xline + 1
-                            End If
-                            '  Print(fnum, StrDup(180, "-") & vbNewLine)
-                            '  Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(7, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(50, "", "S") & GetStringToPrint(33, "", "S") & vbNewLine)
+                            If (chkrs11.Fields(3).Value >= Format(DateTimePicker5.Value.Date, "dd/MM/yyyy") And chkrs11.Fields(3).Value <= Format(DateTimePicker4.Value.Date, "dd/MM/yyyy")) Then
+                                If first Then
+                                    Print(fnum, GetStringToPrint(20, "  ", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(20, "  ", "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(30, "Payment Details  ", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(30, "Payment Details  ", "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(30, "===============  ", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(30, "===============  ", "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(17, "Receipt Date", "S") & GetStringToPrint(17, "Receipt No.", "S") & GetStringToPrint(13, "Amount", "N") & GetStringToPrint(13, "  Advance", "S") & GetStringToPrint(12, "Cash/Cheque", "S") & GetStringToPrint(50, "Tenant Name", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "Receipt Date", "S") & "," & GetStringToPrint(17, "Receipt No.", "S") & "," & GetStringToPrint(13, "Amount", "N") & "," & GetStringToPrint(13, "  Advance", "S") & "," & GetStringToPrint(12, "Cash/Cheque", "S") & "," & GetStringToPrint(50, "Tenant Name", "S") & vbNewLine)
 
-                            xline = xline + 2
+                                    Print(fnum, GetStringToPrint(17, "Godown Type", "S") & GetStringToPrint(17, "Godown No.", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "  ", "S") & GetStringToPrint(12, " ", "S") & GetStringToPrint(50, "Bank A/C Detail", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "Godown Type", "S") & "," & GetStringToPrint(17, "Godown No.", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, " ", "S") & "," & GetStringToPrint(12, " ", "S") & "," & GetStringToPrint(50, "Bank A/C Detail", "S") & vbNewLine)
+
+                                    Print(fnum, GetStringToPrint(17, "Cheque No.", "S") & GetStringToPrint(17, "Cheque Date", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(63, "Bank Name & Branch", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "Cheque No.", "S") & "," & GetStringToPrint(17, "Cheque Date", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, "Bank Name & Branch", "S") & vbNewLine)
+                                    Print(fnum, GetStringToPrint(17, "From Month-Year", "S") & GetStringToPrint(17, "To Month-Year", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(63, "Adjusted Bill No.", "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "From Month-Year", "S") & "," & GetStringToPrint(17, "To Month-Year", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, "Adjusted Bill No.", "S") & vbNewLine)
+                                    Print(fnum, StrDup(133, "=") & vbNewLine)
+                                    Print(fnumm, StrDup(133, "=") & vbNewLine)
+                                    first = False
+                                    xline = xline + 3
+                                Else
+                                    Print(fnum, StrDup(30, ">") & vbNewLine)
+                                End If
+
+
+                                totamt = totamt + chkrs11.Fields(5).Value
+                                totadv = totadv + advanceamtprint
+                                Print(fnum, GetStringToPrint(17, chkrs11.Fields(3).Value, "S") & GetStringToPrint(17, "GST-" + chkrs11.Fields(4).Value.ToString, "S") & GetStringToPrint(13, Format(chkrs11.Fields(5).Value, "######0.00"), "N") & GetStringToPrint(13, Format(advanceamtprint, "######0.00"), "N") & GetStringToPrint(12, "  " & chkrs11.Fields(7).Value, "S") & GetStringToPrint(50, pname, "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(17, chkrs11.Fields(3).Value, "S") & "," & GetStringToPrint(17, "GST-" + chkrs11.Fields(4).Value.ToString, "S") & "," & GetStringToPrint(13, Format(chkrs11.Fields(5).Value, "######0.00"), "N") & "," & GetStringToPrint(13, Format(advanceamtprint, "######0.00"), "N") & "," & GetStringToPrint(12, "  " & chkrs11.Fields(7).Value, "S") & "," & GetStringToPrint(50, pname, "S") & vbNewLine)
+                                xline = xline + 1
+                                Print(fnum, GetStringToPrint(17, chkrs11.Fields(1).Value, "S") & GetStringToPrint(17, chkrs11.Fields(2).Value.ToString, "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(13, " ", "S") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(33, IIf(IsDBNull(chkrs11.Fields(12).Value), "", chkrs11.Fields(12).Value), "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(17, chkrs11.Fields(1).Value, "S") & "," & GetStringToPrint(17, chkrs11.Fields(2).Value.ToString, "S") & "," & GetStringToPrint(13, "", "S") & "," & GetStringToPrint(13, "", "S") & "," & GetStringToPrint(12, "  ", "S") & "," & GetStringToPrint(33, IIf(IsDBNull(chkrs11.Fields(12).Value), "", chkrs11.Fields(12).Value), "S") & vbNewLine)
+                                xline = xline + 1
+                                If chkrs11.Fields(7).Value.Equals("C") Then
+                                Else
+                                    Print(fnum, GetStringToPrint(17, chkrs11.Fields(10).Value, "S") & GetStringToPrint(17, IIf(chkrs11.Fields(7).Value.Equals("C"), "", chkrs11.Fields(11).Value), "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(50, chkrs11.Fields(8).Value & " " & chkrs11.Fields(9).Value, "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, chkrs11.Fields(10).Value, "S") & "," & GetStringToPrint(17, IIf(chkrs11.Fields(7).Value.Equals("C"), "", chkrs11.Fields(11).Value), "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, chkrs11.Fields(8).Value & " " & chkrs11.Fields(9).Value, "S") & vbNewLine)
+                                    xline = xline + 1
+                                End If
+
+
+
+
+                                Print(fnum, GetStringToPrint(17, FROMNO, "S") & GetStringToPrint(17, TONO, "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(63, against, "S") & vbNewLine)
+                                Print(fnumm, GetStringToPrint(17, FROMNO, "S") & "," & GetStringToPrint(17, TONO, "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, against, "S") & vbNewLine)
+                                xline = xline + 1
+                                If Trim(against1).Equals("") Then
+                                Else
+                                    Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(63, against1, "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, against1, "S") & vbNewLine)
+                                    xline = xline + 1
+                                End If
+                                If Trim(against2).Equals("") Then
+                                Else
+                                    Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(63, against2, "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, against2, "S") & vbNewLine)
+                                    xline = xline + 1
+                                End If
+                                If Trim(against3).Equals("") Then
+                                Else
+                                    Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(63, against3, "S") & vbNewLine)
+                                    Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(63, against3, "S") & vbNewLine)
+                                    xline = xline + 1
+                                End If
+                                xline = xline + 2
+
+                            End If
+
                             If chkrs11.EOF = False Then
                                 chkrs11.MoveNext()
                             End If
@@ -2346,13 +2318,13 @@ Public Class FrmGodwnDtl
 
                         Loop
                         If totamt > 0 Then
-                            Print(fnum, StrDup(180, "-") & vbNewLine)
-                            Print(fnumm, StrDup(180, "-") & vbNewLine)
-                            Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(7, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(50, "", "S") & GetStringToPrint(33, "", "S") & vbNewLine)
-                            Print(fnumm, GetStringToPrint(17, "Total-->", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & "," & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & "," & GetStringToPrint(12, "  ", "S") & "," & GetStringToPrint(7, "", "S") & "," & GetStringToPrint(13, "", "S") & "," & GetStringToPrint(50, "", "S") & "," & GetStringToPrint(33, "", "S") & vbNewLine)
+                            Print(fnum, StrDup(133, "-") & vbNewLine)
+                            Print(fnumm, StrDup(133, "-") & vbNewLine)
+                            Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(50, "", "S") & vbNewLine)
+                            Print(fnumm, GetStringToPrint(17, "Total-->", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & "," & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & "," & GetStringToPrint(12, "  ", "S") & "," & GetStringToPrint(50, "", "S") & vbNewLine)
                         End If
                         chkrs11.Close()
-                        recntAMT = totamt
+
                         ''''''''''''''''''''payment details
                     Else
                         ''''''''''''''''checking in godown transfer table
@@ -2419,9 +2391,6 @@ Public Class FrmGodwnDtl
                                     first = False
                                     xline = xline + 3
                                 End If
-
-                                ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-                                'chkrs44.Open("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE WHERE [GROUP]='" & chkrs1.Fields(1).Value & "' AND GODWN_NO='" & chkrs1.Fields(2).Value & "' AND [STATUS]='C'", xcon)
                                 Dim srn As String = "SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE WHERE P_CODE='" & TextBox1.Text & "' AND [GROUP]='" & chkrs2.Fields(0).Value & "' AND GODWN_NO='" & chkrs2.Fields(3).Value & "'"
 
                                 chkrs44.Open("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE WHERE [GODOWN].P_CODE='" & TextBox1.Text & "' AND [GROUP]='" & chkrs2.Fields(0).Value & "' AND GODWN_NO='" & chkrs2.Fields(3).Value & "'", xcon)
@@ -2448,7 +2417,7 @@ Public Class FrmGodwnDtl
                                         SURVEY = chkrs44.Fields(4).Value
                                     End If
                                     pname = chkrs44.Fields(38).Value
-                                    pcode1 = TextBox1.Text    'chkrs44.Fields(1).Value
+                                    pcode1 = TextBox1.Text
 
                                     chkrs22.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs11.Fields(1).Value & "' and GODWN_NO='" & chkrs11.Fields(2).Value & "' and P_CODE ='" & chkrs44.Fields(1).Value & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
                                     Dim amtt As Double = 0
@@ -2487,11 +2456,7 @@ Public Class FrmGodwnDtl
 
                                     net = amtt + gst_amt
                                     CGST_TAXAMT = gst_amt / 2
-
-
-                                    'CGST_TAXAMT = amt * CGST_RATE / 100
                                     CGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
-                                    'SGST_TAXAMT = amt * SGST_RATE / 100
                                     SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
                                 End If
                                 chkrs44.Close()
@@ -2510,19 +2475,10 @@ Public Class FrmGodwnDtl
                                 Dim agcount As Integer = 0
                                 Dim adjusted_amt As Double = 0
                                 Dim last_bldate As DateTime
-                                '  If chkrs1.Fields(6).Value = True Then
-
-                                '  Else
-                                '  grp = chkrs1.Fields(1).Value
-                                '   gdn = chkrs1.Fields(2).Value
                                 Dim RS As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                                 chkrs22.Open("SELECT t2.*,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=FORMAT('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=FORMAT('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO", xcon)
 
                                 Do While chkrs22.EOF = False
-                                    'sgsrate = chkrs2.Fields(8).Value
-                                    'cgsrate = chkrs2.Fields(6).Value
-                                    'sgamt = chkrs2.Fields(9).Value
-                                    'cgamt = chkrs2.Fields(7).Value
                                     If chkrs22.Fields(13).Value >= inv And chkrs22.Fields(14).Value <= invdt And chkrs11.Fields(3).Value >= chkrs22.Fields(4).Value Then
                                         If FIRSTREC Then
                                             chkrs6.Open("Select FROM_DATE,TO_DATE FROM BILL_TR WHERE [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND INVOICE_NO='" & chkrs22.Fields(0).Value & "' and  BILL_DATE=format('" & Convert.ToDateTime(chkrs22.Fields(4).Value) & "','dd/mm/yyyy') ", xcon)
@@ -2588,20 +2544,17 @@ Public Class FrmGodwnDtl
                                     against3 = against3.Substring(0, against3.Length - 2)
                                 End If
                                 '''''''''''''''''''against bill and period end''''''''''''
-                                '    Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
 
                                 ''''''''''''''find out if any advance is left after adjustment start
                                 Dim advanceamt As Double = 0
                                 Dim advanceamtprint As Double = 0
                                 Dim lastbilladjusted As Integer
-                                '  Dim last_bldate As DateTime
                                 advanceamt = chkrs11.Fields(5).Value - adjusted_amt
                                 advanceamtprint = advanceamt
                                 If advanceamt > 0 Then
                                     Dim Rss As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[GODOWN].FROM_D From [BILL] As t2 inner join GODOWN on t2.[GROUP]=[GODOWN].[GROUP] AND t2.[GODWN_NO]=[GODOWN].GODWN_NO Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND T2.P_CODE='" & pcode1 & "' AND ((t2.REC_NO IS NOT NULL AND t2.REC_DATE IS NOT NULL)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                                     chkrs55.Open(Rss, xcon)
                                     Do While chkrs55.EOF = False
-                                        '  chkrs5.MoveLast()
                                         If chkrs11.Fields(3).Value >= chkrs55.Fields(4).Value Then
                                             lastbilladjusted = chkrs55.Fields(0).Value
                                             last_bldate = chkrs55.Fields(4).Value
@@ -2612,12 +2565,9 @@ Public Class FrmGodwnDtl
                                     Loop
                                     chkrs55.Close()
                                     If lastbilladjusted = 0 Then
-                                        'Rss = "SELECT FROM_D From GODOWN Where [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND [STATUS]='C' AND P_CODE='" & pcode1 & "' order by [GROUP]+GODWN_NO"
                                         Rss = "SELECT FROM_D From GODOWN Where [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' and  P_CODE='" & pcode1 & "' order by [GROUP]+GODWN_NO"
                                         chkrs55.Open(Rss, xcon)
                                         If chkrs55.EOF = False Then
-                                            ' chkrs5.MoveLast()
-                                            'lastbilladjusted = chkrs5.Fields(13).Value
                                             last_bldate = chkrs55.Fields(0).Value
                                         End If
                                         chkrs55.Close()
@@ -2639,10 +2589,8 @@ Public Class FrmGodwnDtl
                                                 advanceamt = advanceamt - net
                                                 TONO = FROMNO
                                                 FIRSTREC = False
-                                                'last_bldate = chkrs5.Fields(0).Value
                                             End If
                                         Else
-                                            '  TONO = MonthName(sdt.AddMonths(dtcounter).Month, False) & "-" & sdt.AddMonths(dtcounter).Year
                                             TONO = MonthName(last_bldate.AddMonths(dtcounter).Month, False) & "-" & last_bldate.AddMonths(dtcounter).Year
                                             advanceamt = advanceamt - net
                                             dtcounter = dtcounter + 1
@@ -2664,21 +2612,18 @@ Public Class FrmGodwnDtl
                                 xline = xline + 1
                                 If Trim(against1).Equals("") Then
                                 Else
-                                    '    against1 = against1.Substring(0, against1.Length - 2)
                                     Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against1, "S") & vbNewLine)
                                     Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against1, "S") & vbNewLine)
                                     xline = xline + 1
                                 End If
                                 If Trim(against2).Equals("") Then
                                 Else
-                                    '   against2 = against2.Substring(0, against2.Length - 2)
                                     Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against2, "S") & vbNewLine)
                                     Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against2, "S") & vbNewLine)
                                     xline = xline + 1
                                 End If
                                 If Trim(against3).Equals("") Then
                                 Else
-                                    '  against3 = against3.Substring(0, against3.Length - 2)
                                     Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against3, "S") & vbNewLine)
                                     Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against3, "S") & vbNewLine)
                                     xline = xline + 1
@@ -2699,12 +2644,7 @@ Public Class FrmGodwnDtl
                             Print(fnumm, StrDup(180, "-") & vbNewLine)
                             Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(7, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(50, "", "S") & GetStringToPrint(33, "", "S") & vbNewLine)
                             Print(fnumm, GetStringToPrint(17, "Total-->", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & "," & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & "," & GetStringToPrint(12, "  ", "S") & "," & GetStringToPrint(7, "", "S") & "," & GetStringToPrint(13, "", "S") & "," & GetStringToPrint(50, "", "S") & "," & GetStringToPrint(33, "", "S") & vbNewLine)
-                            '   Print(fnum, StrDup(180, "-") & vbNewLine)
-                            '   Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(7, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(50, "", "S") & GetStringToPrint(33, "", "S") & vbNewLine)
-
                             ''''''''''''''''''''payment details
-
-                            '  End If
                             If chkrs4.BOF = False Then
                                 chkrs4.MoveNext()
                             End If
@@ -2818,7 +2758,7 @@ Public Class FrmGodwnDtl
                                         SURVEY = chkrs44.Fields(4).Value
                                     End If
                                     pname = chkrs44.Fields(38).Value
-                                    pcode1 = TextBox1.Text    'chkrs44.Fields(1).Value
+                                    pcode1 = TextBox1.Text
 
                                     chkrs22.Open("SELECT * FROM RENT WHERE [GROUP]='" & chkrs11.Fields(1).Value & "' and GODWN_NO='" & chkrs11.Fields(2).Value & "' and P_CODE ='" & chkrs44.Fields(1).Value & "' order by  DateValue('01/'+STR(FR_MONTH)+'/'+STR(FR_YEAR)) DESC", xcon)
                                     Dim amtt As Double = 0
@@ -2858,10 +2798,7 @@ Public Class FrmGodwnDtl
                                     net = amtt + gst_amt
                                     CGST_TAXAMT = gst_amt / 2
 
-
-                                    'CGST_TAXAMT = amt * CGST_RATE / 100
                                     CGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
-                                    'SGST_TAXAMT = amt * SGST_RATE / 100
                                     SGST_TAXAMT = Math.Round(gst_amt / 2, 2, MidpointRounding.AwayFromZero)
                                 End If
                                 chkrs44.Close()
@@ -2880,19 +2817,10 @@ Public Class FrmGodwnDtl
                                 Dim agcount As Integer = 0
                                 Dim adjusted_amt As Double = 0
                                 Dim last_bldate As DateTime
-                                '  If chkrs1.Fields(6).Value = True Then
-
-                                '  Else
-                                '  grp = chkrs1.Fields(1).Value
-                                '   gdn = chkrs1.Fields(2).Value
                                 Dim RS As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=#" & Convert.ToDateTime(invdt) & "#)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                                 chkrs22.Open("SELECT t2.*,[PARTY].P_NAME,(SELECT SUM(NET_AMOUNT) FROM [BILL] as t1 Where t1.[GROUP] ='" & grp & "' AND t1.GODWN_NO='" & gdn & "' AND (t1.REC_NO='" & inv & "' and  t1.REC_DATE=format('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) AS balance,IIF(t2.rec_no Is Not null,TRUE,FALSE) AS checker From [BILL] As t2 INNER Join [PARTY] On t2.P_CODE=[PARTY].P_CODE Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND ((t2.REC_NO='" & inv & "' AND t2.REC_DATE=format('" & Convert.ToDateTime(invdt) & "','dd/mm/yyyy'))) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO", xcon)
 
                                 Do While chkrs22.EOF = False
-                                    'sgsrate = chkrs2.Fields(8).Value
-                                    'cgsrate = chkrs2.Fields(6).Value
-                                    'sgamt = chkrs2.Fields(9).Value
-                                    'cgamt = chkrs2.Fields(7).Value
                                     If chkrs22.Fields(13).Value >= inv And chkrs22.Fields(14).Value <= invdt And chkrs11.Fields(3).Value >= chkrs22.Fields(4).Value Then
                                         If FIRSTREC Then
                                             chkrs6.Open("Select FROM_DATE,TO_DATE FROM BILL_TR WHERE [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND INVOICE_NO='" & chkrs22.Fields(0).Value & "' and  BILL_DATE=format('" & Convert.ToDateTime(chkrs22.Fields(4).Value) & "','dd/mm/yyyy') ", xcon)
@@ -2958,7 +2886,6 @@ Public Class FrmGodwnDtl
                                     against3 = against3.Substring(0, against3.Length - 2)
                                 End If
                                 '''''''''''''''''''against bill and period end''''''''''''
-                                '    Print(fnum, GetStringToPrint(15, " ", "S") & vbNewLine)
 
                                 ''''''''''''''find out if any advance is left after adjustment start
                                 Dim advanceamt As Double = 0
@@ -2971,7 +2898,6 @@ Public Class FrmGodwnDtl
                                     Dim Rss As String = "SELECT T2.INVOICE_NO,T2.GROUP,T2.GODWN_NO,T2.P_CODE,T2.BILL_DATE,T2.BILL_AMOUNT,T2.CGST_RATE,T2.CGST_AMT,T2.SGST_RATE,T2.SGST_AMT,T2.NET_AMOUNT,T2.HSN,T2.SRNO,T2.REC_NO,T2.REC_DATE,[GODOWN].FROM_D From [BILL] As t2 inner join GODOWN on t2.[GROUP]=[GODOWN].[GROUP] AND t2.[GODWN_NO]=[GODOWN].GODWN_NO Where t2.[GROUP] ='" & grp & "' AND t2.GODWN_NO='" & gdn & "' AND T2.P_CODE='" & pcode1 & "' AND ((t2.REC_NO IS NOT NULL AND t2.REC_DATE IS NOT NULL)) order by t2.BILL_DATE,t2.GROUP,t2.GODWN_NO"
                                     chkrs55.Open(Rss, xcon)
                                     Do While chkrs55.EOF = False
-                                        '  chkrs5.MoveLast()
                                         If chkrs11.Fields(3).Value >= chkrs55.Fields(4).Value Then
                                             lastbilladjusted = chkrs55.Fields(0).Value
                                             last_bldate = chkrs55.Fields(4).Value
@@ -2985,8 +2911,6 @@ Public Class FrmGodwnDtl
                                         Rss = "SELECT FROM_D From GODOWN Where [GROUP] ='" & grp & "' AND GODWN_NO='" & gdn & "' AND [STATUS]='C' AND P_CODE='" & pcode1 & "' order by [GROUP]+GODWN_NO"
                                         chkrs55.Open(Rss, xcon)
                                         If chkrs55.EOF = False Then
-                                            ' chkrs5.MoveLast()
-                                            'lastbilladjusted = chkrs5.Fields(13).Value
                                             last_bldate = chkrs55.Fields(0).Value
                                         End If
                                         chkrs55.Close()
@@ -3008,10 +2932,8 @@ Public Class FrmGodwnDtl
                                                 advanceamt = advanceamt - net
                                                 TONO = FROMNO
                                                 FIRSTREC = False
-                                                'last_bldate = chkrs5.Fields(0).Value
                                             End If
                                         Else
-                                            '  TONO = MonthName(sdt.AddMonths(dtcounter).Month, False) & "-" & sdt.AddMonths(dtcounter).Year
                                             TONO = MonthName(last_bldate.AddMonths(dtcounter).Month, False) & "-" & last_bldate.AddMonths(dtcounter).Year
                                             advanceamt = advanceamt - net
                                             dtcounter = dtcounter + 1
@@ -3033,21 +2955,18 @@ Public Class FrmGodwnDtl
                                 xline = xline + 1
                                 If Trim(against1).Equals("") Then
                                 Else
-                                    '    against1 = against1.Substring(0, against1.Length - 2)
                                     Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against1, "S") & vbNewLine)
                                     Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against1, "S") & vbNewLine)
                                     xline = xline + 1
                                 End If
                                 If Trim(against2).Equals("") Then
                                 Else
-                                    '   against2 = against2.Substring(0, against2.Length - 2)
                                     Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against2, "S") & vbNewLine)
                                     Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against2, "S") & vbNewLine)
                                     xline = xline + 1
                                 End If
                                 If Trim(against3).Equals("") Then
                                 Else
-                                    '  against3 = against3.Substring(0, against3.Length - 2)
                                     Print(fnum, GetStringToPrint(17, "", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, " ", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(12, "", "S") & GetStringToPrint(7, "", "N") & GetStringToPrint(13, "", "N") & GetStringToPrint(63, against3, "S") & vbNewLine)
                                     Print(fnumm, GetStringToPrint(17, "", "S") & "," & GetStringToPrint(17, "", "S") & "," & GetStringToPrint(13, " ", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(12, "", "S") & "," & GetStringToPrint(7, "", "N") & "," & GetStringToPrint(13, "", "N") & "," & GetStringToPrint(63, against3, "S") & vbNewLine)
                                     xline = xline + 1
@@ -3081,7 +3000,7 @@ Public Class FrmGodwnDtl
                 End If
                 Dim otst As Double = 0
                 Dim prvdt As String = ""
-                If IsDBNull(chkrs2.Fields(21).Value) Then   'Contact Person
+                If IsDBNull(chkrs2.Fields(21).Value) Then
                 Else
                     otst = chkrs2.Fields(21).Value
                 End If
@@ -3090,8 +3009,6 @@ Public Class FrmGodwnDtl
                 If chkrs2.BOF = False Then
                     chkrs2.MoveNext()
                 End If
-                '  Print(fnum, StrDup(180, "-") & vbNewLine)
-                ' Print(fnum, GetStringToPrint(17, "Total-->", "S") & GetStringToPrint(17, "", "S") & GetStringToPrint(13, Format(totamt, "########0.00"), "N") & GetStringToPrint(13, Format(totadv, "######0.00"), "N") & GetStringToPrint(12, "  ", "S") & GetStringToPrint(7, "", "S") & GetStringToPrint(13, "", "S") & GetStringToPrint(50, "", "S") & GetStringToPrint(33, "", "S") & vbNewLine)
                 Print(fnum, GetStringToPrint(20, "  ", "S") & vbNewLine)
                 Print(fnumm, GetStringToPrint(20, "  ", "S") & vbNewLine)
                 If (otst > 0) Then
@@ -3122,9 +3039,10 @@ Public Class FrmGodwnDtl
             FileClose(fnumm)
             MyConn.Close()
             FrmGdnDtlView.RichTextBox1.LoadFile(Application.StartupPath & "\Reports\Godowndetail.dat", RichTextBoxStreamType.PlainText)
-            ''''''''''''''''''''
-            CreatePDF(Application.StartupPath & "\Reports\Godowndetail.dat", Application.StartupPath & "\Reports\Godowndetail")
+
             FrmGdnDtlView.Show()
+            CreatePDF(Application.StartupPath & "\Reports\Godowndetail.dat", Application.StartupPath & "\Reports\Godowndetail")
+
             Dim PrintPDFFile As New ProcessStartInfo
             PrintPDFFile.UseShellExecute = True
 
@@ -3140,11 +3058,10 @@ Public Class FrmGodwnDtl
     End Sub
 
     Private Sub TxtSrch_KeyUp(sender As Object, e As KeyEventArgs) Handles TxtSrch.KeyUp
+        '''''''''search godown datagrid for the text user type in search text box
         MyConn = New OleDbConnection(connString)
-        'If MyConn.State = ConnectionState.Closed Then
         MyConn.Open()
-        da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where " & indexorder & " Like '%" & TxtSrch.Text & "%' ORDER BY [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
-        'da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where [GODOWN].GROUP Like '%" & TxtSrch.Text & "%' ORDER BY [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
+        da = New OleDb.OleDbDataAdapter("SELECT [GODOWN].*,[PARTY].P_NAME from [GODOWN] INNER JOIN [PARTY] on [GODOWN].P_CODE=[PARTY].P_CODE where [godown].[status]='C' and " & indexorder & " Like '%" & TxtSrch.Text & "%' ORDER BY [GODOWN].GROUP+[GODOWN].GODWN_NO", MyConn)
         ds = New DataSet
         ds.Clear()
         da.Fill(ds, "GODOWN")
@@ -3153,4 +3070,5 @@ Public Class FrmGodwnDtl
         ds.Dispose()
         MyConn.Close() ' clouse connection
     End Sub
+
 End Class

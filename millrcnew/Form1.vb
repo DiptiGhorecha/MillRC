@@ -82,7 +82,7 @@ Public Class MainMDIForm
 
     Private Sub GroupToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GroupToolStripMenuItem.Click
 
-
+        ''''''Form2.vb
         If Application.OpenForms().OfType(Of FrmGodownType).Any Then
             FrmGodownType.BringToFront()
         Else
